@@ -29,6 +29,22 @@
     });
   }
 
+  // Reveal project visuals as they enter the viewport; avoid scroll-jacking/parallax.
+  const scrollImages = document.querySelectorAll('[data-image-scroll]');
+  if (!reducedMotion && 'IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('image-in-view');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -24px 0px' });
+    scrollImages.forEach((item) => imageObserver.observe(item));
+  } else {
+    scrollImages.forEach((item) => item.classList.add('image-in-view'));
+  }
+
   const year = document.querySelector('#year');
   if (year) year.textContent = new Date().getFullYear();
 
