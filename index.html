@@ -12,6 +12,56 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="about-motion.css">
+  <style>
+    /* NatexWorks menu distance + hover burst */
+    .menu-toggle {
+      right: max(12px, calc((100vw - var(--wrap)) / 2 - 10px)) !important;
+      transform-origin: center;
+      isolation: isolate;
+      overflow: visible;
+      transition: transform .55s cubic-bezier(.2,.85,.25,1.3), background .25s ease, color .25s ease, border-color .25s ease, box-shadow .35s ease !important;
+    }
+    .menu-toggle::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      z-index: -1;
+      border: 1px solid var(--lime);
+      opacity: 0;
+      transform: scale(.72) rotate(-25deg);
+      transition: opacity .25s ease, transform .45s cubic-bezier(.2,.85,.25,1.3);
+      pointer-events: none;
+    }
+    .menu-toggle:hover {
+      background: var(--lime) !important;
+      color: #10120f !important;
+      border-color: var(--lime) !important;
+      box-shadow: 0 0 0 4px #c5f36b20, 0 0 28px #c5f36b70 !important;
+      transform: rotate(180deg) scale(1.09) translateY(-2px) !important;
+    }
+    .menu-toggle:hover::before {
+      opacity: 1;
+      transform: scale(1.12) rotate(0);
+      animation: menuHoverPulse 1.1s ease-in-out infinite alternate;
+    }
+    .menu-toggle:hover span {
+      background: currentColor !important;
+    }
+    @keyframes menuHoverPulse {
+      from { box-shadow: 0 0 0 0 #c5f36b00; }
+      to { box-shadow: 0 0 0 8px #c5f36b22; }
+    }
+    @media (max-width: 700px) {
+      .menu-toggle { right: 4px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .menu-toggle, .menu-toggle::before {
+        animation: none !important;
+        transition: none !important;
+      }
+      .menu-toggle:hover { transform: none !important; }
+    }
+  </style>
   <script src="script.js" defer></script>
 </head>
 <body>
