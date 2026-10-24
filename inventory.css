@@ -171,8 +171,15 @@
 
 
 /* Final build-note sequencing: aligned headline left, typed explanation right. */
-@media(min-width:651px){.topbar .back-link{margin-right:74px}}@media(max-width:650px){.topbar .back-link{margin-right:64px;position:relative;z-index:1003}}
+@media(min-width:651px){.topbar .back-link{margin-right:94px}}@media(max-width:650px){.topbar .back-link{margin-right:64px;position:relative;z-index:1003}}
 .build-note .build-note-copy [data-build-copy-type].is-typing::after{content:"▍";display:inline-block;margin-left:2px;color:var(--lime);animation:buildTypeCursor .75s steps(2,end) infinite}
 .build-note.is-build-sequence-running:not(.is-copy-complete) .build-note-detail .text-link{opacity:0;visibility:hidden;transform:translateY(6px)}
 .build-note.is-copy-complete .build-note-detail .text-link{opacity:1;visibility:visible;transform:translateY(0);transition:opacity .45s ease,transform .45s ease}
 @media(prefers-reduced-motion:reduce){.build-note .build-note-copy [data-build-copy-type].is-typing::after{display:none}.build-note .build-note-detail .text-link{opacity:1!important;visibility:visible!important;transform:none!important}}
+
+
+/* Portfolio link: icon, spacing, and subtle hover feedback */
+.topbar .back-link{display:inline-flex;align-items:center;gap:7px;transition:color .22s,border-color .22s,transform .22s}
+.topbar .back-link::before{content:"▤";font-size:12px;color:var(--lime);transition:transform .22s}
+.topbar .back-link:hover{color:var(--lime);border-color:var(--lime);transform:translateX(-3px)}
+.topbar .back-link:hover::before{transform:translateY(-2px)}
