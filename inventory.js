@@ -106,7 +106,7 @@
     if (animationFrames[key]) cancelAnimationFrame(animationFrames[key]);
     const start = resultValues[key] ?? 0; resultValues[key] = target;
     if (reducedMotion || start === target) { element.textContent = formatter(target); return; }
-    const started = performance.now(), duration = 2400;
+    const started = performance.now(), duration = window.matchMedia('(min-width: 951px)').matches ? 2400 : 850;
     const step = now => {
       const progress = Math.min(1, (now - started) / duration), eased = 1 - Math.pow(1 - progress, 3);
       element.textContent = formatter(start + (target - start) * eased);
