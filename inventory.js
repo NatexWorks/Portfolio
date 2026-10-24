@@ -135,8 +135,9 @@
     if (timeCaption) timeCaption.textContent = secondsSaved ? 'Estimated monthly time saved if the target is achieved' : 'No time difference based on the entered values';
   };
   if (form) {
-    form.addEventListener('submit', e => { e.preventDefault(); calculate(true); });
-    form.querySelectorAll('input').forEach(input => input.addEventListener('change', () => calculate(true)));
-    calculate(true);
+    // Keep the estimate live while typing; no submit button or blur/Enter action is needed.
+    form.addEventListener('submit', e => { e.preventDefault(); calculate(false); });
+    form.querySelectorAll('input').forEach(input => input.addEventListener('input', () => calculate(false)));
+    calculate(false);
   }
 })();

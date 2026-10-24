@@ -67,3 +67,58 @@
   .js-motion .workflow-card.reveal.is-visible:hover { transform: translateY(-5px); }
   .workflow-card:nth-child(n) { transition-delay: 0s; }
 }
+
+
+/* Refined inventory workflow cards: retain the compact original card height and animate each card in from its corner. */
+@media (min-width: 951px) {
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: min(100%, 820px);
+    margin-inline: auto;
+    padding-bottom: 0;
+  }
+  .workflow-grid .workflow-card {
+    position: relative;
+    top: auto;
+    inset: auto;
+    min-height: 245px;
+    height: 245px;
+    aspect-ratio: auto;
+    margin: 0;
+    padding: 22px;
+    box-shadow: 0 10px 24px #0002;
+    transition: opacity .72s ease, transform .78s cubic-bezier(.2,.75,.2,1), border-color .3s, background .3s, box-shadow .3s;
+  }
+  .workflow-grid .workflow-card:nth-child(1) { --entry-x: -42px; --entry-y: -42px; }
+  .workflow-grid .workflow-card:nth-child(2) { --entry-x: 42px; --entry-y: -42px; }
+  .workflow-grid .workflow-card:nth-child(3) { --entry-x: -42px; --entry-y: 42px; }
+  .workflow-grid .workflow-card:nth-child(4) { --entry-x: 42px; --entry-y: 42px; }
+  .js-motion .workflow-grid .workflow-card.reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translate(var(--entry-x, 0), var(--entry-y, 0));
+  }
+  .js-motion .workflow-grid .workflow-card.reveal.is-visible {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  .js-motion .workflow-grid .workflow-card.reveal.is-visible:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 34px #0004;
+  }
+}
+.calc-live-note {
+  margin: 12px 0 0;
+  color: var(--lime);
+  font: 9px/1.7 var(--mono);
+  letter-spacing: .025em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js-motion .workflow-grid .workflow-card.reveal,
+  .js-motion .workflow-grid .workflow-card.reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
