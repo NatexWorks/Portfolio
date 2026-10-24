@@ -37,27 +37,28 @@
     }, index * 480 + 180);
   });
 
-  // Type the headline first, then animate the paired green strokes before revealing the project copy.
+  // Type the headline, meet the two green strokes, then type the project copy in two speeds.
   const buildTypeTargets = [...document.querySelectorAll('[data-build-heading-type]')];
+  const buildCopyTargets = [...document.querySelectorAll('[data-build-copy-type]')];
   const buildNote = document.querySelector('.build-note');
-  if (buildTypeTargets.length && buildNote && !reducedMotion) {
+  if (buildNote && !reducedMotion) {
     buildNote.classList.add('is-build-sequence-running');
-    buildTypeTargets.forEach(target => { target.textContent = ''; });
-    const typeBuildTarget = targetIndex => {
-      const target = buildTypeTargets[targetIndex];
-      if (!target) {
-        buildNote.classList.add('is-build-sequence-complete');
-        window.setTimeout(() => buildNote.classList.add('is-detail-revealed'), 1120);
-        return;
-      }
-      const fullText = target.dataset.buildHeadingType || '';
+    [...buildTypeTargets, ...buildCopyTargets].forEach(target => { target.textContent = ''; });
+
+    const typeTextTarget = (targets, targetIndex, onComplete) => {
+      const target = targets[targetIndex];
+      if (!target) { onComplete?.(); return; }
+
+      const fullText = target.dataset.buildHeadingType || target.dataset.buildCopyType || '';
       const mode = target.dataset.buildMode || 'characters';
       const speed = Math.max(12, Number(target.dataset.buildSpeed) || 54);
       target.classList.add('is-typing');
+
       const finishTarget = () => {
         target.classList.remove('is-typing');
-        window.setTimeout(() => typeBuildTarget(targetIndex + 1), 150);
+        window.setTimeout(() => typeTextTarget(targets, targetIndex + 1, onComplete), 150);
       };
+
       if (mode === 'words') {
         const words = fullText.split(/\s+/).filter(Boolean);
         let wordIndex = 0;
@@ -67,7 +68,8 @@
           if (wordIndex < words.length) window.setTimeout(typeWord, speed);
           else finishTarget();
         };
-        typeWord();
+        if (words.length) typeWord();
+        else finishTarget();
       } else {
         let charIndex = 0;
         const typeCharacter = () => {
@@ -76,21 +78,33 @@
           if (charIndex < fullText.length) window.setTimeout(typeCharacter, speed);
           else finishTarget();
         };
-        typeCharacter();
+        if (fullText.length) typeCharacter();
+        else finishTarget();
       }
     };
-    if ('IntersectionObserver' in window) {
+
+    const startBuildSequence = () => typeTextTarget(buildTypeTargets, 0, () => {
+      buildNote.classList.add('is-build-sequence-complete');
+      window.setTimeout(() => {
+        buildNote.classList.add('is-detail-revealed');
+        window.setTimeout(() => {
+          typeTextTarget(buildCopyTargets, 0, () => buildNote.classList.add('is-copy-complete'));
+        }, 420);
+      }, 1120);
+    });
+
+    if (buildTypeTargets.length && 'IntersectionObserver' in window) {
       const buildObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             observer.unobserve(entry.target);
-            window.setTimeout(() => typeBuildTarget(0), 120);
+            window.setTimeout(startBuildSequence, 120);
           }
         });
       }, { threshold: .12 });
       buildObserver.observe(buildNote);
-    } else {
-      typeBuildTarget(0);
+    } else if (buildTypeTargets.length) {
+      startBuildSequence();
     }
   }
 
