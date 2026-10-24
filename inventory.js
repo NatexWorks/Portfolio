@@ -150,6 +150,9 @@
   }
 
   const form = document.querySelector('#savings-form');
+  const workDaysInput = document.querySelector('#work-days');
+  const daysCapWarning = document.querySelector('#days-cap-warning');
+  let workDaysExceededCap = false;
   const money = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n);
   const get = id => Math.max(0, Number(document.querySelector('#'+id)?.value || 0));
   const resultValues = {annual:0, hours:0}, animationFrames = {};
@@ -169,7 +172,9 @@
   };
   const calculate = animate => {
     const annual = (get('current-cost') - get('custom-cost')) * 12;
-    const bills = get('bills-day') * get('work-days');
+    const workingDays = Math.min(31, get('work-days'));
+    const bills = get('bills-day') * workingDays;
+    if (daysCapWarning) daysCapWarning.hidden = !workDaysExceededCap;
     const secondsSaved = Math.max(0, get('current-seconds') - get('target-seconds'));
     const hours = bills * secondsSaved / 3600;
     const annualEl = document.querySelector('#annual-savings'), timeEl = document.querySelector('#time-saved');
@@ -189,6 +194,17 @@
   if (form) {
     form.addEventListener('submit', e => { e.preventDefault(); calculate(true); });
     let calculationTimer;
+    if (workDaysInput) {
+      workDaysInput.addEventListener('input', () => {
+        const enteredDays = Number(workDaysInput.value);
+        if (workDaysInput.value !== '' && enteredDays > 31) {
+          workDaysExceededCap = true;
+          workDaysInput.value = '31';
+        } else {
+          workDaysExceededCap = false;
+        }
+      });
+    }
     form.querySelectorAll('input').forEach(input => input.addEventListener('input', () => {
       window.clearTimeout(calculationTimer);
       calculationTimer = window.setTimeout(() => calculate(true), 120);
