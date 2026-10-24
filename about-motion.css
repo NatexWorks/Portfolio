@@ -30,3 +30,44 @@
   .about-word-heading .about-word { animation: none !important; opacity: 1; transform: none; filter: none; }
   .typing-line.is-typing::after { animation: none; }
 }
+
+
+/* Contact section: restrained heading reveal, paragraph line reveal, and clear CTA feedback. */
+.js-motion .contact-card.reveal.is-visible .contact-heading-line {
+  display: inline-block;
+  animation: contactHeadingArrive .65s both cubic-bezier(.2,.75,.2,1);
+}
+.js-motion .contact-card.reveal.is-visible .contact-heading-line:first-child { animation-delay: .08s; }
+.js-motion .contact-card.reveal.is-visible .contact-heading-accent { animation-delay: .22s; }
+.js-motion .contact-copy {
+  opacity: 1;
+  transform: none;
+}
+.js-motion .contact-card.reveal.is-visible .contact-copy {
+  animation: contactCopyArrive .7s .34s both ease-out;
+}
+.contact-card .button-primary {
+  transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.contact-card .button-primary:hover,
+.contact-card .button-primary:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 9px 26px #c5f36b22, 0 0 0 1px #c5f36b44;
+}
+.contact-orb { animation: contactOrbBreathe 7s 1s ease-in-out infinite alternate; transform-origin: center; }
+@keyframes contactHeadingArrive {
+  from { opacity: 0; transform: translateY(15px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes contactCopyArrive {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes contactOrbBreathe {
+  from { opacity: .48; transform: scale(.96); }
+  to { opacity: .8; transform: scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-heading-line, .contact-copy, .contact-orb { animation: none !important; opacity: 1; transform: none; filter: none; }
+  .contact-card .button-primary { transition: none !important; }
+}
