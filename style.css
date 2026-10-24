@@ -176,3 +176,25 @@
 @media (min-width: 951px) and (prefers-reduced-motion: reduce) {
   .hero-headline .headline-word { animation: none; }
 }
+
+
+/* Laptop-only diagonal entrance for the café / local-business concept card. */
+@media (min-width: 951px) {
+  .js-motion .project-card:nth-child(3).reveal {
+    opacity: 0;
+    transform: translate(-56px, 56px);
+    transition: opacity .7s ease, transform .8s cubic-bezier(.2,.75,.2,1);
+  }
+  .js-motion .project-card:nth-child(3).reveal.is-visible {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+@media (min-width: 951px) and (prefers-reduced-motion: reduce) {
+  .js-motion .project-card:nth-child(3).reveal,
+  .js-motion .project-card:nth-child(3).reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
