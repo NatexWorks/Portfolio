@@ -1,18 +1,18 @@
 (() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // One-time logo collision reveal: the visual overlay travels to the existing header brand, without changing page layout.
+  // Only the NX mark emerges from the collision cloud and travels to the existing header mark.
   const brandIntro = document.querySelector('#brand-collision-intro');
-  const targetBrand = document.querySelector('.site-header > .brand');
-  const introLogo = document.querySelector('.brand-intro-final');
-  if (brandIntro && targetBrand && introLogo && !reducedMotion && typeof introLogo.animate === 'function') {
+  const targetMark = document.querySelector('.site-header > .brand .brand-mark');
+  const introMark = document.querySelector('.brand-intro-final');
+  if (brandIntro && targetMark && introMark && !reducedMotion && typeof introMark.animate === 'function') {
     document.documentElement.classList.add('brand-intro-running');
     window.setTimeout(() => {
-      introLogo.classList.add('is-revealed');
+      introMark.classList.add('is-revealed');
       window.setTimeout(() => {
-        const targetRect = targetBrand.getBoundingClientRect();
-        const travel = introLogo.animate([
-          { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', filter: 'drop-shadow(0 0 18px #c5f36b55)' },
-          { left: `${targetRect.left}px`, top: `${targetRect.top}px`, transform: 'translate(0, 0) scale(1)', filter: 'drop-shadow(0 0 0 transparent)' }
+        const targetRect = targetMark.getBoundingClientRect();
+        const travel = introMark.animate([
+          { left: '50%', top: '50%', width: '58px', height: '58px', fontSize: '25px', transform: 'translate(-50%, -50%) scale(1)', filter: 'drop-shadow(0 0 18px #c5f36b55)' },
+          { left: `${targetRect.left}px`, top: `${targetRect.top}px`, width: `${targetRect.width}px`, height: `${targetRect.height}px`, fontSize: '14px', transform: 'translate(0, 0) scale(1)', filter: 'drop-shadow(0 0 0 transparent)' }
         ], { duration: 780, easing: 'cubic-bezier(.2,.75,.2,1)', fill: 'forwards' });
         travel.onfinish = () => {
           brandIntro.remove();
@@ -21,7 +21,7 @@
       }, 260);
     }, 850);
   } else if (brandIntro) {
-    brandIntro.remove();
+    brandIntro?.remove();
   }
 
   const menuButton = document.querySelector('.menu-toggle');
