@@ -31,8 +31,8 @@
     <section class="hero wrap" id="overview">
       <div class="hero-copy reveal">
         <div class="eyebrow"><i></i> MERN STACK · BUSINESS SOFTWARE</div>
-        <h1>Less guesswork.<br><em>More control.</em></h1>
-        <p class="hero-intro">An inventory management system built around the everyday work of small retailers: products, stock visibility, billing workflows, and useful business insights in one place.</p>
+        <h1>Less <span class="typewriter-word" data-typewriter="guesswork">guesswork</span>.<br><em><span class="typewriter-accent" data-typewriter="More control">More control</span></em>.</h1>
+        <p class="hero-intro intro-reveal">An inventory management system built around the everyday work of small retailers: products, stock visibility, billing workflows, and useful business insights in one place.</p>
         <div class="hero-actions">
           <a class="button primary" href="https://inventory-system-mu-puce.vercel.app/" target="_blank" rel="noreferrer">Open live demo <span>↗</span></a>
           <a class="button secondary" href="#workflows">Explore the build <span>↓</span></a>
@@ -40,7 +40,7 @@
         <div class="hero-meta"><span><b>01</b> Featured build</span><span><b>MERN</b> Stack</span><span><b>Retail</b> Workflows</span></div>
       </div>
       <div class="product-stage reveal-left" aria-label="Illustrative interface preview based on the inventory project">
-        <div class="stage-top"><span class="window-dots"><i></i><i></i><i></i></span><span>INVENTORY / OVERVIEW</span><span class="live-tag"><i></i> SAMPLE WORKSPACE</span></div>
+        <div class="stage-top"><span class="window-dots" role="group" aria-label="Switch preview screen"><button type="button" class="window-dot is-active" data-preview="overview" aria-label="Show overview preview" aria-pressed="true"></button><button type="button" class="window-dot" data-preview="products" aria-label="Show products preview" aria-pressed="false"></button><button type="button" class="window-dot" data-preview="billing" aria-label="Show billing preview" aria-pressed="false"></button></span><span>INVENTORY / OVERVIEW</span><span class="live-tag"><i></i> SAMPLE WORKSPACE</span></div>
         <div class="app-frame">
           <aside class="app-sidebar">
             <div class="app-logo">N<span>×</span></div>
@@ -70,10 +70,10 @@
         </div>
         <div class="stage-caption"><span>INTERFACE PREVIEW</span><span>Illustrative sample data · not a live screenshot</span></div>
       </div>
-      <div class="hero-scroll"><span>SCROLL TO EXPLORE</span><i></i><span>PRODUCT · PROCESS · OUTCOME</span></div>
+      <a class="hero-scroll" href="#problem" aria-label="Scroll to the problem section"><span>SCROLL TO EXPLORE</span><i></i><span>PRODUCT · PROCESS · OUTCOME ↓</span></a>
     </section>
 
-    <section class="problem-band">
+    <section class="problem-band" id="problem">
       <div class="wrap problem-inner reveal"><div><div class="eyebrow">THE PROBLEM</div><h2>Stock records shouldn't<br>slow a business down.</h2></div><p>When products, stock counts, billing, and reporting live in separate places, everyday work can mean repeated entry, missed updates, and slower decisions. This project explores a more connected workflow for small retailers.</p></div>
     </section>
 
@@ -84,8 +84,8 @@
         <article class="workflow-card reveal"><span class="workflow-icon">◫</span><span class="card-index">02 / STOCK</span><h3>Inventory visibility</h3><p>Track stock levels, spot low-stock items, and get a clearer view of what needs attention.</p><div class="card-foot"><span>STOCK TRACKING</span><span>↗</span></div></article>
         <article class="workflow-card reveal"><span class="workflow-icon">▦</span><span class="card-index">03 / CHECKOUT</span><h3>POS & billing flow</h3><p>Bring product lookup and sales workflows closer together instead of juggling disconnected steps.</p><div class="card-foot"><span>SALES WORKFLOW</span><span>↗</span></div></article>
         <article class="workflow-card reveal"><span class="workflow-icon">⌗</span><span class="card-index">04 / LOOKUP</span><h3>Barcode-assisted flow</h3><p>Support faster item identification through barcode-based product lookup where the scanner setup is supported.</p><div class="card-foot"><span>PRODUCT LOOKUP</span><span>↗</span></div></article>
-        <article class="workflow-card reveal"><span class="workflow-icon">⌁</span><span class="card-index">05 / REPORTS</span><h3>Useful business signals</h3><p>Bring key stock and product information into a dashboard that is easier to scan.</p><div class="card-foot"><span>REPORTING</span><span>↗</span></div></article>
-        <article class="workflow-card reveal"><span class="workflow-icon">◎</span><span class="card-index">06 / TEAM</span><h3>Room to fit the team</h3><p>Shape access and workflows around the roles and day-to-day needs of the business.</p><div class="card-foot"><span>BUSINESS-SPECIFIC</span><span>↗</span></div></article>
+        
+        
       </div>
       <p class="small-note">The live demo is the source of truth for currently enabled flows. Some business-specific features may need configuration or further implementation before production use.</p>
     </section>
@@ -105,19 +105,19 @@
     </section>
 
     <section class="wrap calculator-section section-space" id="calculator">
-      <div class="section-heading reveal"><div><div class="eyebrow">04 / MAKE THE COMPARISON YOURS</div><h2>Estimate the<br><em>possible difference.</em></h2></div><p>Change the example values to match your shop. The calculator compares your own cost and billing-time assumptions—it's not a guaranteed saving claim.</p></div>
+      <div class="section-heading reveal"><div><div class="eyebrow">04 / MAKE THE COMPARISON YOURS</div><h2>Estimate the<br><em>possible difference.</em></h2></div><p><strong class="free-label">Inventory SaaS is free to use — ₹0/month.</strong> This example estimates a possible difference using sample shop numbers. Results are illustrative, not a guaranteed saving.</p></div>
       <div class="calculator-grid reveal">
         <form class="calc-form" id="savings-form">
-          <div class="form-heading"><span>EXAMPLE CALCULATOR</span><span class="edit-badge">EDIT VALUES</span></div>
+          <div class="form-heading"><span>ILLUSTRATIVE EXAMPLE</span><span class="edit-badge">FREE TO USE · ₹0/MO</span></div>
           <label>Current POS / software cost per month (₹)<input type="number" id="current-cost" min="0" step="100" value="1500"></label>
-          <label>Proposed custom solution cost per month (₹)<input type="number" id="custom-cost" min="0" step="100" value="1000"></label>
+          <label>Inventory SaaS cost per month (₹)<input type="number" id="custom-cost" min="0" step="100" value="0" readonly aria-label="Inventory SaaS is free to use, zero rupees per month"></label>
           <div class="input-pair"><label>Bills per day<input type="number" id="bills-day" min="0" max="5000" value="80"></label><label>Working days / month<input type="number" id="work-days" min="1" max="31" value="26"></label></div>
           <div class="input-pair"><label>Current seconds per bill<input type="number" id="current-seconds" min="1" max="3600" value="45"></label><label>Target seconds per bill<input type="number" id="target-seconds" min="1" max="3600" value="30"></label></div>
           <button class="button primary calc-button" type="submit">Update estimate ↗</button>
           <p class="calc-disclaimer">Illustrative only. Excludes setup, hardware, training, tax, maintenance, and any feature development not included in the proposed price.</p>
         </form>
         <div class="calc-results" aria-live="polite">
-          <div class="result-label">YOUR INPUT-BASED ESTIMATE</div>
+          <div class="result-label">SAMPLE ESTIMATE · NOT A PROMISE</div>
           <div class="result-block"><span>Potential annual software-cost difference</span><strong id="annual-savings">₹6,000</strong><small id="cost-caption">Based on the monthly amounts entered</small></div>
           <div class="result-block"><span>Potential billing time saved / month</span><strong id="time-saved">8.7 hrs</strong><small id="time-caption">If the target time is achieved consistently</small></div>
           <div class="result-foot"><span class="result-dot"></span><p>Use a real quote and time a sample of actual bills before presenting this estimate to a customer.</p></div>
@@ -125,10 +125,11 @@
       </div>
     </section>
 
-    <section class="wrap build-note section-space reveal"><div class="build-mark">N<span>×</span></div><div><div class="eyebrow">BUILT BY MANISH</div><h2>I like building products<br>that solve real problems.</h2><p>This project is a foundation for business-specific software. The right solution starts by understanding the workflow, then choosing the features that actually remove friction.</p><a class="text-link" href="https://github.com/NatexWorks/Inventory-Management-System" target="_blank" rel="noreferrer">Explore the code on GitHub ↗</a></div></section>
+    <section class="wrap build-note section-space reveal" id="about"><div class="build-mark">N<span>×</span></div><div><div class="eyebrow">BUILT BY MANISH</div><h2 class="build-heading">I like building products<br><span>that solve real problems.</span></h2><p>This project is a foundation for business-specific software. The right solution starts by understanding the workflow, then choosing the features that actually remove friction.</p><a class="text-link" href="https://github.com/NatexWorks/Inventory-Management-System" target="_blank" rel="noreferrer">Explore the code on GitHub ↗</a></div></section>
 
     <section class="contact-section" id="contact"><div class="wrap contact-card reveal"><div><div class="eyebrow"><i></i> HAVE A BUSINESS WORKFLOW IN MIND?</div><h2>Let's build what<br><em>your business needs.</em></h2><p>Need a website, an inventory tool, or a custom workflow? Tell me what is slowing your business down.</p></div><div class="contact-actions"><a class="button primary" href="mailto:natexworks@gmail.com?subject=Custom%20business%20solution%20enquiry">Discuss your project ↗</a><a class="text-link" href="index.html">Back to portfolio <span>↗</span></a></div></div></section>
   </main>
+  <button class="scroll-next" type="button" aria-label="Scroll to next section"><span>NEXT SECTION</span><b>↓</b></button>
   <footer class="footer wrap"><a class="brand" href="index.html"><span class="brand-mark">N<span>×</span></span><span>NatexWorks<span class="brand-dot">.</span></span></a><span>INVENTORY MANAGEMENT SYSTEM / CASE STUDY</span><a href="#overview">BACK TO TOP ↑</a></footer>
 </body>
 </html>
