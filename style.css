@@ -154,3 +154,25 @@
  .service-detail ul{grid-column:2}
  .service-principle{grid-template-columns:1fr;padding:22px;gap:16px}
 }
+
+
+/* Laptop-only reverse word reveal: reserve the headline layout, reveal from the final word backwards. */
+@media (min-width: 951px) {
+  .hero-headline .hero-line { animation: none; }
+  .hero-headline .headline-word {
+    display: inline-block;
+    animation: headlineWordIn .58s both cubic-bezier(.2,.75,.2,1);
+  }
+  .hero-headline .word-solutions { animation-delay: .08s; }
+  .hero-headline .word-custom { animation-delay: .26s; }
+  .hero-headline .word-websites { animation-delay: .44s; }
+  .hero-headline .word-than { animation-delay: .62s; }
+  .hero-headline .word-more { animation-delay: .80s; }
+}
+@keyframes headlineWordIn {
+  from { opacity: 0; transform: translateY(12px); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@media (min-width: 951px) and (prefers-reduced-motion: reduce) {
+  .hero-headline .headline-word { animation: none; }
+}
