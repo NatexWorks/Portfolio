@@ -136,3 +136,10 @@
 /* Keep the first headline line neutral; only the second line carries the moving green underline. */
 .build-note .build-heading .build-heading-line{display:inline;color:inherit;position:static}
 .build-note .build-heading .build-heading-line::after{content:none}
+
+
+/* Working-days cap warning: keep it next to the time result without changing the calculator layout. */
+.time-result-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.time-result-line #time-saved{margin-right:0}
+.time-result-line .days-cap-warning{display:inline-block;max-width:200px;margin:6px 0;color:#ff6666;font-size:9px;line-height:1.55;font-weight:600}
+.time-result-line .days-cap-warning[hidden]{display:none!important}
