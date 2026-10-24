@@ -287,3 +287,37 @@
   }
   .brand-flash, .brand-cloud { display: none; }
 }
+
+
+/* About section: staggered word reveal and paced, accessible typewriter copy. */
+.about-word-heading .about-word {
+  display: inline-block;
+  opacity: 1;
+  transform: none;
+}
+.js-motion .about-inner.is-visible .about-word-heading .about-word {
+  animation: aboutWordArrive .48s both cubic-bezier(.2,.75,.2,1);
+}
+.js-motion .about-inner.is-visible .about-word-heading .about-word:nth-of-type(1) { animation-delay: .06s; }
+.js-motion .about-inner.is-visible .about-word-heading .about-word:nth-of-type(2) { animation-delay: .17s; }
+.js-motion .about-inner.is-visible .about-word-heading .about-word:nth-of-type(3) { animation-delay: .28s; }
+.js-motion .about-inner.is-visible .about-word-heading .about-word:nth-of-type(4) { animation-delay: .39s; }
+.js-motion .about-inner.is-visible .about-word-heading .about-word:nth-of-type(5) { animation-delay: .50s; }
+.js-motion .about-inner.is-visible .about-word-heading .about-word:nth-of-type(6) { animation-delay: .61s; }
+@keyframes aboutWordArrive {
+  from { opacity: 0; transform: translateY(12px); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.about-typing-copy { line-height: 1.9; }
+.typing-line { white-space: normal; }
+.typing-line.is-typing::after {
+  content: "▍";
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--lime);
+  animation: cursorBlink .75s steps(2,end) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-word-heading .about-word { animation: none !important; opacity: 1; transform: none; filter: none; }
+  .typing-line.is-typing::after { animation: none; }
+}
