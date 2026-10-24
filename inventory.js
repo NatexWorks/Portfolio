@@ -37,15 +37,20 @@
     }, index * 480 + 180);
   });
 
-  // The Built by Manish section types only when it scrolls into view; reduced-motion users keep the full text.
-  const buildTypeTargets = [...document.querySelectorAll('[data-build-type]')];
+  // Type the headline first, then animate the paired green strokes before revealing the project copy.
+  const buildTypeTargets = [...document.querySelectorAll('[data-build-heading-type]')];
   const buildNote = document.querySelector('.build-note');
   if (buildTypeTargets.length && buildNote && !reducedMotion) {
+    buildNote.classList.add('is-build-sequence-running');
     buildTypeTargets.forEach(target => { target.textContent = ''; });
     const typeBuildTarget = targetIndex => {
       const target = buildTypeTargets[targetIndex];
-      if (!target) return;
-      const fullText = target.dataset.buildType || '';
+      if (!target) {
+        buildNote.classList.add('is-build-sequence-complete');
+        window.setTimeout(() => buildNote.classList.add('is-detail-revealed'), 1120);
+        return;
+      }
+      const fullText = target.dataset.buildHeadingType || '';
       const mode = target.dataset.buildMode || 'characters';
       const speed = Math.max(12, Number(target.dataset.buildSpeed) || 54);
       target.classList.add('is-typing');
@@ -54,7 +59,7 @@
         window.setTimeout(() => typeBuildTarget(targetIndex + 1), 150);
       };
       if (mode === 'words') {
-        const words = fullText.split(/\s+/).filter(Boolean);
+        const words = fullText.split(/\\s+/).filter(Boolean);
         let wordIndex = 0;
         const typeWord = () => {
           target.textContent += (wordIndex ? ' ' : '') + words[wordIndex];
