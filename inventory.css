@@ -171,7 +171,7 @@
 
 
 /* Final build-note sequencing: aligned headline left, typed explanation right. */
-@media(min-width:651px){.topbar{padding-right:72px}}
+@media(min-width:651px){.topbar .back-link{margin-right:64px}}
 .build-note .build-note-copy [data-build-copy-type].is-typing::after{content:"▍";display:inline-block;margin-left:2px;color:var(--lime);animation:buildTypeCursor .75s steps(2,end) infinite}
 .build-note.is-build-sequence-running:not(.is-copy-complete) .build-note-detail .text-link{opacity:0;visibility:hidden;transform:translateY(6px)}
 .build-note.is-copy-complete .build-note-detail .text-link{opacity:1;visibility:visible;transform:translateY(0);transition:opacity .45s ease,transform .45s ease}
