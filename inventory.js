@@ -59,7 +59,7 @@
         window.setTimeout(() => typeBuildTarget(targetIndex + 1), 150);
       };
       if (mode === 'words') {
-        const words = fullText.split(/\\s+/).filter(Boolean);
+        const words = fullText.split(/\s+/).filter(Boolean);
         let wordIndex = 0;
         const typeWord = () => {
           target.textContent += (wordIndex ? ' ' : '') + words[wordIndex];
