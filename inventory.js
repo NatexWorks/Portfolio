@@ -23,8 +23,7 @@
   const form = document.querySelector('#savings-form');
   const money = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n);
   const get = id => Math.max(0, Number(document.querySelector('#'+id)?.value || 0));
-  const calculate = e => {
-    if (e) e.preventDefault();
+  const calculate = () => {
     const monthlyDiff = get('current-cost') - get('custom-cost');
     const annual = monthlyDiff * 12;
     const bills = get('bills-day') * get('work-days');
@@ -35,5 +34,9 @@
     document.querySelector('#time-saved').textContent = hours.toLocaleString('en-IN',{maximumFractionDigits:1}) + ' hrs';
     document.querySelector('#time-caption').textContent = secondsSaved ? 'Estimated monthly time saved if the target is achieved' : 'No time difference based on the entered values';
   };
-  if (form) { form.addEventListener('submit', calculate); form.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate)); calculate(); }
+  if (form) {
+    form.addEventListener('submit', e => { e.preventDefault(); calculate(); });
+    form.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
+    calculate();
+  }
 })();
