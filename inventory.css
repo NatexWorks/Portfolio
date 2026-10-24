@@ -168,3 +168,11 @@
 @keyframes buildSmokePuff{0%{opacity:0;transform:translate(-50%,-50%) scale(.25)}25%{opacity:.95;transform:translate(-50%,-58%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-68%) scale(1.75)}}
 @media(max-width:650px){.build-note{grid-template-columns:1fr;gap:24px}.build-note-main,.build-note-detail{width:100%}}
 @media(prefers-reduced-motion:reduce){.build-note .build-heading [data-build-heading-type].is-typing{border:0;padding-right:0}.build-line-effect{display:none!important}.build-note-detail{opacity:1!important;visibility:visible!important;filter:none!important;transform:none!important;transition:none!important}}
+
+
+/* Final build-note sequencing: aligned headline left, typed explanation right. */
+@media(min-width:651px){.topbar{padding-right:72px}}
+.build-note .build-note-copy [data-build-copy-type].is-typing::after{content:"▍";display:inline-block;margin-left:2px;color:var(--lime);animation:buildTypeCursor .75s steps(2,end) infinite}
+.build-note.is-build-sequence-running:not(.is-copy-complete) .build-note-detail .text-link{opacity:0;visibility:hidden;transform:translateY(6px)}
+.build-note.is-copy-complete .build-note-detail .text-link{opacity:1;visibility:visible;transform:translateY(0);transition:opacity .45s ease,transform .45s ease}
+@media(prefers-reduced-motion:reduce){.build-note .build-note-copy [data-build-copy-type].is-typing::after{display:none}.build-note .build-note-detail .text-link{opacity:1!important;visibility:visible!important;transform:none!important}}
