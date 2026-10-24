@@ -220,7 +220,7 @@ html.brand-intro-running .site-header>.brand .brand-mark{visibility:hidden}
 .brand-dust-cloud i:nth-child(5){width:11px;height:11px;right:2%;bottom:14%}
 .brand-intro-final{position:fixed;left:50%;top:50%;z-index:10001;width:58px;height:58px;display:grid;place-items:center;visibility:hidden;opacity:0;transform:translate(-50%,-50%) scale(.72);filter:drop-shadow(0 0 18px #c5f36b55);white-space:nowrap;pointer-events:none}
 .brand-intro-final.is-revealed{visibility:visible;opacity:1;transform:translate(-50%,-50%) scale(1);transition:opacity .25s ease,transform .3s cubic-bezier(.2,.75,.2,1)}
-.brand-intro-final.brand-mark{width:100%;height:100%;font-size:25px;letter-spacing:-.1em;border-color:var(--lime);box-shadow:0 0 24px #c5f36b55}
+.brand-intro-final.brand-mark{width:58px;height:58px;font-size:25px;letter-spacing:-.1em;border-color:var(--lime);box-shadow:0 0 24px #c5f36b55}
 @keyframes brandNatexImpact{0%{opacity:0;transform:translateX(-45vw) scale(.88)}18%{opacity:1}76%{opacity:1;transform:translateX(8px) scale(1)}100%{opacity:0;transform:translateX(8px) scale(.88)}}
 @keyframes brandWorksImpact{0%{opacity:0;transform:translateX(45vw) scale(.88)}18%{opacity:1}76%{opacity:1;transform:translateX(-8px) scale(1)}100%{opacity:0;transform:translateX(-8px) scale(.88)}}
 @keyframes brandDustBurst{0%{opacity:0;transform:translate(-50%,-45%) scale(.12)}22%{opacity:.95}62%{opacity:.82;transform:translate(-50%,-48%) scale(1.08)}100%{opacity:0;transform:translate(-50%,-53%) scale(1.28)}}
