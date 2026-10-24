@@ -29,3 +29,41 @@
 .scroll-next:hover{background:#242d1b;border-color:var(--lime);transform:translateY(-2px)}
 @media(max-width:650px){.workflow-grid{padding-bottom:5vh}.workflow-card{top:calc(70px + (var(--stack-index, 0) * 12px));min-height:220px;margin-bottom:12px;padding:18px}.scroll-next{right:12px;bottom:12px;padding:9px 10px}.scroll-next span{font-size:7px}.intro-reveal{animation-delay:.2s}}
 @media(prefers-reduced-motion:reduce){.typewriter-word::after,.typewriter-accent::after{display:none!important;animation:none!important}.intro-reveal{animation:none;opacity:1;transform:none;filter:none}.build-heading span::after{transition:none;transform:scaleX(1)}}
+
+
+/* Laptop-only: centred 2×2 workflow square with each card entering from its matching corner. */
+@media (min-width: 951px) {
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: min(100%, 1080px);
+    margin-inline: auto;
+    padding-bottom: 0;
+  }
+  .workflow-card {
+    position: relative;
+    inset: auto;
+    top: auto;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    margin: 0;
+    box-shadow: none;
+    transition: transform .75s cubic-bezier(.2,.7,.2,1), opacity .65s ease, border-color .3s, background .3s;
+  }
+  .workflow-card:nth-child(1) { z-index: auto; }
+  .workflow-card:nth-child(2) { z-index: auto; }
+  .workflow-card:nth-child(3) { z-index: auto; }
+  .workflow-card:nth-child(4) { z-index: auto; }
+  .js-motion .workflow-card.reveal {
+    opacity: 0;
+  }
+  .js-motion .workflow-card.reveal:nth-child(1) { transform: translate(-34px, -34px); }
+  .js-motion .workflow-card.reveal:nth-child(2) { transform: translate(34px, -34px); }
+  .js-motion .workflow-card.reveal:nth-child(3) { transform: translate(-34px, 34px); }
+  .js-motion .workflow-card.reveal:nth-child(4) { transform: translate(34px, 34px); }
+  .js-motion .workflow-card.reveal.is-visible { opacity: 1; transform: translate(0, 0); }
+  .js-motion .workflow-card.reveal.is-visible:hover { transform: translateY(-5px); }
+  .workflow-card:nth-child(n) { transition-delay: 0s; }
+}
