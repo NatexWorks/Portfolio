@@ -64,4 +64,34 @@
 
     revealItems.forEach((item) => observer.observe(item));
   }
+  
+  // Typewriter phrases: short, quick, and disabled for reduced-motion visitors.
+  const typeTarget = document.querySelector('[data-rotate]');
+  if (typeTarget && !reducedMotion) {
+    const phrases = (typeTarget.dataset.rotate || '').split('|').filter(Boolean);
+    let phraseIndex = 0;
+    let charIndex = phrases[0]?.length || 0;
+    let deleting = false;
+    const type = () => {
+      const phrase = phrases[phraseIndex] || '';
+      if (!deleting) {
+        charIndex = Math.min(charIndex + 1, phrase.length);
+        typeTarget.textContent = phrase.slice(0, charIndex);
+        if (charIndex === phrase.length) {
+          deleting = true;
+          window.setTimeout(type, 850);
+          return;
+        }
+      } else {
+        charIndex = Math.max(0, charIndex - 1);
+        typeTarget.textContent = phrase.slice(0, charIndex);
+        if (charIndex === 0) {
+          deleting = false;
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+        }
+      }
+      window.setTimeout(type, deleting ? 20 : 35);
+    };
+    window.setTimeout(() => { deleting = true; type(); }, 1200);
+  }
 })();
