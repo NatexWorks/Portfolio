@@ -128,3 +128,29 @@
   .hero-eyebrow,.hero-line{animation:none!important;opacity:1;transform:none;filter:none}
   .brand>span:last-child,.brand-mark,.project-visual{transition:none!important}
 }
+
+
+/* Dedicated services page */
+.services-more{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:22px;padding:18px 0;border-top:1px solid #30372b;color:#a5ad99;font-size:12px}
+.services-more p{margin:0}
+.services-page-hero{padding-top:95px;padding-bottom:65px;border-bottom:1px solid #2b3125}
+.services-page-hero h1{font-size:clamp(44px,7vw,82px);line-height:1.03;letter-spacing:-.075em;margin:28px 0 22px;max-width:850px}
+.services-page-hero>p{max-width:660px;color:#adb4a4;line-height:1.9}
+.service-detail-list{padding-block:60px}
+.service-detail{display:grid;grid-template-columns:70px minmax(0,1fr) minmax(180px,.55fr);gap:25px;padding:30px 0;border-bottom:1px solid #30372b}
+.service-detail:first-child{border-top:1px solid #30372b}
+.service-detail-number{font:11px var(--mono);color:var(--lime);padding-top:7px}
+.service-detail h2{font-size:clamp(23px,3vw,34px);letter-spacing:-.055em;margin:0 0 12px}
+.service-detail p{color:#a8b09d;font-size:13px;line-height:1.9;margin:0;max-width:620px}
+.service-detail ul{margin:0;padding-left:17px;color:#c7cebb;font-size:11px;line-height:2}
+.service-principle{display:grid;grid-template-columns:1fr 1fr;gap:30px;padding:35px;border:1px solid #3a4430;background:linear-gradient(120deg,#1c2417,#151912);margin-bottom:65px}
+.service-principle h2{font-size:clamp(25px,3.5vw,40px);letter-spacing:-.06em;line-height:1.1;margin:0}
+.service-principle p{font-size:12px;color:#aab39e;line-height:1.9;margin:0}
+.service-page-contact{padding-block:40px 75px}
+@media(max-width:760px){
+ .services-more{align-items:flex-start;flex-direction:column}
+ .services-page-hero{padding-top:65px;padding-bottom:45px}
+ .service-detail{grid-template-columns:34px 1fr;gap:14px;padding:24px 0}
+ .service-detail ul{grid-column:2}
+ .service-principle{grid-template-columns:1fr;padding:22px;gap:16px}
+}
