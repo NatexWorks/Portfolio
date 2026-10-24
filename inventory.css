@@ -122,3 +122,17 @@
     transition: none;
   }
 }
+
+
+/* Built by Manish: sequential typing with an underline that grows with the revealed phrase. */
+.build-note .build-heading .build-heading-accent{display:inline;color:var(--lime);text-decoration:underline;text-decoration-color:var(--lime);text-decoration-thickness:1px;text-underline-offset:.16em;text-decoration-skip-ink:none}
+.build-note .build-heading .build-heading-accent::after{content:none}
+.build-note .build-heading [data-build-type].is-typing{border-right:2px solid var(--lime);padding-right:2px}
+.build-note .build-note-copy{color:#a6ad99;line-height:1.9}
+.build-note .build-note-copy [data-build-type].is-typing::after{content:"▍";display:inline-block;margin-left:2px;color:var(--lime);animation:buildTypeCursor .75s steps(2,end) infinite}
+@keyframes buildTypeCursor{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.build-note .build-heading [data-build-type].is-typing,.build-note .build-note-copy [data-build-type].is-typing::after{border:0;animation:none}}
+
+/* Keep the first headline line neutral; only the second line carries the moving green underline. */
+.build-note .build-heading .build-heading-line{display:inline;color:inherit;position:static}
+.build-note .build-heading .build-heading-line::after{content:none}
