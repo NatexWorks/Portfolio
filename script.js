@@ -355,8 +355,7 @@
     activateServiceStack();
     scheduleServiceStackUpdate();
     window.addEventListener('scroll', scheduleServiceStackUpdate, { passive: true });
-
-    const refreshServiceStackMeasurements = () => {
+    window.addEventListener('resize', () => {
       if (!serviceStackMedia.matches || reducedMotion) {
         resetServiceStack();
         return;
@@ -364,26 +363,7 @@
       activateServiceStack();
       if (serviceStackActive) measureServiceStack();
       scheduleServiceStackUpdate();
-    };
-
-    window.addEventListener('resize', refreshServiceStackMeasurements, { passive: true });
-
-    // Recalculate card heights after web fonts finish loading; mobile copy can wrap
-    // onto additional lines and otherwise make the final transition start too early.
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(refreshServiceStackMeasurements);
-    }
-
-    // Keep the scroll stack aligned if a card's content height changes after initial
-    // layout (for example, after font loading or a viewport text reflow).
-    if ('ResizeObserver' in window) {
-      const serviceStackResizeObserver = new ResizeObserver(() => {
-        if (!serviceStackMedia.matches || reducedMotion || !serviceStackActive) return;
-        measureServiceStack();
-        scheduleServiceStackUpdate();
-      });
-      serviceStackCards.forEach((card) => serviceStackResizeObserver.observe(card));
-    }
+    }, { passive: true });
   }
 
 })();
