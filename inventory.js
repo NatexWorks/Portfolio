@@ -285,16 +285,24 @@
     document.documentElement.classList.add('mobile-workflow-motion');
     workflowGrid.classList.add('mobile-workflow-stack');
 
+    // Use a 33-degree path from each intended quadrant: Catalog upper-left,
+    // Stock upper-right, Checkout lower-left, and Barcode lower-right.
+    const entryAngle = 33 * Math.PI / 180;
+    const entryDistance = 64;
+    const entryXDistance = Math.round(Math.cos(entryAngle) * entryDistance);
+    const entryYDistance = Math.round(Math.sin(entryAngle) * entryDistance);
+
     workflowCards.forEach((card, index) => {
       const side = index % 2 === 0 ? -1 : 1;
+      const verticalSide = index < 2 ? -1 : 1;
       card.style.setProperty('--stack-index', String(index));
       card.dataset.workflowProgress = '0';
       card.style.setProperty('--entry-opacity', '0');
-      card.style.setProperty('--entry-x', `${side * 42}px`);
-      card.style.setProperty('--entry-y', '42px');
+      card.style.setProperty('--entry-x', `${side * entryXDistance}px`);
+      card.style.setProperty('--entry-y', `${verticalSide * entryYDistance}px`);
       card.style.setProperty('--entry-z', '0px');
-      card.style.setProperty('--entry-rotate-x', '5deg');
-      card.style.setProperty('--entry-rotate-y', `${side * 6}deg`);
+      card.style.setProperty('--entry-rotate-x', `${verticalSide * 4}deg`);
+      card.style.setProperty('--entry-rotate-y', `${side * 4}deg`);
       card.style.setProperty('--shadow-y', '10px');
       card.style.setProperty('--shadow-blur', '22px');
       card.style.setProperty('--card-glow', '0');
@@ -312,8 +320,15 @@
       workflowSection.style.setProperty('--workflow-opacity', '1');
       nextSection.style.setProperty('--workflow-panel-shift', '0px');
 
-      timelineEnd = nextSection.getBoundingClientRect().top + window.scrollY;
-      timelineStart = timelineEnd - (window.innerHeight || 1) * 0.9;
+      const viewportHeight = window.innerHeight || 1;
+      const lastCard = workflowCards[workflowCards.length - 1];
+      const lastProgress = Number(lastCard.dataset.workflowProgress || '0');
+      const lastRect = lastCard.getBoundingClientRect();
+      // Barcode enters from the lower-right, so undo its remaining vertical offset.
+      const lastLayoutTop = lastRect.top - (1 - lastProgress) * entryYDistance;
+      const lastStickyTop = 70;
+      timelineStart = lastLayoutTop + window.scrollY - lastStickyTop;
+      timelineEnd = timelineStart + Math.min(viewportHeight * 0.32, 260);
     };
 
     const update = () => {
@@ -323,29 +338,32 @@
       const viewportHeight = window.innerHeight || 1;
       workflowCards.forEach((card, index) => {
         const side = index % 2 === 0 ? -1 : 1;
+        const verticalSide = index < 2 ? -1 : 1;
         const previousProgress = Number(card.dataset.workflowProgress || '0');
         const rect = card.getBoundingClientRect();
+        const verticalOffset = verticalSide * entryYDistance;
 
-        // Remove the last frame's vertical entrance offset before measuring scroll progress.
-        const layoutTop = rect.top - (1 - previousProgress) * 42;
-        const targetTop = 70 + index * 12;
-        const startTop = viewportHeight * 0.8;
-        const progress = clamp((startTop - layoutTop) / Math.max(1, startTop - targetTop), 0, 1);
+        // Correct for the transform, then trigger the diagonal entry only 118px before its stack position.
+        const layoutTop = rect.top - (1 - previousProgress) * verticalOffset;
+        const targetTop = 70 + (workflowCards.length - index - 1) * 10;
+        const entranceDistance = 118;
+        const startTop = targetTop + entranceDistance;
+        const progress = clamp((startTop - layoutTop) / entranceDistance, 0, 1);
         const remaining = 1 - progress;
 
         card.dataset.workflowProgress = progress.toFixed(4);
         card.style.setProperty('--entry-opacity', progress.toFixed(4));
-        card.style.setProperty('--entry-x', `${side * remaining * 42}px`);
-        card.style.setProperty('--entry-y', `${remaining * 42}px`);
-        card.style.setProperty('--entry-z', `${progress * 6}px`);
-        card.style.setProperty('--entry-rotate-x', `${remaining * 5}deg`);
-        card.style.setProperty('--entry-rotate-y', `${side * remaining * 6}deg`);
+        card.style.setProperty('--entry-x', `${side * remaining * entryXDistance}px`);
+        card.style.setProperty('--entry-y', `${verticalSide * remaining * entryYDistance}px`);
+        card.style.setProperty('--entry-z', `${progress * 8}px`);
+        card.style.setProperty('--entry-rotate-x', `${verticalSide * remaining * 4}deg`);
+        card.style.setProperty('--entry-rotate-y', `${side * remaining * 4}deg`);
         card.style.setProperty('--shadow-y', `${10 + progress * 10}px`);
         card.style.setProperty('--shadow-blur', `${22 + progress * 20}px`);
         card.style.setProperty('--card-glow', `${progress * 0.28}`);
       });
 
-      // The panel starts just below the viewport and settles at its natural top position.
+      // Begin the foreground-panel transition when the final card reaches its stack position.
       const rawProgress = clamp((window.scrollY - timelineStart) / Math.max(1, timelineEnd - timelineStart), 0, 1);
       const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
       workflowSection.style.setProperty('--workflow-scale', String(1 - 0.035 * progress));
