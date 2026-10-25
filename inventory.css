@@ -275,7 +275,7 @@
     /* Reveal the panel from the bottom while keeping its layout position fixed (no blank gap). */
     transform: translate3d(0, 0, 0);
     clip-path: inset(var(--workflow-panel-clip, 100vh) 0 0 0);
-    box-shadow: 0 -28px 62px #0009;
+    box-shadow: 0 -18px 38px #0008;
     border-top-color: #49583a;
     will-change: clip-path;
     backface-visibility: hidden;
