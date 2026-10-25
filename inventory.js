@@ -61,6 +61,8 @@
   if (workflowLiveNote && mobileLenisQuery.matches && !reducedMotion && 'IntersectionObserver' in window) {
     const fullLiveNote = workflowLiveNote.dataset.liveDemoText || workflowLiveNote.textContent;
     workflowLiveNote.setAttribute('aria-label', fullLiveNote);
+    // Reserve the final rendered height before typing so the section below never jumps.
+    workflowLiveNote.style.minHeight = workflowLiveNote.getBoundingClientRect().height + 'px';
     workflowLiveNote.textContent = '';
     const liveNoteObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
@@ -307,6 +309,7 @@
     const workflowSection = document.querySelector('#workflows.workflows');
     const workflowGrid = workflowSection?.querySelector('.workflow-grid');
     const workflowCards = Array.from(workflowGrid?.querySelectorAll('.workflow-card') || []);
+    const workflowLiveNote = workflowSection?.querySelector('.workflow-live-note');
     const nextSection = document.querySelector('#compare');
 
     if (!workflowSection || !workflowGrid || workflowCards.length !== 4 || !nextSection) return;
@@ -315,7 +318,7 @@
     document.documentElement.classList.add('mobile-workflow-motion');
     workflowGrid.classList.add('mobile-workflow-stack');
 
-    const stickyTopOffsets = [100, 90, 80, 70];
+    const stickyTopOffsets = [70, 80, 90, 100];
     const entryYDistance = 64;
     const entranceDistance = 118;
 
@@ -379,14 +382,23 @@
       workflowSection.style.setProperty('--workflow-rise', '0px');
       workflowSection.style.setProperty('--workflow-opacity', '1');
 
+      // Measure the card stack with no tail spacing, then add only enough room for the
+      // disclaimer to sit 15px below the settled stack's lowest edge.
+      workflowGrid.style.setProperty('--stack-note-tail-space', '0px');
       const gridDocumentTop = window.scrollY + workflowGrid.getBoundingClientRect().top;
       cardDocumentTops = workflowCards.map(card => gridDocumentTop + card.offsetTop);
       stageTargets = cardDocumentTops.map((documentTop, index) => Math.max(0, documentTop - stickyTopOffsets[index] + entranceDistance));
       gateStartY = Math.max(0, stageTargets[0] - entranceDistance);
-      // Keep the complete four-card stack parked after card four arrives.
-      // The following gesture then moves through a short, deliberate handoff runway.
-      timelineStart = stageTargets[3] + Math.min((window.innerHeight || 1) * 0.14, 110);
+      timelineStart = stageTargets[3];
       timelineEnd = timelineStart + Math.min((window.innerHeight || 1) * 0.32, 260);
+
+      if (workflowLiveNote) {
+        const naturalNoteTop = window.scrollY + workflowLiveNote.getBoundingClientRect().top;
+        const stackBottom = Math.max(...stickyTopOffsets.map((top, index) => top + workflowCards[index].offsetHeight));
+        const desiredNoteTop = timelineStart + stackBottom + 15;
+        const tailSpace = Math.max(0, desiredNoteTop - naturalNoteTop);
+        workflowGrid.style.setProperty('--stack-note-tail-space', tailSpace + 'px');
+      }
 
       motionProperties.forEach((property, index) => {
         if (previousValues[index]) workflowSection.style.setProperty(property, previousValues[index]);
@@ -424,7 +436,7 @@
         workflowSection.style.setProperty('--workflow-tilt', '0deg');
         workflowSection.style.setProperty('--workflow-rise', '0px');
         workflowSection.style.setProperty('--workflow-opacity', '1');
-        nextSection.style.setProperty('--workflow-panel-shift', '0px');
+        nextSection.style.setProperty('--workflow-panel-clip', viewportHeight + 'px');
         return;
       }
 
@@ -434,7 +446,9 @@
       workflowSection.style.setProperty('--workflow-tilt', (-4.5 * progress) + 'deg');
       workflowSection.style.setProperty('--workflow-rise', (-16 * progress) + 'px');
       workflowSection.style.setProperty('--workflow-opacity', String(1 - 0.1 * progress));
-      nextSection.style.setProperty('--workflow-panel-shift', (viewportHeight * 0.15 * (1 - progress)) + 'px');
+      // Clip from the top by a viewport-scaled amount so the panel rises into view
+      // without translating its layout box and creating a gap underneath the disclaimer.
+      nextSection.style.setProperty('--workflow-panel-clip', (viewportHeight * (1 - progress)) + 'px');
     };
 
     const requestUpdate = () => {
@@ -678,6 +692,7 @@
       workflowSection.style.removeProperty('--workflow-rise');
       workflowSection.style.removeProperty('--workflow-opacity');
       nextSection.style.removeProperty('--workflow-panel-shift');
+      nextSection.style.removeProperty('--workflow-panel-clip');
       workflowCards.forEach(card => {
         [
           '--stack-index', '--entry-opacity', '--entry-x', '--entry-y', '--entry-z',
