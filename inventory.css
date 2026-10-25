@@ -376,3 +376,15 @@
 @media(prefers-reduced-motion:reduce) {
   .scroll-next,.scroll-next::before,.scroll-next::after { transition:none!important; animation:none!important; }
 }
+
+
+/* Match the portfolio scroll-control hover feedback and keep both states clear. */
+.scroll-next:hover {
+  background: #242d1b;
+  border-color: var(--lime);
+  transform: translateY(-2px);
+}
+.scroll-next.is-back-top:hover {
+  background: var(--lime);
+  border-color: var(--lime);
+}
