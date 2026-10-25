@@ -205,10 +205,10 @@
     transform-style: preserve-3d;
   }
 
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(1) { top: 100px; }
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(2) { top: 90px; }
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(3) { top: 80px; }
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(4) { top: 70px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(1) { top: 70px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(2) { top: 80px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(3) { top: 90px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(4) { top: 100px; }
 
   html.mobile-workflow-motion #workflows .workflow-card {
     height: 220px;
