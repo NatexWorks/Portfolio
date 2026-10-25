@@ -315,7 +315,7 @@
     document.documentElement.classList.add('mobile-workflow-motion');
     workflowGrid.classList.add('mobile-workflow-stack');
 
-    const stickyTopOffsets = [100, 90, 80, 70];
+    const stickyTopOffsets = [70, 80, 90, 100];
     const entryYDistance = 64;
     const entranceDistance = 118;
 
