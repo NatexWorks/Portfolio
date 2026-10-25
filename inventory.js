@@ -439,12 +439,11 @@
         card.style.setProperty('--entry-opacity', progress.toFixed(4));
         card.style.setProperty('--entry-x', '0px');
         card.style.setProperty('--entry-y', (remaining * entryYDistance) + 'px');
-        card.style.setProperty('--entry-z', (progress * 14) + 'px');
-        card.style.setProperty('--entry-rotate-x', (-2.2 * remaining) + 'deg');
-        card.style.setProperty('--entry-rotate-y', (index % 2 === 0 ? -1 : 1) * remaining * 1.2 + 'deg');
-        card.style.setProperty('--shadow-y', (12 + progress * 12) + 'px');
-        card.style.setProperty('--shadow-blur', (24 + progress * 24) + 'px');
-        card.style.setProperty('--card-glow', String(progress * 0.42));
+        // Keep scroll-frame work compositor-friendly: opacity + vertical translation only.
+        // Depth, rotation, shadow and glow remain static to avoid repeated paint-heavy updates.
+        card.style.setProperty('--entry-z', '0px');
+        card.style.setProperty('--entry-rotate-x', '0deg');
+        card.style.setProperty('--entry-rotate-y', '0deg');
       });
 
       // At card four's stop, keep the stack still. Exit motion starts only on another gesture.
@@ -453,7 +452,7 @@
         workflowSection.style.setProperty('--workflow-tilt', '0deg');
         workflowSection.style.setProperty('--workflow-rise', '0px');
         workflowSection.style.setProperty('--workflow-opacity', '1');
-        nextSection.style.setProperty('--workflow-panel-clip', viewportHeight + 'px');
+        nextSection.style.setProperty('--workflow-panel-rise', viewportHeight + 'px');
         return;
       }
 
@@ -463,9 +462,8 @@
       workflowSection.style.setProperty('--workflow-tilt', (-4.5 * progress) + 'deg');
       workflowSection.style.setProperty('--workflow-rise', (-16 * progress) + 'px');
       workflowSection.style.setProperty('--workflow-opacity', String(1 - 0.1 * progress));
-      // Clip from the top by a viewport-scaled amount so the panel rises into view
-      // without translating its layout box and creating a gap underneath the disclaimer.
-      nextSection.style.setProperty('--workflow-panel-clip', (viewportHeight * (1 - progress)) + 'px');
+      // Move the already-rendered next section upward using a compositor-friendly transform.
+      nextSection.style.setProperty('--workflow-panel-rise', (viewportHeight * (1 - progress)) + 'px');
     };
 
     const requestUpdate = () => {
