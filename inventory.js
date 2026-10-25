@@ -452,7 +452,7 @@
         workflowSection.style.setProperty('--workflow-tilt', '0deg');
         workflowSection.style.setProperty('--workflow-rise', '0px');
         workflowSection.style.setProperty('--workflow-opacity', '1');
-        nextSection.style.setProperty('--workflow-panel-rise', viewportHeight + 'px');
+        nextSection.style.setProperty('--workflow-panel-clip', viewportHeight + 'px');
         return;
       }
 
@@ -462,8 +462,8 @@
       workflowSection.style.setProperty('--workflow-tilt', (-4.5 * progress) + 'deg');
       workflowSection.style.setProperty('--workflow-rise', (-16 * progress) + 'px');
       workflowSection.style.setProperty('--workflow-opacity', String(1 - 0.1 * progress));
-      // Move the already-rendered next section upward using a compositor-friendly transform.
-      nextSection.style.setProperty('--workflow-panel-rise', (viewportHeight * (1 - progress)) + 'px');
+      // Reveal the existing next section in place so no blank gap appears below the workflow note.
+      nextSection.style.setProperty('--workflow-panel-clip', (viewportHeight * (1 - progress)) + 'px');
     };
 
     const requestUpdate = () => {
