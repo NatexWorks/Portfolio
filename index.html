@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css?v=20261025-2">
+  <link rel="stylesheet" href="style.css?v=20261025-3">
   <link rel="stylesheet" href="about-motion.css">
   <style>
     /* NatexWorks menu distance + hover burst */
@@ -226,6 +226,8 @@
       .hero-cafe-meta span:first-child { max-width:75%; font-size:5px; }
       .portfolio-scroll-next { right:12px; bottom:12px; }
     }
+    /* Keep the fixed control the same compact size as inventory.html. */
+    .portfolio-scroll-next { width:auto; min-width:0; min-height:0; padding:9px 10px; }
     @media(prefers-reduced-motion:reduce) {
       .hero-project-track { scroll-behavior:auto!important; }
       .hero-cafe-photo,.hero-cafe-copy,.hero-project-hint>span { animation:none!important; }
