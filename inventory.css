@@ -281,3 +281,60 @@
     will-change: auto;
   }
 }
+
+
+/* Mobile-only final refinements: keep Portfolio beside the existing menu button and tighten the workflow ending. */
+@media (max-width:650px) {
+  .topbar .back-link {
+    position: fixed !important;
+    top: 12px;
+    right: 64px;
+    z-index: 1003;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    margin: 0 !important;
+    padding: 0 9px 0 8px;
+    border: 1px solid #4b5540;
+    background: #171b14e8;
+    color: var(--text);
+    font-size: 9px;
+    letter-spacing: .035em;
+    white-space: nowrap;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .topbar .back-link::before { margin-right: 1px; }
+
+  html.mobile-workflow-motion #workflows .workflow-grid {
+    padding-bottom: min(8vh, 90px);
+    padding-bottom: min(8svh, 90px);
+  }
+
+  #workflows.section-space { padding-bottom: 20px; }
+  #compare > .wrap.section-space { padding-top: 25px; }
+
+  .workflow-live-note {
+    max-width: 100%;
+    margin-top: 5px;
+    color: #a4ad98;
+    font: 11px/1.75 var(--mono);
+    letter-spacing: -.015em;
+  }
+
+  .workflow-live-note.is-typing::after {
+    content: "▍";
+    display: inline-block;
+    margin-left: 2px;
+    color: var(--lime);
+    animation: workflowNoteCursor .75s steps(2,end) infinite;
+  }
+}
+
+@keyframes workflowNoteCursor { 50% { opacity: 0; } }
+
+@media (max-width:650px) and (prefers-reduced-motion:reduce) {
+  .workflow-live-note.is-typing::after { display: none !important; animation: none !important; }
+}
