@@ -4,6 +4,31 @@
   const brandIntro = document.querySelector('#brand-collision-intro');
   const targetMark = document.querySelector('.site-header > .brand .brand-mark');
   const introMark = document.querySelector('.brand-intro-final');
+  // Mobile-only premium shockwave, particles, and sparks between Natex and Works.
+  const mobileBrandFX = window.matchMedia('(max-width: 760px)').matches;
+  if (mobileBrandFX && brandIntro && !reducedMotion) {
+    const shockwave = document.createElement('span');
+    shockwave.className = 'brand-shockwave';
+    shockwave.setAttribute('aria-hidden', 'true');
+    brandIntro.appendChild(shockwave);
+    const flash = document.createElement('span');
+    flash.className = 'brand-flash';
+    flash.setAttribute('aria-hidden', 'true');
+    brandIntro.appendChild(flash);
+    const particleColors = ['#c5f36b', '#efffd8', '#a9d65c', '#ffffff'];
+    for (let i = 0; i < 28; i += 1) {
+      const particle = document.createElement('span');
+      particle.className = 'brand-particle';
+      particle.setAttribute('aria-hidden', 'true');
+      particle.style.setProperty('--particle-angle', `${(360 / 28) * i + (i % 3) * 4}deg`);
+      particle.style.setProperty('--particle-distance', `${42 + ((i * 17) % 86)}px`);
+      particle.style.setProperty('--particle-size', `${2 + (i % 3)}px`);
+      particle.style.setProperty('--particle-delay', `${(i % 6) * 22}ms`);
+      particle.style.setProperty('--particle-color', particleColors[i % particleColors.length]);
+      brandIntro.appendChild(particle);
+    }
+  }
+
   if (brandIntro && targetMark && introMark && !reducedMotion && typeof introMark.animate === 'function') {
     document.documentElement.classList.add('brand-intro-running');
     window.setTimeout(() => {
@@ -17,6 +42,7 @@
         travel.onfinish = () => {
           brandIntro.remove();
           document.documentElement.classList.remove('brand-intro-running');
+          if (mobileBrandFX) document.documentElement.classList.add('hero-content-ready');
         };
       }, 260);
     }, 850);
