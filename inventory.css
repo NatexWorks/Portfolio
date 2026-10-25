@@ -388,3 +388,6 @@
   background: var(--lime);
   border-color: var(--lime);
 }
+
+.scroll-next:not(.is-back-top):hover::before { opacity:.75; animation:backTopGlowLeft 1.15s ease-in-out infinite alternate; }
+.scroll-next:not(.is-back-top):hover::after { opacity:.75; animation:backTopGlowRight 1.15s ease-in-out infinite alternate; }
