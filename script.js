@@ -259,7 +259,7 @@
       entries,
       gridBottom: gridTop + serviceStackGrid.offsetHeight,
       triggerY: finalCard.staticTop - finalCard.stickyTop,
-      exitDuration: Math.max(viewportHeight * 1.3, 760),
+      exitDuration: Math.max(viewportHeight * 0.24, 140),
       viewportHeight,
       stackTop
     };
