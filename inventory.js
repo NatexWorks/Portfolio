@@ -2,6 +2,7 @@
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mobileLenisQuery = window.matchMedia('(max-width: 760px)');
   let lenisInstance = null;
+  let workflowStepController = null;
 
   // Mobile-only Lenis scrolling; preserve native layout and leave desktop/tablet scroll unchanged.
   if (mobileLenisQuery.matches && !reducedMotion && typeof window.Lenis === 'function') {
@@ -213,6 +214,10 @@
       if (icon) icon.textContent = next.id === 'overview' ? '↑' : '↓';
     };
     nextButton.addEventListener('click', () => {
+      if (workflowStepController && workflowStepController.isActive()) {
+        workflowStepController.advance(1);
+        return;
+      }
       const target = document.querySelector(nextButton.dataset.target || '#problem');
       if (!target) return;
       if (lenisInstance) {
@@ -290,10 +295,11 @@
     calculate(true);
   }
 
-  // Mobile-only scroll-progress motion for the four workflow cards and their following section.
-  // The desktop/tablet layouts are not touched; the effect is initialized only at the mobile breakpoint.
+  // Mobile-only, gesture-stepped scroll choreography for the four workflow cards.
+  // A gesture can reveal only one card, regardless of swipe or wheel speed.
   const workflowMobileQuery = window.matchMedia('(max-width: 650px)');
   let mobileWorkflowMotionInitialized = false;
+  let teardownMobileWorkflowMotion = null;
 
   const initMobileWorkflowMotion = () => {
     if (mobileWorkflowMotionInitialized || !workflowMobileQuery.matches || reducedMotion) return;
@@ -309,16 +315,16 @@
     document.documentElement.classList.add('mobile-workflow-motion');
     workflowGrid.classList.add('mobile-workflow-stack');
 
-    // Every incoming card drops in from above; earlier cards settle about 10px lower.
-    const entryXDistance = 0;
+    const stickyTopOffsets = [100, 90, 80, 70];
     const entryYDistance = 64;
+    const entranceDistance = 118;
 
     workflowCards.forEach((card, index) => {
       card.style.setProperty('--stack-index', String(index));
       card.dataset.workflowProgress = '0';
       card.style.setProperty('--entry-opacity', '0');
       card.style.setProperty('--entry-x', '0px');
-      card.style.setProperty('--entry-y', `-${entryYDistance}px`);
+      card.style.setProperty('--entry-y', '-' + entryYDistance + 'px');
       card.style.setProperty('--entry-z', '0px');
       card.style.setProperty('--entry-rotate-x', '0deg');
       card.style.setProperty('--entry-rotate-y', '0deg');
@@ -330,24 +336,58 @@
     const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
     let timelineStart = 0;
     let timelineEnd = 0;
+    let cardDocumentTops = [];
+    let stageTargets = [];
+    let gateStartY = 0;
     let framePending = false;
+    let gateActive = false;
+    let gateArmed = true;
+    let workflowStage = -1;
+    let stageAnimating = false;
+    let lastObservedScroll = window.scrollY;
+    let touchStart = null;
+    let wheelGestureLocked = false;
+    let wheelResetTimer = null;
 
-    const measureTimeline = () => {
+    const motionProperties = ['--workflow-scale', '--workflow-tilt', '--workflow-rise', '--workflow-opacity'];
+
+    const syncLenisAt = (targetY) => {
+      if (!lenisInstance) return;
+      // Synchronize Lenis with the browser's position before parking it again.
+      lenisInstance.start();
+      lenisInstance.scrollTo(targetY, { immediate: true, force: true });
+      lenisInstance.stop();
+    };
+
+    const setScrollImmediately = (targetY) => {
+      if (lenisInstance) lenisInstance.stop();
+      const root = document.documentElement;
+      const previousBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      window.scrollTo(0, targetY);
+      root.style.scrollBehavior = previousBehavior;
+      syncLenisAt(targetY);
+    };
+
+    const measureWorkflowStops = () => {
+      // Neutralize the section transform while measuring document coordinates.
+      const previousValues = motionProperties.map(property => workflowSection.style.getPropertyValue(property));
       workflowSection.style.setProperty('--workflow-scale', '1');
       workflowSection.style.setProperty('--workflow-tilt', '0deg');
       workflowSection.style.setProperty('--workflow-rise', '0px');
       workflowSection.style.setProperty('--workflow-opacity', '1');
-      nextSection.style.setProperty('--workflow-panel-shift', '0px');
 
-      const viewportHeight = window.innerHeight || 1;
-      const lastCard = workflowCards[workflowCards.length - 1];
-      const lastProgress = Number(lastCard.dataset.workflowProgress || '0');
-      const lastRect = lastCard.getBoundingClientRect();
-      // Undo Barcode's remaining top-down entrance offset before measuring the stack.
-      const lastLayoutTop = lastRect.top + (1 - lastProgress) * entryYDistance;
-      const lastStickyTop = 70;
-      timelineStart = lastLayoutTop + window.scrollY - lastStickyTop;
-      timelineEnd = timelineStart + Math.min(viewportHeight * 0.32, 260);
+      const gridDocumentTop = window.scrollY + workflowGrid.getBoundingClientRect().top;
+      cardDocumentTops = workflowCards.map(card => gridDocumentTop + card.offsetTop);
+      stageTargets = cardDocumentTops.map((documentTop, index) => Math.max(0, documentTop - stickyTopOffsets[index]));
+      gateStartY = Math.max(0, stageTargets[0] - entranceDistance);
+      timelineStart = stageTargets[3];
+      timelineEnd = timelineStart + Math.min((window.innerHeight || 1) * 0.32, 260);
+
+      motionProperties.forEach((property, index) => {
+        if (previousValues[index]) workflowSection.style.setProperty(property, previousValues[index]);
+        else workflowSection.style.removeProperty(property);
+      });
     };
 
     const update = () => {
@@ -358,29 +398,28 @@
       workflowCards.forEach((card, index) => {
         const previousProgress = Number(card.dataset.workflowProgress || '0');
         const rect = card.getBoundingClientRect();
-        const verticalOffset = -entryYDistance;
-
-        // Each card enters vertically from above, only 118px before its final stack position.
-        const layoutTop = rect.top - (1 - previousProgress) * verticalOffset;
-        const targetTop = 70 + (workflowCards.length - index - 1) * 10;
-        const entranceDistance = 118;
+        // Undo the card's previous transform to recover its layout position.
+        const layoutTop = rect.top + (1 - previousProgress) * entryYDistance;
+        const targetTop = stickyTopOffsets[index];
         const startTop = targetTop + entranceDistance;
-        const progress = clamp((startTop - layoutTop) / entranceDistance, 0, 1);
+        const rawProgress = clamp((startTop - layoutTop) / entranceDistance, 0, 1);
+        // Ease the entrance so opacity, depth and shadows settle gently at the stack.
+        const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
         const remaining = 1 - progress;
 
         card.dataset.workflowProgress = progress.toFixed(4);
         card.style.setProperty('--entry-opacity', progress.toFixed(4));
         card.style.setProperty('--entry-x', '0px');
-        card.style.setProperty('--entry-y', `${-remaining * entryYDistance}px`);
-        card.style.setProperty('--entry-z', `${progress * 8}px`);
+        card.style.setProperty('--entry-y', (-remaining * entryYDistance) + 'px');
+        card.style.setProperty('--entry-z', (progress * 8) + 'px');
         card.style.setProperty('--entry-rotate-x', '0deg');
         card.style.setProperty('--entry-rotate-y', '0deg');
-        card.style.setProperty('--shadow-y', `${10 + progress * 10}px`);
-        card.style.setProperty('--shadow-blur', `${22 + progress * 20}px`);
-        card.style.setProperty('--card-glow', `${progress * 0.28}`);
+        card.style.setProperty('--shadow-y', (10 + progress * 10) + 'px');
+        card.style.setProperty('--shadow-blur', (22 + progress * 20) + 'px');
+        card.style.setProperty('--card-glow', String(progress * 0.28));
       });
 
-      // Keep the following section in its normal position until Barcode has stacked.
+      // At card four's stop, keep the stack still. Exit motion starts only on another gesture.
       if (window.scrollY < timelineStart) {
         workflowSection.style.setProperty('--workflow-scale', '1');
         workflowSection.style.setProperty('--workflow-tilt', '0deg');
@@ -390,14 +429,13 @@
         return;
       }
 
-      // Once the final card reaches its stack position, tilt the stack back and raise the panel.
       const rawProgress = clamp((window.scrollY - timelineStart) / Math.max(1, timelineEnd - timelineStart), 0, 1);
       const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
       workflowSection.style.setProperty('--workflow-scale', String(1 - 0.035 * progress));
-      workflowSection.style.setProperty('--workflow-tilt', `${-4.5 * progress}deg`);
-      workflowSection.style.setProperty('--workflow-rise', `${-16 * progress}px`);
+      workflowSection.style.setProperty('--workflow-tilt', (-4.5 * progress) + 'deg');
+      workflowSection.style.setProperty('--workflow-rise', (-16 * progress) + 'px');
       workflowSection.style.setProperty('--workflow-opacity', String(1 - 0.1 * progress));
-      nextSection.style.setProperty('--workflow-panel-shift', `${viewportHeight * 0.15 * (1 - progress)}px`);
+      nextSection.style.setProperty('--workflow-panel-shift', (viewportHeight * 0.15 * (1 - progress)) + 'px');
     };
 
     const requestUpdate = () => {
@@ -406,21 +444,246 @@
       window.requestAnimationFrame(update);
     };
 
+    const animateScrollTo = (targetY, onComplete) => {
+      stageAnimating = true;
+      if (lenisInstance) lenisInstance.stop();
+
+      const root = document.documentElement;
+      const previousBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      const startY = window.scrollY;
+      const distance = targetY - startY;
+      const duration = clamp(380 + Math.abs(distance) * 0.32, 420, 520);
+      let startTime = 0;
+
+      const step = (now) => {
+        if (!startTime) startTime = now;
+        const rawProgress = clamp((now - startTime) / duration, 0, 1);
+        const easedProgress = 1 - Math.pow(1 - rawProgress, 3);
+        window.scrollTo(0, startY + distance * easedProgress);
+
+        if (rawProgress < 1) {
+          window.requestAnimationFrame(step);
+          return;
+        }
+
+        window.scrollTo(0, targetY);
+        root.style.scrollBehavior = previousBehavior;
+        syncLenisAt(targetY);
+        stageAnimating = false;
+        lastObservedScroll = window.scrollY;
+        if (typeof onComplete === 'function') onComplete();
+      };
+
+      window.requestAnimationFrame(step);
+    };
+
+    const leaveWorkflowGate = (rearmWhenGoingBack) => {
+      gateActive = false;
+      workflowStage = -1;
+      gateArmed = Boolean(rearmWhenGoingBack && window.scrollY < gateStartY - 24);
+      if (lenisInstance) lenisInstance.start();
+      lastObservedScroll = window.scrollY;
+    };
+
+    const advanceWorkflowStage = (direction) => {
+      if (!gateActive || stageAnimating || workflowStage < 0) return;
+
+      if (direction > 0) {
+        if (workflowStage < 3) {
+          const nextStage = workflowStage + 1;
+          animateScrollTo(stageTargets[nextStage], () => {
+            workflowStage = nextStage;
+          });
+          return;
+        }
+
+        // Fourth card is now parked. This next gesture runs the section-to-section handoff.
+        animateScrollTo(timelineEnd, () => leaveWorkflowGate(false));
+        return;
+      }
+
+      if (workflowStage > 0) {
+        const previousStage = workflowStage - 1;
+        animateScrollTo(stageTargets[previousStage], () => {
+          workflowStage = previousStage;
+        });
+        return;
+      }
+
+      // Allow the user to leave the sequence upward without trapping them in the section.
+      animateScrollTo(Math.max(0, gateStartY - 36), () => leaveWorkflowGate(true));
+    };
+
+    const activateWorkflowGate = () => {
+      if (gateActive || !gateArmed || !workflowMobileQuery.matches) return;
+      gateActive = true;
+      gateArmed = false;
+      workflowStage = -1;
+
+      // Stop a fast flick at the start of card one's entrance, then animate card one in.
+      setScrollImmediately(gateStartY);
+      animateScrollTo(stageTargets[0], () => {
+        workflowStage = 0;
+      });
+    };
+
+    const handleWorkflowGateScroll = () => {
+      const currentY = window.scrollY;
+      if (!gateActive && !gateArmed && currentY < gateStartY - 24) gateArmed = true;
+      const movingDown = currentY > lastObservedScroll + 1;
+      lastObservedScroll = currentY;
+
+      if (!gateActive && gateArmed && movingDown && currentY >= gateStartY) {
+        activateWorkflowGate();
+      }
+    };
+
+    const handleTouchStart = (event) => {
+      if (!event.touches || event.touches.length !== 1) {
+        touchStart = null;
+        return;
+      }
+      const target = event.target;
+      const interactive = target && typeof target.closest === 'function'
+        ? target.closest('a, button, input, select, textarea, [contenteditable="true"]')
+        : null;
+      touchStart = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+        canAdvance: gateActive && !stageAnimating && !interactive
+      };
+    };
+
+    const handleTouchMove = (event) => {
+      if (!gateActive || !touchStart || !event.touches || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      const deltaX = touch.clientX - touchStart.x;
+      const deltaY = touch.clientY - touchStart.y;
+      // Native touch scrolling is suppressed only while the staged workflow owns the gesture.
+      if (Math.abs(deltaY) > 6 && Math.abs(deltaY) > Math.abs(deltaX) * 1.05) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    };
+
+    const handleTouchEnd = (event) => {
+      if (!touchStart) return;
+      const start = touchStart;
+      touchStart = null;
+      if (!gateActive || !start.canAdvance || stageAnimating || !event.changedTouches || !event.changedTouches.length) return;
+
+      const touch = event.changedTouches[0];
+      const deltaX = touch.clientX - start.x;
+      const deltaY = touch.clientY - start.y;
+      if (Math.abs(deltaY) < 28 || Math.abs(deltaY) <= Math.abs(deltaX) * 1.05) return;
+      advanceWorkflowStage(deltaY < 0 ? 1 : -1);
+    };
+
+    const handleTouchCancel = () => { touchStart = null; };
+
+    const handleWheel = (event) => {
+      if (Math.abs(event.deltaY) < 2 || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+      if (gateActive) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (!wheelGestureLocked && !stageAnimating) {
+          wheelGestureLocked = true;
+          advanceWorkflowStage(event.deltaY > 0 ? 1 : -1);
+        }
+      } else if (!wheelGestureLocked) {
+        // Mark the wheel burst even before the gate, so one fast burst cannot enter and skip stages.
+        wheelGestureLocked = true;
+      }
+
+      if (wheelResetTimer) window.clearTimeout(wheelResetTimer);
+      wheelResetTimer = window.setTimeout(() => {
+        wheelGestureLocked = false;
+      }, 320);
+    };
+
+    const handleKeydown = (event) => {
+      if (!gateActive) return;
+      let direction = 0;
+      if (['ArrowDown', 'PageDown', ' ' , 'Spacebar'].includes(event.key) || (event.key === 'Enter' && event.target === document.body)) direction = 1;
+      else if (['ArrowUp', 'PageUp'].includes(event.key) || (event.shiftKey && event.key === ' ')) direction = -1;
+      if (!direction) return;
+      event.preventDefault();
+      if (!event.repeat && !stageAnimating) advanceWorkflowStage(direction);
+    };
+
     const handleResize = () => {
-      measureTimeline();
+      measureWorkflowStops();
+      if (gateActive && !stageAnimating && workflowStage >= 0) {
+        setScrollImmediately(stageTargets[workflowStage]);
+      }
       requestUpdate();
     };
 
+    workflowStepController = {
+      isActive: () => gateActive,
+      advance: direction => advanceWorkflowStage(direction)
+    };
+
     window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('scroll', handleWorkflowGateScroll, { passive: true });
     window.addEventListener('resize', handleResize, { passive: true });
-    measureTimeline();
+    window.addEventListener('touchstart', handleTouchStart, { passive: true, capture: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false, capture: true });
+    window.addEventListener('touchcancel', handleTouchCancel, { passive: true, capture: true });
+    window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    window.addEventListener('keydown', handleKeydown, { capture: true });
+
+    measureWorkflowStops();
+    lastObservedScroll = window.scrollY;
     update();
+
+    teardownMobileWorkflowMotion = () => {
+      if (wheelResetTimer) window.clearTimeout(wheelResetTimer);
+      window.removeEventListener('scroll', requestUpdate);
+      window.removeEventListener('scroll', handleWorkflowGateScroll);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('touchstart', handleTouchStart, true);
+      window.removeEventListener('touchmove', handleTouchMove, true);
+      window.removeEventListener('touchend', handleTouchEnd, true);
+      window.removeEventListener('touchcancel', handleTouchCancel, true);
+      window.removeEventListener('wheel', handleWheel, true);
+      window.removeEventListener('keydown', handleKeydown, true);
+
+      gateActive = false;
+      gateArmed = true;
+      stageAnimating = false;
+      workflowStage = -1;
+      touchStart = null;
+      wheelGestureLocked = false;
+      workflowSection.style.removeProperty('--workflow-scale');
+      workflowSection.style.removeProperty('--workflow-tilt');
+      workflowSection.style.removeProperty('--workflow-rise');
+      workflowSection.style.removeProperty('--workflow-opacity');
+      nextSection.style.removeProperty('--workflow-panel-shift');
+      workflowCards.forEach(card => {
+        [
+          '--stack-index', '--entry-opacity', '--entry-x', '--entry-y', '--entry-z',
+          '--entry-rotate-x', '--entry-rotate-y', '--shadow-y', '--shadow-blur', '--card-glow'
+        ].forEach(property => card.style.removeProperty(property));
+        delete card.dataset.workflowProgress;
+      });
+      workflowGrid.classList.remove('mobile-workflow-stack');
+      document.documentElement.classList.remove('mobile-workflow-motion');
+      workflowStepController = null;
+      mobileWorkflowMotionInitialized = false;
+      teardownMobileWorkflowMotion = null;
+      if (lenisInstance) lenisInstance.start();
+    };
   };
 
   initMobileWorkflowMotion();
   if (typeof workflowMobileQuery.addEventListener === 'function') {
     workflowMobileQuery.addEventListener('change', event => {
       if (event.matches) initMobileWorkflowMotion();
+      else if (teardownMobileWorkflowMotion) teardownMobileWorkflowMotion();
     });
   }
 
