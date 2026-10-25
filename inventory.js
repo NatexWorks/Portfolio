@@ -348,6 +348,8 @@
     let touchStart = null;
     let wheelGestureLocked = false;
     let wheelResetTimer = null;
+    let activeAnimationFrame = 0;
+    let scrollBehaviorRestore = null;
 
     const motionProperties = ['--workflow-scale', '--workflow-tilt', '--workflow-rise', '--workflow-opacity'];
 
@@ -450,6 +452,7 @@
 
       const root = document.documentElement;
       const previousBehavior = root.style.scrollBehavior;
+      scrollBehaviorRestore = previousBehavior;
       root.style.scrollBehavior = 'auto';
       const startY = window.scrollY;
       const distance = targetY - startY;
@@ -463,19 +466,21 @@
         window.scrollTo(0, startY + distance * easedProgress);
 
         if (rawProgress < 1) {
-          window.requestAnimationFrame(step);
+          activeAnimationFrame = window.requestAnimationFrame(step);
           return;
         }
 
+        activeAnimationFrame = 0;
         window.scrollTo(0, targetY);
         root.style.scrollBehavior = previousBehavior;
+        scrollBehaviorRestore = null;
         syncLenisAt(targetY);
         stageAnimating = false;
         lastObservedScroll = window.scrollY;
         if (typeof onComplete === 'function') onComplete();
       };
 
-      window.requestAnimationFrame(step);
+      activeAnimationFrame = window.requestAnimationFrame(step);
     };
 
     const leaveWorkflowGate = (rearmWhenGoingBack) => {
@@ -588,9 +593,9 @@
       if (gateActive) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (!wheelGestureLocked && !stageAnimating) {
+        if (!wheelGestureLocked) {
           wheelGestureLocked = true;
-          advanceWorkflowStage(event.deltaY > 0 ? 1 : -1);
+          if (!stageAnimating) advanceWorkflowStage(event.deltaY > 0 ? 1 : -1);
         }
       } else if (!wheelGestureLocked) {
         // Mark the wheel burst even before the gate, so one fast burst cannot enter and skip stages.
@@ -642,6 +647,12 @@
 
     teardownMobileWorkflowMotion = () => {
       if (wheelResetTimer) window.clearTimeout(wheelResetTimer);
+      if (activeAnimationFrame) window.cancelAnimationFrame(activeAnimationFrame);
+      activeAnimationFrame = 0;
+      if (scrollBehaviorRestore !== null) {
+        document.documentElement.style.scrollBehavior = scrollBehaviorRestore;
+        scrollBehaviorRestore = null;
+      }
       window.removeEventListener('scroll', requestUpdate);
       window.removeEventListener('scroll', handleWorkflowGateScroll);
       window.removeEventListener('resize', handleResize);
