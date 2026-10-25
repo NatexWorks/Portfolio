@@ -249,7 +249,7 @@
 
     serviceStackCards.forEach((card, index) => {
       const height = card.offsetHeight || 300;
-      const stickyTop = stackTop + (serviceStackCards.length - index - 1) * 12;
+      const stickyTop = stackTop + index * 12;
       entries.push({ card, index, staticTop: cursor, stickyTop, height });
       cursor += height + (index < serviceStackCards.length - 1 ? gridGap : 0);
     });
