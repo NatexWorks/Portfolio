@@ -1,5 +1,23 @@
 (() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobileLenisQuery = window.matchMedia('(max-width: 760px)');
+  let lenisInstance = null;
+
+  // Mobile-only Lenis scrolling; preserve native layout and leave desktop/tablet scroll unchanged.
+  if (mobileLenisQuery.matches && !reducedMotion && typeof window.Lenis === 'function') {
+    lenisInstance = new window.Lenis({
+      autoRaf: true,
+      anchors: true,
+      smoothWheel: true,
+      syncTouch: true,
+      syncTouchLerp: 0.075,
+      touchInertiaExponent: 1.7,
+      lerp: 0.09,
+      respectReducedMotion: true,
+      stopInertiaOnNavigate: true
+    });
+  }
+
   const toggle = document.querySelector('.menu-toggle');
   const menu = document.querySelector('#site-menu');
   if (toggle && menu) {
@@ -61,12 +79,21 @@
 
       if (mode === 'words') {
         const words = fullText.split(/\s+/).filter(Boolean);
+        const tailWordCount = Math.min(words.length, Math.max(0, Math.floor(Number(target.dataset.buildTailWords) || 0)));
+        const tailSpeed = Math.max(speed, Number(target.dataset.buildTailSpeed) || speed);
         let wordIndex = 0;
         const typeWord = () => {
           target.textContent += (wordIndex ? ' ' : '') + words[wordIndex];
           wordIndex += 1;
-          if (wordIndex < words.length) window.setTimeout(typeWord, speed);
-          else finishTarget();
+          if (wordIndex < words.length) {
+            let delay = speed;
+            const tailStart = words.length - tailWordCount;
+            if (tailWordCount > 0 && wordIndex >= tailStart) {
+              const rampStep = wordIndex - tailStart + 1;
+              delay = Math.round(speed + (tailSpeed - speed) * rampStep / tailWordCount);
+            }
+            window.setTimeout(typeWord, delay);
+          } else finishTarget();
         };
         if (words.length) typeWord();
         else finishTarget();
@@ -163,7 +190,15 @@
     };
     nextButton.addEventListener('click', () => {
       const target = document.querySelector(nextButton.dataset.target || '#problem');
-      target?.scrollIntoView({behavior: reducedMotion ? 'auto' : 'smooth', block:'start'});
+      if (!target) return;
+      if (lenisInstance) {
+        lenisInstance.scrollTo(target, {
+          duration: 1.05,
+          easing: t => 1 - Math.pow(1 - t, 3)
+        });
+      } else {
+        target.scrollIntoView({behavior: reducedMotion ? 'auto' : 'smooth', block:'start'});
+      }
     });
     window.addEventListener('scroll', updateNext, {passive:true}); updateNext();
   }
