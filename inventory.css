@@ -185,7 +185,7 @@
 .topbar .back-link:hover::before{transform:translateY(-2px)}
 
 
-/* Mobile-only workflow scroll choreography: diagonal entries, 3D card depth, and a foreground section reveal. */
+/* Mobile-only workflow scroll choreography: eased top-down card entrances, gesture-by-gesture sequencing, and a foreground section reveal. */
 @media (max-width: 650px) {
   html.mobile-workflow-motion #workflows {
     position: relative;
