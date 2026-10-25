@@ -381,7 +381,7 @@
 
       const gridDocumentTop = window.scrollY + workflowGrid.getBoundingClientRect().top;
       cardDocumentTops = workflowCards.map(card => gridDocumentTop + card.offsetTop);
-      stageTargets = cardDocumentTops.map((documentTop, index) => Math.max(0, documentTop - stickyTopOffsets[index]));
+      stageTargets = cardDocumentTops.map((documentTop, index) => Math.max(0, documentTop - stickyTopOffsets[index] + entranceDistance));
       gateStartY = Math.max(0, stageTargets[0] - entranceDistance);
       timelineStart = stageTargets[3];
       timelineEnd = timelineStart + Math.min((window.innerHeight || 1) * 0.32, 260);
@@ -398,13 +398,8 @@
 
       const viewportHeight = window.innerHeight || 1;
       workflowCards.forEach((card, index) => {
-        const previousProgress = Number(card.dataset.workflowProgress || '0');
-        const rect = card.getBoundingClientRect();
-        // Undo the card's previous transform to recover its layout position.
-        const layoutTop = rect.top + (1 - previousProgress) * entryYDistance;
-        const targetTop = stickyTopOffsets[index];
-        const startTop = targetTop + entranceDistance;
-        const rawProgress = clamp((startTop - layoutTop) / entranceDistance, 0, 1);
+        const entryStartY = cardDocumentTops[index] - stickyTopOffsets[index];
+        const rawProgress = clamp((window.scrollY - entryStartY) / entranceDistance, 0, 1);
         // Ease the entrance so opacity, depth and shadows settle gently at the stack.
         const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
         const remaining = 1 - progress;
