@@ -483,3 +483,13 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
 @media (max-width:760px) and (prefers-reduced-motion:reduce) {
   #services .service-grid.service-stack-enabled { padding-bottom: 0 !important; }
 }
+
+
+/* Mobile-only spacing adjustments: services CTA and problem statement to How I Work. */
+@media (max-width: 760px) {
+  /* Add exactly 3px between the Local SEO / Maps service card stack and its CTA. */
+  #services .services-more { margin-top: 25px; }
+
+  /* Reduce the combined space before How I Work by about 40% (122px to 73px). */
+  #skills.skills-type-section { padding-bottom: 16px !important; }
+}
