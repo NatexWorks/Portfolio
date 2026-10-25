@@ -183,3 +183,95 @@
 .topbar .back-link::before{content:"▤";font-size:12px;color:var(--lime);transition:transform .22s}
 .topbar .back-link:hover{color:var(--lime);border-color:var(--lime);transform:translateX(-3px)}
 .topbar .back-link:hover::before{transform:translateY(-2px)}
+
+
+/* Mobile-only workflow scroll choreography: diagonal entries, 3D card depth, and a foreground section reveal. */
+@media (max-width: 650px) {
+  html.mobile-workflow-motion #workflows {
+    position: relative;
+    z-index: 2;
+    transform-origin: 50% 12%;
+    transform: perspective(1100px) translate3d(0, var(--workflow-rise, 0px), 0) rotateX(var(--workflow-tilt, 0deg)) scale(var(--workflow-scale, 1));
+    opacity: var(--workflow-opacity, 1);
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+  }
+
+  html.mobile-workflow-motion #workflows .workflow-grid {
+    padding-bottom: 50vh;
+    padding-bottom: 50svh;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+  }
+
+  html.mobile-workflow-motion #workflows .workflow-card {
+    height: 220px;
+    min-height: 220px;
+    margin-bottom: 12px;
+    transform-origin: center top;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    box-shadow: 0 var(--shadow-y, 14px) var(--shadow-blur, 30px) #0008, inset 0 1px 0 #ffffff12, inset 0 -1px 0 #0004;
+    transition: none;
+    will-change: transform, opacity, box-shadow;
+  }
+
+  html.mobile-workflow-motion #workflows .workflow-card::before {
+    opacity: var(--card-glow, 0);
+  }
+
+  html.mobile-workflow-motion #workflows .workflow-grid .workflow-card.reveal {
+    opacity: var(--entry-opacity, 1);
+    transform: perspective(950px) translate3d(var(--entry-x, 0px), var(--entry-y, 0px), var(--entry-z, 0px)) rotateX(var(--entry-rotate-x, 0deg)) rotateY(var(--entry-rotate-y, 0deg));
+    transition: none;
+  }
+
+  html.mobile-workflow-motion #compare {
+    position: relative;
+    z-index: 5;
+    transform: translate3d(0, var(--workflow-panel-shift, 0px), 0);
+    box-shadow: 0 -28px 62px #0009;
+    border-top-color: #49583a;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+}
+
+/* Mobile visitors who prefer reduced motion get the same cards in a normal, non-sticky flow. */
+@media (max-width: 650px) and (prefers-reduced-motion: reduce) {
+  html.mobile-workflow-motion #workflows {
+    padding-bottom: 0;
+    transform: none !important;
+    opacity: 1 !important;
+    will-change: auto;
+  }
+
+  html.mobile-workflow-motion #workflows .workflow-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding-bottom: 0;
+    perspective: none;
+  }
+
+  html.mobile-workflow-motion #workflows .workflow-card,
+  html.mobile-workflow-motion #workflows .workflow-grid .workflow-card.reveal {
+    position: relative;
+    inset: auto;
+    top: auto;
+    height: auto;
+    min-height: 220px;
+    margin: 0;
+    opacity: 1 !important;
+    transform: none !important;
+    box-shadow: 0 8px 20px #0003;
+    transition: none !important;
+    will-change: auto;
+  }
+
+  html.mobile-workflow-motion #compare {
+    transform: none !important;
+    box-shadow: none !important;
+    will-change: auto;
+  }
+}
