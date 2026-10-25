@@ -62,6 +62,86 @@
       .menu-toggle:hover { transform: none !important; }
     }
   </style>
+  <style>
+    /* Café reference: echo Neswef's warm editorial palette and live-site typography without touching other project cards. */
+    .cafe-visual {
+      height: 345px;
+      padding: 0;
+      color: #f8f0e4;
+      background: #29291f;
+      border-color: #5a4b39;
+      isolation: isolate;
+    }
+    .neswef-preview-top {
+      position: relative;
+      z-index: 3;
+      height: 54px;
+      padding: 0 17px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: #f5eee2;
+      background: #28251feF;
+      border-bottom: 1px solid #f0e2ca25;
+    }
+    .neswef-preview-brand { display:flex; align-items:center; gap:7px; font:700 17px Georgia,serif; letter-spacing:-.06em; white-space:nowrap; }
+    .neswef-preview-brand i { width:23px; height:23px; display:grid; place-items:center; border:1px solid #c8a77a; border-radius:50%; color:#e3b77e; font-style:normal; font-size:13px; }
+    .neswef-preview-brand small { align-self:center; margin-left:1px; color:#c6a984; font:8px var(--mono); letter-spacing:.14em; }
+    .neswef-preview-links,.neswef-preview-cta { font:7px var(--mono); letter-spacing:.055em; white-space:nowrap; }
+    .neswef-preview-links { color:#e2d2bc; }
+    .neswef-preview-cta { padding:8px 10px; color:#2b241b; background:#e5c39a; }
+    .neswef-preview-scene { position:absolute; inset:54px 0 25px; overflow:hidden; background:#b18a61; }
+    .neswef-preview-photo { position:absolute; inset:0; background-image:linear-gradient(90deg,#201a13d9 0%,#2b2015a8 45%,#2b20151a 100%),url("https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1000&q=82"); background-size:cover; background-position:center 54%; transform:scale(1.02); transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .4s ease; filter:saturate(.8); }
+    .cafe-visual:hover .neswef-preview-photo { transform:scale(1.07); filter:saturate(1); }
+    .neswef-preview-shade { position:absolute; inset:0; background:linear-gradient(0deg,#211a13a8,transparent 45%); }
+    .neswef-preview-copy { position:absolute; z-index:1; left:25px; top:23px; max-width:70%; }
+    .neswef-preview-kicker { font:7px var(--mono); letter-spacing:.12em; color:#e8c79d; }
+    .neswef-preview-copy h3 { margin:12px 0 10px; font:clamp(35px,4vw,49px)/.96 Georgia,serif; font-weight:400; letter-spacing:-.065em; color:#fff6e9; }
+    .neswef-preview-copy h3 em { color:#edc08b; font-weight:400; }
+    .neswef-preview-copy p { margin:0; color:#f0e4d3; font-size:9px; line-height:1.8; }
+    .neswef-preview-button { display:inline-flex; align-items:center; gap:15px; margin-top:14px; padding:9px 11px; background:#f3e5d1; color:#30261c; font:7px var(--mono); letter-spacing:.045em; }
+    .neswef-preview-button b { color:#9b6538; font-size:11px; }
+    .neswef-preview-seal { position:absolute; right:19px; bottom:20px; z-index:1; width:72px; height:72px; display:grid; place-content:center; border:1px solid #f1dfc5c7; border-radius:50%; color:#f8ead8; text-align:center; font:7px/1.7 var(--mono); letter-spacing:.04em; transform:rotate(9deg); }
+    .neswef-preview-bottom { position:absolute; z-index:3; left:0; right:0; bottom:0; height:25px; padding:0 13px; display:flex; align-items:center; justify-content:space-between; gap:8px; color:#c9b69c; background:#28251f; font:6px var(--mono); letter-spacing:.045em; }
+    .cafe-visual .visual-caption { z-index:4; left:12px; bottom:31px; color:#fff1df; text-shadow:0 1px 6px #0009; }
+    @media (max-width:1000px) { .neswef-preview-copy h3 { font-size:42px; } }
+    @media (max-width:760px) {
+      .neswef-preview-top { height:49px; padding-inline:12px; }
+      .neswef-preview-brand { font-size:15px; gap:5px; }
+      .neswef-preview-brand i { width:21px; height:21px; }
+      .neswef-preview-links { display:none; }
+      .neswef-preview-scene { top:49px; }
+      .neswef-preview-copy { left:20px; top:24px; max-width:78%; }
+      .neswef-preview-copy h3 { font-size:clamp(38px,10vw,49px); }
+      .neswef-preview-seal { right:13px; bottom:19px; width:61px; height:61px; font-size:6px; }
+      .neswef-preview-bottom { padding-inline:10px; font-size:5px; }
+      .neswef-preview-bottom span:last-child { display:none; }
+    }
+    @media (max-width:390px) { .neswef-preview-cta { padding:7px; font-size:6px; } .neswef-preview-copy { left:16px; } }
+    @media (prefers-reduced-motion:reduce) { .neswef-preview-photo { transition:none!important; transform:none!important; } }
+    /* Small fixed navigation controls, matching inventory.html. */
+    .portfolio-scroll-next,.portfolio-back-top {
+      position:fixed; right:max(18px,calc((100vw - var(--wrap))/2)); z-index:900;
+      display:flex; align-items:center; gap:12px; padding:10px 13px;
+      background:#171b14e8; border:1px solid #4b5540; color:var(--text);
+      font:8px var(--mono); letter-spacing:.09em; backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px); cursor:pointer; box-shadow:0 10px 28px #0004;
+      transition:background .2s,border-color .2s,transform .2s,opacity .2s,visibility .2s;
+    }
+    .portfolio-scroll-next { bottom:22px; }
+    .portfolio-scroll-next b { font:16px var(--sans); color:var(--lime); }
+    .portfolio-back-top { bottom:67px; opacity:0; visibility:hidden; pointer-events:none; }
+    .portfolio-back-top.is-visible { opacity:1; visibility:visible; pointer-events:auto; }
+    .portfolio-scroll-next:hover,.portfolio-back-top:hover { background:#242d1b; border-color:var(--lime); transform:translateY(-2px); }
+    @media(max-width:650px) {
+      .portfolio-scroll-next,.portfolio-back-top { right:12px; padding:9px 10px; }
+      .portfolio-scroll-next { bottom:12px; }
+      .portfolio-back-top { bottom:56px; }
+      .portfolio-scroll-next span,.portfolio-back-top span { font-size:7px; }
+    }
+    @media(prefers-reduced-motion:reduce) { .portfolio-scroll-next,.portfolio-back-top { transition:none!important; } }
+  </style>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -127,7 +207,9 @@
           </article>
           <article class="project-card reveal">
             <a class="project-visual cafe-visual image-scroll" data-image-scroll href="https://natexworks.github.io/Neswef/" target="_blank" rel="noopener noreferrer" aria-label="Open the Neswef café website">
-              <div class="cafe-nav"><span>goodday<span>®</span></span><span>MENU　 OUR STORY　 VISIT US</span><span>ORDER ↗</span></div><div class="cafe-content"><span class="cafe-kicker">YOUR EVERYDAY RITUAL</span><h3>Make room<br>for <em>good.</em></h3><p>Good coffee. Slow mornings.<br>A little more time for you.</p><span class="cafe-button">FIND YOUR CUP ↗</span></div><div class="cafe-stamp">BREWED<br>WITH CARE</div><div class="cafe-bean bean-one"></div><div class="cafe-bean bean-two"></div><span class="visual-caption">CONCEPT DESIGN · CAFÉ WEBSITE</span>
+              <div class="neswef-preview-top"><span class="neswef-preview-brand"><i>n</i> neswef <small>CAFÉ</small></span><span class="neswef-preview-links">THE MENU　 OUR STORY　 FIND US</span><span class="neswef-preview-cta">VISIT US ↗</span></div>
+              <div class="neswef-preview-scene"><div class="neswef-preview-photo" aria-hidden="true"></div><div class="neswef-preview-shade"></div><div class="neswef-preview-copy"><span class="neswef-preview-kicker">YOUR NEIGHBOURHOOD SLOW-DOWN</span><h3>Stay for a<br><em>little longer.</em></h3><p>Good coffee. Fresh bakes.<br>A softer kind of everyday.</p><span class="neswef-preview-button">EXPLORE THE MENU <b>↗</b></span></div><span class="neswef-preview-seal">MADE WITH<br>CARE & HEART</span></div>
+              <div class="neswef-preview-bottom"><span>NESWEF CAFÉ / WEBSITE PREVIEW</span><span>WARM MOMENTS, WELL MADE ↗</span></div><span class="visual-caption">LIVE WEBSITE PREVIEW · NESWEF CAFÉ</span>
             </a>
             <div class="project-info"><div><div class="project-type">03 / BUSINESS WEBSITE CONCEPT</div><h3>Café & local business</h3><p>A warm, mobile-friendly website concept with clear menu, location, contact paths, and a foundation for local discovery.</p><div class="tag-list"><span>Responsive design</span><span>Local business</span><span>Concept only</span></div></div><a class="round-arrow" href="https://natexworks.github.io/Neswef/" target="_blank" rel="noopener noreferrer" aria-label="Open the Neswef café website">↗</a></div>
           </article>
@@ -164,7 +246,30 @@
 
       <section class="section contact-section" id="contact"><div class="contact-card reveal"><div class="contact-orb"></div><div class="eyebrow"><span class="status-dot"></span> HAVE A PROJECT IN MIND?</div><h2 class="contact-heading"><span class="contact-heading-line">Let's make something</span><br><span class="contact-heading-line contact-heading-accent">useful.</span></h2><p class="contact-copy">Tell me what you're building, what isn't working, or what you'd like to improve. We'll start with the problem and work from there.</p><a class="button button-primary" href="mailto:natexworks@gmail.com?subject=Project%20enquiry%20%E2%80%94%20NatexWorks">Start a conversation <span aria-hidden="true">↗</span></a><span class="contact-email">NATEXWORKS@GMAIL.COM</span></div></section>
     </main>
+    <button class="portfolio-scroll-next" id="portfolioScrollNext" type="button" aria-label="Scroll to next section"><span>NEXT SECTION</span><b>↓</b></button>
+    <button class="portfolio-back-top" id="portfolioBackTop" type="button" aria-label="Back to top"><span>BACK TO TOP</span><b>↑</b></button>
     <footer class="site-footer"><a class="brand" href="#home"><span class="brand-mark">N<span>×</span></span><span class="brand-wordmark"><span class="brand-word-natex">Natex</span><span class="brand-word-works">Works</span><span class="brand-dot">.</span></span></a><span>BUILT WITH INTENTION. <span id="year"></span></span><a href="#home">BACK TO TOP ↑</a></footer>
   </div>
+  <script>
+    (function () {
+      const nextButton = document.getElementById('portfolioScrollNext');
+      const topButton = document.getElementById('portfolioBackTop');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const getSections = () => Array.from(document.querySelectorAll('main > section, main > .feature-band')).filter(section => section.getBoundingClientRect().height > 0);
+      nextButton.addEventListener('click', function () {
+        const sections = getSections();
+        const threshold = window.scrollY + 100;
+        const next = sections.find(section => section.getBoundingClientRect().top + window.scrollY > threshold);
+        if (next) next.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+        else document.getElementById('home').scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+      });
+      topButton.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+      });
+      const updateTopButton = () => topButton.classList.toggle('is-visible', window.scrollY > 550);
+      window.addEventListener('scroll', updateTopButton, { passive: true });
+      updateTopButton();
+    })();
+  </script>
 </body>
 </html>
