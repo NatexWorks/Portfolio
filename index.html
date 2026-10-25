@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css?v=20261025-4">
+  <link rel="stylesheet" href="style.css?v=20261025-5">
   <link rel="stylesheet" href="about-motion.css">
   <style>
     /* NatexWorks menu distance + hover burst */
@@ -197,12 +197,13 @@
     .portfolio-scroll-next::before { left:-7px; }
     .portfolio-scroll-next::after { right:-7px; }
     .portfolio-scroll-next.is-back-top {
-      color:#10150c; background:var(--lime); border-color:var(--lime);
-      box-shadow:0 0 0 1px #c5f36b50,0 0 19px #c5f36b55,0 8px 28px #0005;
+      border-color:var(--lime);
     }
-    .portfolio-scroll-next.is-back-top span,.portfolio-scroll-next.is-back-top b { color:#10150c; }
-    .portfolio-scroll-next.is-back-top::before { opacity:.95; animation:backTopGlowLeft 1.15s ease-in-out infinite alternate; }
-    .portfolio-scroll-next.is-back-top::after { opacity:.95; animation:backTopGlowRight 1.15s ease-in-out infinite alternate; }
+    .portfolio-scroll-next.is-back-top:hover {
+      background:#171b14e8;
+      border-color:var(--lime);
+    }
+    .portfolio-scroll-next.is-back-top::before,.portfolio-scroll-next.is-back-top::after { opacity:0; animation:none; }
     @keyframes backTopGlowLeft { from { transform:scaleY(.55) translateX(0); opacity:.45; } to { transform:scaleY(1.2) translateX(-3px); opacity:1; } }
     @keyframes backTopGlowRight { from { transform:scaleY(.55) translateX(0); opacity:.45; } to { transform:scaleY(1.2) translateX(3px); opacity:1; } }
     .site-footer { justify-content:flex-start; }
@@ -342,7 +343,7 @@
           <article class="service-card reveal"><span class="service-number">04</span><div class="service-icon">◎</div><h3>SEO & Google Maps</h3><p>Practical on-page SEO, local search setup, and Google Business Profile improvements to help your business get discovered. Rankings can’t be guaranteed, but we’ll work consistently and strategically toward stronger visibility—and well-executed local SEO often delivers meaningful progress.</p><span class="service-foot">LOCAL SEO · SEARCH · MAPS</span></article>
           <article class="service-card reveal"><span class="service-number">03</span><div class="service-icon">✳</div><h3>Responsive polish</h3><p>Layout fixes, interaction improvements, and interface refinements across mobile, tablet, and desktop.</p><span class="service-foot">MOBILE-FIRST · UI IMPROVEMENTS</span></article>
         </div>
-        <div class="services-more reveal"><p>Need more detail before deciding?</p><a class="text-link" href="services.html">Explore service details <span aria-hidden="true">↗</span></a></div>
+        <div class="services-more reveal"><a class="text-link" href="services.html">Explore service details <span aria-hidden="true">↗</span></a></div>
       </section>
 
       <section class="section skills-type-section reveal" id="skills"><div class="skills-copy"><div class="eyebrow">BUILT WITH THE MERN STACK</div><h2>From business problem<br>to <span class="headline-muted">working product.</span></h2><p>I enjoy the challenges of building complete products—from interface and data flow to the logic behind the scenes.</p><div class="stack-tags"><span>MongoDB</span><span>Express</span><span>React</span><span>Node.js</span></div></div><div class="typewriter-panel"><span class="terminal-top"><i></i><i></i><i></i> MANISH / BUILD LOG</span><p class="terminal-prompt">const focus = <span class="typewriter-text" data-rotate="custom business tools|SaaS products|useful web experiences">custom business tools</span><span class="type-cursor">▍</span></p><p class="terminal-note">Good software starts with the right problem.</p></div></section>
