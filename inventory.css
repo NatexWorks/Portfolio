@@ -205,10 +205,10 @@
     transform-style: preserve-3d;
   }
 
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(1) { top: 70px; }
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(2) { top: 80px; }
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(3) { top: 90px; }
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(4) { top: 100px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(1) { top: 100px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(2) { top: 90px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(3) { top: 80px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(4) { top: 70px; }
 
   html.mobile-workflow-motion #workflows .workflow-card {
     height: 220px;
@@ -235,6 +235,30 @@
   html.mobile-workflow-motion #workflows .workflow-card::before {
     opacity: var(--card-glow, 0);
     filter: saturate(1.15);
+  }
+
+  /* Split highlight along the upper edge; keep the card's original content untouched. */
+  html.mobile-workflow-motion #workflows .workflow-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 12px;
+    right: 12px;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      #bfe96828 12%,
+      #d9ff9b 29%,
+      #bfe96830 43%,
+      transparent 49%,
+      transparent 56%,
+      #bfe96824 64%,
+      #d9ff9b 79%,
+      #bfe96824 91%,
+      transparent 100%);
+    box-shadow: 0 0 7px #bfe9682e, 0 1px 12px #bfe96812;
+    opacity: var(--card-glow, 0);
   }
 
   html.mobile-workflow-motion #workflows .workflow-grid .workflow-card.reveal {
