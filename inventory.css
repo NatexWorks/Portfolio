@@ -193,7 +193,6 @@
     transform-origin: 50% 12%;
     transform: perspective(1100px) translate3d(0, var(--workflow-rise, 0px), 0) rotateX(var(--workflow-tilt, 0deg)) scale(var(--workflow-scale, 1));
     opacity: var(--workflow-opacity, 1);
-    transform-style: preserve-3d;
     will-change: transform, opacity;
   }
 
@@ -212,8 +211,8 @@
     padding: 18px;
     transform-origin: center top;
     border-color: #59664a;
-    /* One restrained shadow avoids stacking several expensive-looking depth cues. */
-    box-shadow: 0 12px 26px #0006;
+    /* A single soft shadow preserves depth without heavy stacked effects. */
+    box-shadow: 0 10px 22px #0005;
     transition: none;
   }
 
@@ -241,7 +240,6 @@
     box-shadow: 0 -14px 32px #0006;
     transform: translate3d(0, var(--workflow-panel-rise, 0px), 0);
     will-change: transform;
-    backface-visibility: hidden;
   }
 }
 
