@@ -218,13 +218,14 @@
     transform-style: preserve-3d;
     backface-visibility: hidden;
     border-color: #697b4b;
+    /* Static depth: avoid repainting animated shadows during scroll. */
     box-shadow:
-      0 var(--shadow-y, 14px) var(--shadow-blur, 30px) #0009,
+      0 18px 30px #0009,
       0 0 0 1px #bfe96812,
       inset 0 1px 0 #f2ffd45c,
       inset 0 -1px 0 #0007;
     transition: none;
-    will-change: transform, opacity, box-shadow;
+    will-change: transform, opacity;
   }
 
   html.mobile-workflow-motion #workflows .workflow-card:nth-child(1) { z-index: 1; }
@@ -233,8 +234,8 @@
   html.mobile-workflow-motion #workflows .workflow-card:nth-child(4) { z-index: 4; }
 
   html.mobile-workflow-motion #workflows .workflow-card::before {
-    opacity: var(--card-glow, 0);
-    filter: saturate(1.15);
+    opacity: 0;
+    filter: none;
   }
 
   /* Split highlight along the upper edge; keep the card's original content untouched. */
@@ -258,7 +259,8 @@
       #bfe96824 91%,
       transparent 100%);
     box-shadow: 0 0 7px #bfe9682e, 0 1px 12px #bfe96812;
-    opacity: var(--card-glow, 0);
+    opacity: 0;
+    box-shadow: none;
   }
 
   html.mobile-workflow-motion #workflows .workflow-grid .workflow-card.reveal {
@@ -272,12 +274,11 @@
   html.mobile-workflow-motion #compare {
     position: relative;
     z-index: 5;
-    /* Reveal the panel from the bottom while keeping its layout position fixed (no blank gap). */
-    transform: translate3d(0, 0, 0);
-    clip-path: inset(var(--workflow-panel-clip, 100vh) 0 0 0);
+    /* The panel is already in the document; reveal it with a single compositor transform. */
+    transform: translate3d(0, var(--workflow-panel-rise, 100vh), 0);
     box-shadow: 0 -18px 38px #0008;
     border-top-color: #49583a;
-    will-change: clip-path;
+    will-change: transform;
     backface-visibility: hidden;
   }
 }
