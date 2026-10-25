@@ -696,3 +696,45 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
     gap: 18px;
   }
 }
+
+
+/* Phone-only: swap the service labels, remove the line that collides with SEO copy. */
+@media (max-width: 760px) {
+  #services .services-more {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    border-top: 0 !important;
+    padding-top: 12px !important;
+    padding-bottom: 18px !important;
+  }
+
+  #services .services-more::before {
+    content: "LOCAL SEO · SEARCH · MAPS";
+    display: block;
+    margin: 0;
+    color: #7c856d;
+    font: 8px/1.6 var(--mono);
+    letter-spacing: .07em;
+  }
+
+  #services .services-more .text-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 60px !important;
+    padding: 0;
+    font-size: 12px !important;
+    line-height: 1.6;
+    letter-spacing: normal !important;
+  }
+
+  #services .services-more .text-link::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  #services .services-more .text-link span {
+    display: inline !important;
+  }
+}
