@@ -337,3 +337,42 @@
 @media (max-width:650px) and (prefers-reduced-motion:reduce) {
   .workflow-live-note.is-typing::after { display: none !important; animation: none !important; }
 }
+
+/* Match the portfolio's Next Section / Back to Top treatment without changing this button's dimensions. */
+.scroll-next {
+  isolation:isolate;
+  overflow:visible;
+  -webkit-backdrop-filter:blur(14px);
+  transition:background .2s,border-color .2s,transform .2s,box-shadow .35s,color .2s;
+}
+.scroll-next::before,.scroll-next::after {
+  content:"";
+  position:absolute;
+  top:6px;
+  bottom:6px;
+  width:13px;
+  z-index:-1;
+  opacity:0;
+  filter:blur(7px);
+  pointer-events:none;
+  background:var(--lime);
+  border-radius:50%;
+}
+.scroll-next::before { left:-7px; }
+.scroll-next::after { right:-7px; }
+.scroll-next.is-back-top {
+  color:#10150c;
+  background:var(--lime);
+  border-color:var(--lime);
+  box-shadow:0 0 0 1px #c5f36b50,0 0 19px #c5f36b55,0 8px 28px #0005;
+}
+.scroll-next.is-back-top span,.scroll-next.is-back-top b { color:#10150c; }
+.scroll-next.is-back-top::before { opacity:.95; animation:backTopGlowLeft 1.15s ease-in-out infinite alternate; }
+.scroll-next.is-back-top::after { opacity:.95; animation:backTopGlowRight 1.15s ease-in-out infinite alternate; }
+.scroll-next.is-back-top:hover { background:var(--lime); border-color:var(--lime); }
+.scroll-next:focus-visible { outline:1px solid var(--lime); outline-offset:4px; }
+@keyframes backTopGlowLeft { from { transform:scaleY(.55) translateX(0); opacity:.45; } to { transform:scaleY(1.2) translateX(-3px); opacity:1; } }
+@keyframes backTopGlowRight { from { transform:scaleY(.55) translateX(0); opacity:.45; } to { transform:scaleY(1.2) translateX(3px); opacity:1; } }
+@media(prefers-reduced-motion:reduce) {
+  .scroll-next,.scroll-next::before,.scroll-next::after { transition:none!important; animation:none!important; }
+}
