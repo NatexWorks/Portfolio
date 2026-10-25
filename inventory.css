@@ -392,3 +392,33 @@
 
 /* Keep the Inventory footer NatexWorks wordmark the same size as index.html. */
 .footer .brand > span:last-child { font-size:50px; line-height:1; }
+
+
+/* test: prevent narrow-phone overflow and improve touch/readability targets */
+html, body { overflow-x: clip; }
+.brand-mark, .app-logo {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+}
+.app-logo span { line-height: 1 !important; }
+.text-link, .footer a { min-height: 44px; }
+.back-link { display: inline-flex; align-items: center; min-height: 44px; padding-block: 8px; }
+.brand { min-height: 44px; }
+.side-item { min-height: 44px; justify-content: center; }
+.window-dot { position: relative; }
+.window-dot::after { content: ""; position: absolute; inset: -12px; }
+.hero-scroll { min-height: 44px; padding-block: 10px; font-size: 9px; gap: 14px; }
+.small-note { color: #929b84; font-size: 11px; }
+.calc-form input, .calc-form select, .calc-form textarea,
+.calculator input, .calculator select, .calculator textarea,
+.calc-field input { min-height: 44px; }
+.topbar-label, .back-link { font-size: 11px; }
+.app-logo { min-width: 31px; min-height: 31px; }
+@media (max-width: 760px) {
+  .js-motion .reveal-left { transform: translateY(24px) !important; }
+  .hero-scroll { flex-wrap: wrap; }
+}
