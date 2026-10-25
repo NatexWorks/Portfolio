@@ -10,7 +10,43 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261025-6">
+  <style>
+    /* Fixed Next Section / Back to Top control for the services page. */
+    .services-scroll-next {
+      position:fixed; right:max(18px,calc((100vw - var(--wrap))/2)); bottom:22px; z-index:900;
+      display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 13px;
+      background:#171b14e8; border:1px solid #4b5540; color:var(--text);
+      font:8px var(--mono); letter-spacing:.09em; white-space:nowrap;
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      cursor:pointer; box-shadow:0 10px 28px #0004; transition:background .2s,border-color .2s,transform .2s,box-shadow .35s;
+      isolation:isolate; overflow:visible;
+    }
+    .services-scroll-next b { font:16px var(--sans); color:var(--lime); }
+    .services-scroll-next::before,.services-scroll-next::after {
+      content:""; position:absolute; top:6px; bottom:6px; width:13px; z-index:-1;
+      opacity:0; filter:blur(7px); pointer-events:none; background:var(--lime); border-radius:50%;
+    }
+    .services-scroll-next::before { left:-7px; }
+    .services-scroll-next::after { right:-7px; }
+    .services-scroll-next:hover { background:#242d1b; border-color:var(--lime); transform:translateY(-2px); }
+    .services-scroll-next:not(.is-back-top):hover::before { opacity:.75; animation:servicesGlowLeft 1.15s ease-in-out infinite alternate; }
+    .services-scroll-next:not(.is-back-top):hover::after { opacity:.75; animation:servicesGlowRight 1.15s ease-in-out infinite alternate; }
+    /* Back to Top changes only its border; its text and fill stay untouched. */
+    .services-scroll-next.is-back-top { border-color:var(--lime); }
+    .services-scroll-next.is-back-top:hover { background:#171b14e8; border-color:var(--lime); }
+    .services-scroll-next.is-back-top::before,.services-scroll-next.is-back-top::after { opacity:0; animation:none; }
+    .services-scroll-next:focus-visible { outline:1px solid var(--lime); outline-offset:4px; }
+    @keyframes servicesGlowLeft { from { transform:scaleY(.55); opacity:.45; } to { transform:scaleY(1.2) translateX(-3px); opacity:1; } }
+    @keyframes servicesGlowRight { from { transform:scaleY(.55); opacity:.45; } to { transform:scaleY(1.2) translateX(3px); opacity:1; } }
+    @media(max-width:650px) {
+      .services-scroll-next { right:12px; bottom:12px; padding:9px 10px; }
+      .services-scroll-next span { font-size:7px; }
+    }
+    @media(prefers-reduced-motion:reduce) {
+      .services-scroll-next,.services-scroll-next::before,.services-scroll-next::after { transition:none!important; animation:none!important; }
+    }
+  </style>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -44,7 +80,53 @@
         <div class="contact-card reveal"><div><div class="eyebrow"><span class="status-dot"></span> START WITH THE PROBLEM</div><h2>What do you need<br><span>to improve?</span></h2><p>Share the goal, what you have already, and the main obstacle. We can define a practical scope before committing to a build.</p></div><div class="contact-actions"><a class="button button-primary" href="mailto:natexworks@gmail.com?subject=Project%20enquiry%20%E2%80%94%20NatexWorks">Start a conversation <span aria-hidden="true">↗</span></a><span class="contact-email">NATEXWORKS@GMAIL.COM</span></div></div>
       </section>
     </main>
+    <button class="services-scroll-next" id="servicesScrollNext" type="button" aria-label="Scroll to next section"><span>NEXT SECTION</span><b>↓</b></button>
     <footer class="site-footer"><a class="brand" href="index.html#home"><span class="brand-mark">N<span>×</span></span><span>NatexWorks<span class="brand-dot">.</span></span></a><span>BUILT WITH INTENTION. <span id="year"></span></span><a href="#main">BACK TO TOP ↑</a></footer>
   </div>
+  <script>
+    (function () {
+      const button = document.getElementById('servicesScrollNext');
+      if (!button) return;
+      const label = button.querySelector('span');
+      const arrow = button.querySelector('b');
+      const sections = Array.from(document.querySelectorAll('main > section'))
+        .filter(section => section.getBoundingClientRect().height > 0);
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const isAtPageEnd = () => {
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        const pageHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+        return scrollY + window.innerHeight >= pageHeight - 36;
+      };
+
+      const syncButton = () => {
+        const backMode = isAtPageEnd();
+        button.classList.toggle('is-back-top', backMode);
+        label.textContent = backMode ? 'BACK TO TOP' : 'NEXT SECTION';
+        arrow.textContent = backMode ? '↑' : '↓';
+        button.setAttribute('aria-label', backMode ? 'Back to top' : 'Scroll to next section');
+        button.title = backMode ? 'Back to top' : 'Scroll to next section';
+      };
+
+      button.addEventListener('click', () => {
+        if (isAtPageEnd()) {
+          window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+          return;
+        }
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        const threshold = scrollY + Math.max(110, window.innerHeight * .16);
+        const next = sections.find(section => section.getBoundingClientRect().top + scrollY > threshold);
+        if (next) next.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+        else {
+          const pageHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+          window.scrollTo({ top: pageHeight, behavior: reducedMotion ? 'auto' : 'smooth' });
+        }
+      });
+
+      window.addEventListener('scroll', syncButton, { passive: true });
+      window.addEventListener('resize', syncButton);
+      syncButton();
+    })();
+  </script>
 </body>
 </html>
