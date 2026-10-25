@@ -329,7 +329,7 @@
     document.documentElement.classList.add('mobile-workflow-motion');
     workflowGrid.classList.add('mobile-workflow-stack');
 
-    const stickyTopOffsets = [70, 80, 90, 100];
+    let stickyTopOffsets = [];
     const entryYDistance = 64;
     const entranceDistance = 118;
 
@@ -393,20 +393,26 @@
       workflowSection.style.setProperty('--workflow-rise', '0px');
       workflowSection.style.setProperty('--workflow-opacity', '1');
 
-      // Measure the card stack with no tail spacing, then add only enough room for the
-      // disclaimer to sit 15px below the settled stack's lowest edge.
+      // Center the layered cards vertically in the mobile viewport.
+      const viewportHeight = window.innerHeight || 1;
+      const centeredTop = Math.max(70, (viewportHeight - 250) / 2);
+      stickyTopOffsets = workflowCards.map((_, index) => centeredTop + index * 10);
+      workflowCards.forEach((card, index) => { card.style.top = stickyTopOffsets[index] + 'px'; });
+
+      // Measure with no tail spacing, then reserve only the space needed for a 25px
+      // gap between the settled stack and the live-demo note.
       workflowGrid.style.setProperty('--stack-note-tail-space', '0px');
       const gridDocumentTop = window.scrollY + workflowGrid.getBoundingClientRect().top;
       cardDocumentTops = workflowCards.map(card => gridDocumentTop + card.offsetTop);
       stageTargets = cardDocumentTops.map((documentTop, index) => Math.max(0, documentTop - stickyTopOffsets[index] + entranceDistance));
       gateStartY = Math.max(0, stageTargets[0] - entranceDistance);
       timelineStart = stageTargets[3];
-      timelineEnd = timelineStart + Math.min((window.innerHeight || 1) * 0.32, 260);
+      timelineEnd = timelineStart + Math.min(viewportHeight * 0.18, 140);
 
       if (workflowLiveNote) {
         const naturalNoteTop = window.scrollY + workflowLiveNote.getBoundingClientRect().top;
         const stackBottom = Math.max(...stickyTopOffsets.map((top, index) => top + workflowCards[index].offsetHeight));
-        const desiredNoteTop = timelineStart + stackBottom + 15;
+        const desiredNoteTop = timelineStart + stackBottom + 25;
         const tailSpace = Math.max(0, desiredNoteTop - naturalNoteTop);
         workflowGrid.style.setProperty('--stack-note-tail-space', tailSpace + 'px');
       }
@@ -478,7 +484,7 @@
       root.style.scrollBehavior = 'auto';
       const startY = window.scrollY;
       const distance = targetY - startY;
-      const duration = clamp(380 + Math.abs(distance) * 0.32, 420, 520);
+      const duration = clamp(250 + Math.abs(distance) * 0.16, 280, 380);
       let startTime = 0;
 
       const step = (now) => {
@@ -709,6 +715,7 @@
           '--stack-index', '--entry-opacity', '--entry-x', '--entry-y', '--entry-z',
           '--entry-rotate-x', '--entry-rotate-y', '--shadow-y', '--shadow-blur', '--card-glow'
         ].forEach(property => card.style.removeProperty(property));
+        card.style.removeProperty('top');
         delete card.dataset.workflowProgress;
       });
       workflowGrid.classList.remove('mobile-workflow-stack');
