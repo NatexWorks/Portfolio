@@ -249,7 +249,7 @@
 
     serviceStackCards.forEach((card, index) => {
       const height = card.offsetHeight || 300;
-      const stickyTop = stackTop + index * 12;
+      const stickyTop = stackTop + (serviceStackCards.length - index - 1) * 10;
       entries.push({ card, index, staticTop: cursor, stickyTop, height });
       cursor += height + (index < serviceStackCards.length - 1 ? gridGap : 0);
     });
@@ -315,14 +315,12 @@
       const entranceProgress = clampServiceProgress(
         (entry.stickyTop + entranceDistance - constrainedTop) / entranceDistance
       );
-      const side = entry.index % 2 === 0 ? -1 : 1;
-      const x = side * (1 - entranceProgress) * 34;
-      const y = (1 - entranceProgress) * 23;
-      const rotate = side * (1 - entranceProgress) * 2.4;
-      const scale = 0.985 + entranceProgress * 0.015;
+      // The card stays horizontally centred: only a short vertical settle is used.
+      // Reverse sticky offsets place each newer card above the previous one by 10px.
+      const y = (1 - entranceProgress) * 18;
+      const scale = 0.992 + entranceProgress * 0.008;
       entry.card.style.transform =
-        `perspective(1000px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) ` +
-        `rotateY(${rotate.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+        `perspective(1000px) translate3d(0, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
     });
 
     if (scrollY >= metrics.triggerY) {
