@@ -22,15 +22,39 @@
   const toggle = document.querySelector('.menu-toggle');
   const menu = document.querySelector('#site-menu');
   if (toggle && menu) {
-    const closeMenu = () => { toggle.setAttribute('aria-expanded','false'); toggle.setAttribute('aria-label','Open navigation'); menu.classList.remove('is-open'); };
+    const menuLinks = Array.from(menu.querySelectorAll('a[href]'));
+    const setMenuOpen = (open, restoreFocus = false) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+      menu.classList.toggle('is-open', open);
+      if (open) menuLinks[0]?.focus();
+      else if (restoreFocus) toggle.focus();
+    };
+
     toggle.addEventListener('click', () => {
-      const open = toggle.getAttribute('aria-expanded') === 'true';
-      toggle.setAttribute('aria-expanded', String(!open));
-      toggle.setAttribute('aria-label', open ? 'Open navigation' : 'Close navigation');
-      menu.classList.toggle('is-open', !open);
+      setMenuOpen(toggle.getAttribute('aria-expanded') !== 'true');
     });
-    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && menu.classList.contains('is-open')) { closeMenu(); toggle.focus(); } });
+    menuLinks.forEach(link => link.addEventListener('click', () => setMenuOpen(false)));
+
+    document.addEventListener('keydown', event => {
+      if (!menu.classList.contains('is-open')) return;
+      if (event.key === 'Escape') {
+        setMenuOpen(false, true);
+        return;
+      }
+      if (event.key !== 'Tab' || menuLinks.length === 0) return;
+
+      const firstLink = menuLinks[0];
+      const lastLink = menuLinks[menuLinks.length - 1];
+      const focusOutsideMenu = !menu.contains(document.activeElement) && document.activeElement !== toggle;
+      if (focusOutsideMenu || (event.shiftKey && (document.activeElement === firstLink || document.activeElement === toggle))) {
+        event.preventDefault();
+        lastLink.focus();
+      } else if (!event.shiftKey && (document.activeElement === lastLink || document.activeElement === toggle)) {
+        event.preventDefault();
+        firstLink.focus();
+      }
+    });
   }
   if (!reducedMotion && 'IntersectionObserver' in window) {
     document.documentElement.classList.add('js-motion');
