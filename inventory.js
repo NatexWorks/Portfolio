@@ -408,15 +408,15 @@
 
         // Match index.html: a small vertical settle and a restrained scale, tied directly to scrolling.
         entry.card.style.transform =
-          'perspective(1000px) translate3d(0, ' + y.toFixed(2) + 'px, 0) scale(' + scale.toFixed(4) + ')';
+          'translate3d(0, ' + y.toFixed(2) + 'px, 0) scale(' + scale.toFixed(4) + ')';
       });
 
       if (scrollY >= metrics.triggerY) {
         const exitProgress = clamp((scrollY - metrics.triggerY) / metrics.exitDuration);
         const progress = smoothstep(exitProgress);
         workflowSection.style.setProperty('--workflow-rise', (-18 * progress).toFixed(2) + 'px');
-        workflowSection.style.setProperty('--workflow-tilt', (9 * progress).toFixed(2) + 'deg');
-        workflowSection.style.setProperty('--workflow-scale', (1 - 0.055 * progress).toFixed(4));
+        workflowSection.style.setProperty('--workflow-tilt', (2.5 * progress).toFixed(2) + 'deg');
+        workflowSection.style.setProperty('--workflow-scale', (1 - 0.025 * progress).toFixed(4));
         workflowSection.style.setProperty('--workflow-opacity', '1');
         nextSection.style.setProperty('--workflow-panel-rise', (84 * (1 - progress)).toFixed(2) + 'px');
       } else {
