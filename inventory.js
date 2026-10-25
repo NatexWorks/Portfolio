@@ -363,7 +363,17 @@
         card.style.setProperty('--card-glow', `${progress * 0.28}`);
       });
 
-      // Begin the foreground-panel transition when the final card reaches its stack position.
+      // Keep the following section in its normal position until Barcode has stacked.
+      if (window.scrollY < timelineStart) {
+        workflowSection.style.setProperty('--workflow-scale', '1');
+        workflowSection.style.setProperty('--workflow-tilt', '0deg');
+        workflowSection.style.setProperty('--workflow-rise', '0px');
+        workflowSection.style.setProperty('--workflow-opacity', '1');
+        nextSection.style.setProperty('--workflow-panel-shift', '0px');
+        return;
+      }
+
+      // Once the final card reaches its stack position, tilt the stack back and raise the panel.
       const rawProgress = clamp((window.scrollY - timelineStart) / Math.max(1, timelineEnd - timelineStart), 0, 1);
       const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
       workflowSection.style.setProperty('--workflow-scale', String(1 - 0.035 * progress));
