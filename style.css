@@ -818,3 +818,13 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
 @media (prefers-reduced-motion: reduce) {
   .nav.is-open { transition: none !important; }
 }
+
+
+/* Keep floating page controls out of view whenever the full-screen main navigation is open. */
+body:has(.nav.is-open) .portfolio-scroll-next,
+body:has(.nav.is-open) .portfolio-back-top,
+body:has(.nav.is-open) .services-scroll-next {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
