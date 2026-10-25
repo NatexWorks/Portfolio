@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css?v=20261025-6">
+  <link rel="stylesheet" href="style.css?v=20261025-7">
   <link rel="stylesheet" href="about-motion.css">
   <style>
     /* NatexWorks menu distance + hover burst */
@@ -237,6 +237,30 @@
       .hero-cafe-photo,.hero-cafe-copy,.hero-project-hint>span { animation:none!important; }
       .hero-cafe-photo { transform:none!important; }
       .portfolio-scroll-next.is-back-top::before,.portfolio-scroll-next.is-back-top::after { animation:none!important; }
+    }
+
+    /* Keep the footer wordmark exactly the same size as inventory.html. */
+    .site-footer .brand-wordmark,
+    .site-footer .brand > span:last-child { font-size:50px; line-height:1; }
+
+    /* Plain scroll controls: no glow/light effects in either state. */
+    .portfolio-scroll-next::before,
+    .portfolio-scroll-next::after { display:none!important; animation:none!important; }
+    .portfolio-scroll-next,
+    .portfolio-scroll-next:hover {
+      background:#171b14e8;
+      border-color:#4b5540;
+      color:var(--text);
+      box-shadow:none;
+      transform:none;
+    }
+    .portfolio-scroll-next.is-back-top,
+    .portfolio-scroll-next.is-back-top:hover {
+      background:#171b14e8;
+      border-color:var(--lime);
+      color:var(--text);
+      box-shadow:none;
+      transform:none;
     }
 
   </style>
