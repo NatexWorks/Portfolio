@@ -365,6 +365,11 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
     line-height: 1.4;
   }
 
+  .service-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
   /* Mobile sequence: Business websites -> Custom build -> Responsive polish -> Local SEO. */
   .service-card:nth-child(1) { order: 1; }
   .service-card:nth-child(2) { order: 2; }
