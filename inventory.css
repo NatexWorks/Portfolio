@@ -202,8 +202,6 @@
     flex-direction: column;
     gap: 0;
     padding: 8px 0 var(--stack-note-tail-space, 0px);
-    perspective: 1000px;
-    transform-style: preserve-3d;
   }
 
   html.mobile-workflow-motion #workflows .workflow-card {
@@ -213,17 +211,10 @@
     margin: 0 0 12px;
     padding: 18px;
     transform-origin: center top;
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-    border-color: #697b4b;
-    /* Static depth keeps scroll-frame animation compositor-friendly. */
-    box-shadow:
-      0 18px 30px #0009,
-      0 0 0 1px #bfe96812,
-      inset 0 1px 0 #f2ffd45c,
-      inset 0 -1px 0 #0007;
+    border-color: #59664a;
+    /* One restrained shadow avoids stacking several expensive-looking depth cues. */
+    box-shadow: 0 12px 26px #0006;
     transition: none;
-    will-change: transform;
   }
 
   /* Newer cards sit 10px above the previous card, like the service stack on index.html. */
@@ -237,32 +228,8 @@
     filter: none;
   }
 
-  html.mobile-workflow-motion #workflows .workflow-card::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 12px;
-    right: 12px;
-    height: 1px;
-    pointer-events: none;
-    background: linear-gradient(90deg,
-      transparent 0%,
-      #bfe96828 12%,
-      #d9ff9b 29%,
-      #bfe96830 43%,
-      transparent 49%,
-      transparent 56%,
-      #bfe96824 64%,
-      #d9ff9b 79%,
-      #bfe96824 91%,
-      transparent 100%);
-    opacity: 0;
-  }
-
   html.mobile-workflow-motion #workflows .workflow-grid .workflow-card.reveal {
     opacity: 1;
-    outline: 1px solid #d9ff9b24;
-    outline-offset: -1px;
     transition: none;
   }
 
@@ -271,7 +238,7 @@
     z-index: 9;
     border-top: 1px solid #49583a;
     background: linear-gradient(180deg, #171c14 0%, #10120f 22%);
-    box-shadow: 0 -24px 58px #0008;
+    box-shadow: 0 -14px 32px #0006;
     transform: translate3d(0, var(--workflow-panel-rise, 0px), 0);
     will-change: transform;
     backface-visibility: hidden;
