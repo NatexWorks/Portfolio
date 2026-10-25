@@ -225,6 +225,8 @@
       const label = nextButton.querySelector('span'), icon = nextButton.querySelector('b');
       if (label) label.textContent = next.id === 'overview' ? 'BACK TO TOP' : 'NEXT SECTION';
       if (icon) icon.textContent = next.id === 'overview' ? '↑' : '↓';
+      nextButton.classList.toggle('is-back-top', next.id === 'overview');
+      nextButton.title = next.id === 'overview' ? 'Back to top' : 'Scroll to next section';
     };
     nextButton.addEventListener('click', () => {
       if (workflowStepController && workflowStepController.isActive()) {
