@@ -446,3 +446,36 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
     will-change: auto;
   }
 }
+
+
+/* Mobile-only spacing refinements requested for services, stack exit, MERN panel, and process. */
+@media (max-width:760px) {
+  #services .service-grid.service-stack-enabled {
+    padding-bottom: 6vh;
+  }
+
+  /* Reduce the combined gap from Explore service details to the MERN section by about 40%. */
+  #services.services-section { padding-bottom: 50px !important; }
+  #skills.skills-type-section { padding-top: 40px !important; }
+
+  /* Compact the terminal panel without shrinking its readable text. */
+  #skills .typewriter-panel {
+    min-height: 161px;
+    padding: 16px;
+  }
+  #skills .terminal-top { padding-bottom: 12px; }
+  #skills .terminal-prompt {
+    margin: 16px 0 8px;
+    line-height: 1.45;
+  }
+  #skills .terminal-note { margin: 6px 0 0; }
+
+  /* Shorten the full How I Work section and its repeated rows by roughly 30%. */
+  #process.process-section {
+    padding-top: 57px !important;
+    padding-bottom: 57px !important;
+  }
+  #process .section-heading { margin-bottom: 22px !important; }
+  #process .process-step { padding: 14px 0; }
+}
+
