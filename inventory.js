@@ -600,9 +600,16 @@
       }
 
       if (wheelResetTimer) window.clearTimeout(wheelResetTimer);
-      wheelResetTimer = window.setTimeout(() => {
+      const releaseWheelGesture = () => {
+        // Do not let one long/high-intensity wheel burst advance a second card mid-animation.
+        if (stageAnimating) {
+          wheelResetTimer = window.setTimeout(releaseWheelGesture, 100);
+          return;
+        }
         wheelGestureLocked = false;
-      }, 320);
+        wheelResetTimer = null;
+      };
+      wheelResetTimer = window.setTimeout(releaseWheelGesture, 520);
     };
 
     const handleKeydown = (event) => {
