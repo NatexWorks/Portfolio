@@ -55,6 +55,30 @@
     }, index * 480 + 180);
   });
 
+  // Type the workflow caveat when it enters view on mobile; keep it readable without motion.
+  const workflowLiveNote = document.querySelector('.workflow-live-note[data-live-demo-text]');
+  if (workflowLiveNote && mobileLenisQuery.matches && !reducedMotion && 'IntersectionObserver' in window) {
+    const fullLiveNote = workflowLiveNote.dataset.liveDemoText || workflowLiveNote.textContent;
+    workflowLiveNote.setAttribute('aria-label', fullLiveNote);
+    workflowLiveNote.textContent = '';
+    const liveNoteObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        let position = 0;
+        workflowLiveNote.classList.add('is-typing');
+        const typeNext = () => {
+          position += 1;
+          workflowLiveNote.textContent = fullLiveNote.slice(0, position);
+          if (position < fullLiveNote.length) window.setTimeout(typeNext, 22);
+          else workflowLiveNote.classList.remove('is-typing');
+        };
+        typeNext();
+      });
+    }, { threshold: 0.25, rootMargin: '0px 0px -20px 0px' });
+    liveNoteObserver.observe(workflowLiveNote);
+  }
+
   // Type the headline, meet the two green strokes, then type the project copy in two speeds.
   const buildTypeTargets = [...document.querySelectorAll('[data-build-heading-type]')];
   const buildCopyTargets = [...document.querySelectorAll('[data-build-copy-type]')];
@@ -285,24 +309,19 @@
     document.documentElement.classList.add('mobile-workflow-motion');
     workflowGrid.classList.add('mobile-workflow-stack');
 
-    // Use a 33-degree path from each intended quadrant: Catalog upper-left,
-    // Stock upper-right, Checkout lower-left, and Barcode lower-right.
-    const entryAngle = 33 * Math.PI / 180;
-    const entryDistance = 64;
-    const entryXDistance = Math.round(Math.cos(entryAngle) * entryDistance);
-    const entryYDistance = Math.round(Math.sin(entryAngle) * entryDistance);
+    // Every incoming card drops in from above; earlier cards settle about 10px lower.
+    const entryXDistance = 0;
+    const entryYDistance = 64;
 
     workflowCards.forEach((card, index) => {
-      const side = index % 2 === 0 ? -1 : 1;
-      const verticalSide = index < 2 ? -1 : 1;
       card.style.setProperty('--stack-index', String(index));
       card.dataset.workflowProgress = '0';
       card.style.setProperty('--entry-opacity', '0');
-      card.style.setProperty('--entry-x', `${side * entryXDistance}px`);
-      card.style.setProperty('--entry-y', `${verticalSide * entryYDistance}px`);
+      card.style.setProperty('--entry-x', '0px');
+      card.style.setProperty('--entry-y', `-${entryYDistance}px`);
       card.style.setProperty('--entry-z', '0px');
-      card.style.setProperty('--entry-rotate-x', `${verticalSide * 4}deg`);
-      card.style.setProperty('--entry-rotate-y', `${side * 4}deg`);
+      card.style.setProperty('--entry-rotate-x', '0deg');
+      card.style.setProperty('--entry-rotate-y', '0deg');
       card.style.setProperty('--shadow-y', '10px');
       card.style.setProperty('--shadow-blur', '22px');
       card.style.setProperty('--card-glow', '0');
@@ -324,8 +343,8 @@
       const lastCard = workflowCards[workflowCards.length - 1];
       const lastProgress = Number(lastCard.dataset.workflowProgress || '0');
       const lastRect = lastCard.getBoundingClientRect();
-      // Barcode enters from the lower-right, so undo its remaining vertical offset.
-      const lastLayoutTop = lastRect.top - (1 - lastProgress) * entryYDistance;
+      // Undo Barcode's remaining top-down entrance offset before measuring the stack.
+      const lastLayoutTop = lastRect.top + (1 - lastProgress) * entryYDistance;
       const lastStickyTop = 70;
       timelineStart = lastLayoutTop + window.scrollY - lastStickyTop;
       timelineEnd = timelineStart + Math.min(viewportHeight * 0.32, 260);
@@ -337,13 +356,11 @@
 
       const viewportHeight = window.innerHeight || 1;
       workflowCards.forEach((card, index) => {
-        const side = index % 2 === 0 ? -1 : 1;
-        const verticalSide = index < 2 ? -1 : 1;
         const previousProgress = Number(card.dataset.workflowProgress || '0');
         const rect = card.getBoundingClientRect();
-        const verticalOffset = verticalSide * entryYDistance;
+        const verticalOffset = -entryYDistance;
 
-        // Correct for the transform, then trigger the diagonal entry only 118px before its stack position.
+        // Each card enters vertically from above, only 118px before its final stack position.
         const layoutTop = rect.top - (1 - previousProgress) * verticalOffset;
         const targetTop = 70 + (workflowCards.length - index - 1) * 10;
         const entranceDistance = 118;
@@ -353,11 +370,11 @@
 
         card.dataset.workflowProgress = progress.toFixed(4);
         card.style.setProperty('--entry-opacity', progress.toFixed(4));
-        card.style.setProperty('--entry-x', `${side * remaining * entryXDistance}px`);
-        card.style.setProperty('--entry-y', `${verticalSide * remaining * entryYDistance}px`);
+        card.style.setProperty('--entry-x', '0px');
+        card.style.setProperty('--entry-y', `${-remaining * entryYDistance}px`);
         card.style.setProperty('--entry-z', `${progress * 8}px`);
-        card.style.setProperty('--entry-rotate-x', `${verticalSide * remaining * 4}deg`);
-        card.style.setProperty('--entry-rotate-y', `${side * remaining * 4}deg`);
+        card.style.setProperty('--entry-rotate-x', '0deg');
+        card.style.setProperty('--entry-rotate-y', '0deg');
         card.style.setProperty('--shadow-y', `${10 + progress * 10}px`);
         card.style.setProperty('--shadow-blur', `${22 + progress * 20}px`);
         card.style.setProperty('--card-glow', `${progress * 0.28}`);
