@@ -239,14 +239,14 @@
 
 /* Mobile visitors who prefer reduced motion get the same cards in a normal, non-sticky flow. */
 @media (max-width: 650px) and (prefers-reduced-motion: reduce) {
-  html.mobile-workflow-motion #workflows {
+  #workflows {
     padding-bottom: 0;
     transform: none !important;
     opacity: 1 !important;
     will-change: auto;
   }
 
-  html.mobile-workflow-motion #workflows .workflow-grid {
+  #workflows .workflow-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 12px;
@@ -254,8 +254,8 @@
     perspective: none;
   }
 
-  html.mobile-workflow-motion #workflows .workflow-card,
-  html.mobile-workflow-motion #workflows .workflow-grid .workflow-card.reveal {
+  #workflows .workflow-card,
+  #workflows .workflow-grid .workflow-card.reveal {
     position: relative;
     inset: auto;
     top: auto;
@@ -269,7 +269,7 @@
     will-change: auto;
   }
 
-  html.mobile-workflow-motion #compare {
+  #compare {
     transform: none !important;
     box-shadow: none !important;
     will-change: auto;
