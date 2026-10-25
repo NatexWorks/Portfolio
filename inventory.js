@@ -61,8 +61,19 @@
   if (workflowLiveNote && mobileLenisQuery.matches && !reducedMotion && 'IntersectionObserver' in window) {
     const fullLiveNote = workflowLiveNote.dataset.liveDemoText || workflowLiveNote.textContent;
     workflowLiveNote.setAttribute('aria-label', fullLiveNote);
-    // Reserve the final rendered height before typing so the section below never jumps.
-    workflowLiveNote.style.minHeight = workflowLiveNote.getBoundingClientRect().height + 'px';
+    // Reserve the exact final height only on mobile, keeping tablet/laptop layout untouched.
+    const mobileWorkflowNoteQuery = window.matchMedia('(max-width: 650px)');
+    const reserveWorkflowLiveNoteHeight = () => {
+      const currentText = workflowLiveNote.textContent;
+      workflowLiveNote.style.removeProperty('min-height');
+      if (mobileWorkflowNoteQuery.matches) {
+        workflowLiveNote.textContent = fullLiveNote;
+        workflowLiveNote.style.minHeight = workflowLiveNote.getBoundingClientRect().height + 'px';
+      }
+      workflowLiveNote.textContent = currentText;
+    };
+    reserveWorkflowLiveNoteHeight();
+    window.addEventListener('resize', reserveWorkflowLiveNoteHeight, { passive: true });
     workflowLiveNote.textContent = '';
     const liveNoteObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
