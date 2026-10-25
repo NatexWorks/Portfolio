@@ -141,6 +141,98 @@
       .portfolio-scroll-next span,.portfolio-back-top span { font-size:7px; }
     }
     @media(prefers-reduced-motion:reduce) { .portfolio-scroll-next,.portfolio-back-top { transition:none!important; } }
+  
+    /* Cinematic project scroller: Project 001 stays intact; Project 002 reveals the live café direction. */
+    .hero-project-track {
+      position:absolute; inset:0; display:flex; height:100%; width:100%;
+      overflow-x:auto; overflow-y:hidden; overscroll-behavior-x:contain;
+      scroll-snap-type:x mandatory; scroll-behavior:smooth; scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+    }
+    .hero-project-track::-webkit-scrollbar { display:none; }
+    .hero-project-slide { position:relative; height:100%; min-width:100%; flex:0 0 100%; overflow:hidden; scroll-snap-align:start; isolation:isolate; }
+    .hero-project-slide-inventory { background:#191d16; }
+    .art-top { gap:9px; }
+    .art-project-label { white-space:nowrap; }
+    .hero-project-next {
+      min-width:0; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+      padding:6px 8px; border:1px solid #536346; background:#11160fe0; color:var(--lime);
+      font:7px var(--mono); letter-spacing:.045em; white-space:nowrap; cursor:pointer;
+      transition:background .22s ease, color .22s ease, border-color .22s ease, box-shadow .22s ease, transform .22s ease;
+    }
+    .hero-project-next b { font:12px var(--sans); }
+    .hero-project-next:hover { background:var(--lime); color:#11160d; border-color:var(--lime); box-shadow:0 0 18px #c5f36b55; transform:translateY(-1px); }
+    .hero-project-slide-cafe { color:#faf0e2; background:#25231d; }
+    .hero-cafe-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; opacity:.88; filter:saturate(.84) contrast(1.06); transform:scale(1.07); animation:heroCafeDrift 18s ease-in-out infinite alternate; }
+    .hero-cafe-scrim { position:absolute; inset:0; background:linear-gradient(90deg,rgba(19,18,14,.88) 0%,rgba(29,23,17,.62) 48%,rgba(23,21,17,.16) 100%),linear-gradient(0deg,rgba(17,16,13,.72),transparent 58%); }
+    .cafe-window-chrome { position:relative; z-index:2; height:42px; display:flex; align-items:center; justify-content:space-between; gap:9px; padding:0 13px; border-bottom:1px solid #eadcc52b; color:#e5d7c3; font:7px var(--mono); letter-spacing:.07em; }
+    .cafe-window-chrome>span:nth-child(2) { white-space:nowrap; }
+    .hero-cafe-copy { position:absolute; z-index:2; left:8%; top:22%; width:min(72%,420px); animation:heroCafeCopyIn .9s cubic-bezier(.2,.75,.25,1) both; }
+    .hero-cafe-eyebrow { display:block; color:#edc39a; font:7px var(--mono); letter-spacing:.13em; margin-bottom:13px; }
+    .hero-cafe-copy h2 { margin:0 0 13px; color:#fff5e8; font:500 clamp(36px,4vw,51px)/.94 Georgia,serif; letter-spacing:-.06em; }
+    .hero-cafe-copy h2 em { color:#edc39a; font-weight:400; }
+    .hero-cafe-copy p { max-width:300px; margin:0; color:#f1e7da; font-size:9px; line-height:1.8; }
+    .hero-cafe-link { display:inline-flex; align-items:center; gap:15px; margin-top:19px; padding:9px 12px; background:#f4e7d5; color:#2e261c; font:7px var(--mono); letter-spacing:.09em; transition:transform .25s ease,box-shadow .25s ease; }
+    .hero-cafe-link span { font:14px var(--sans); color:#9b633d; }
+    .hero-cafe-link:hover { transform:translateY(-2px); box-shadow:0 0 20px #edc39a44; }
+    .hero-cafe-seal { position:absolute; z-index:2; right:23px; bottom:66px; width:91px; height:91px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; border:1px solid #f6e7d2a8; border-radius:50%; color:#fbefdf; text-align:center; transform:rotate(9deg); background:#211b1370; backdrop-filter:blur(3px); }
+    .hero-cafe-seal span,.hero-cafe-seal i { font:6px var(--mono); letter-spacing:.12em; font-style:normal; }
+    .hero-cafe-seal strong { font:italic 11px Georgia,serif; letter-spacing:-.02em; }
+    .hero-cafe-seal i { color:#edc39a; }
+    .hero-cafe-meta { position:absolute; z-index:2; left:0; right:0; bottom:0; height:42px; padding:0 15px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-top:1px solid #eadcc52b; color:#d0c0a9; background:#17140f6e; font:7px var(--mono); letter-spacing:.06em; }
+    .hero-project-hint { position:absolute; z-index:5; right:12px; bottom:49px; display:flex; align-items:center; gap:7px; color:#a5ad96; font:6px var(--mono); letter-spacing:.06em; pointer-events:none; text-shadow:0 1px 6px #000; }
+    .hero-project-hint>span { width:5px; height:5px; border-radius:50%; background:var(--lime); box-shadow:0 0 10px #c5f36b99; animation:projectHintPulse 1.5s ease-in-out infinite; }
+    @keyframes heroCafeDrift { from { transform:scale(1.07) translate3d(0,0,0); } to { transform:scale(1.14) translate3d(-1.2%,1%,0); } }
+    @keyframes heroCafeCopyIn { from { opacity:.35; transform:translate3d(0,12px,0); } to { opacity:1; transform:translate3d(0,0,0); } }
+    @keyframes projectHintPulse { 0%,100% { opacity:.55; box-shadow:0 0 4px #c5f36b55; } 50% { opacity:1; box-shadow:0 0 12px #c5f36bbb; } }
+    /* One fixed control: Next Section while browsing, Back to Top at the true page end. */
+    .portfolio-scroll-next {
+      width:156px; min-width:156px; min-height:40px; justify-content:space-between; white-space:nowrap;
+      position:fixed; isolation:isolate; overflow:visible;
+    }
+    .portfolio-scroll-next::before,.portfolio-scroll-next::after {
+      content:""; position:absolute; top:6px; bottom:6px; width:13px; z-index:-1;
+      opacity:0; filter:blur(7px); pointer-events:none; background:var(--lime); border-radius:50%;
+    }
+    .portfolio-scroll-next::before { left:-7px; }
+    .portfolio-scroll-next::after { right:-7px; }
+    .portfolio-scroll-next.is-back-top {
+      color:#10150c; background:var(--lime); border-color:var(--lime);
+      box-shadow:0 0 0 1px #c5f36b50,0 0 19px #c5f36b55,0 8px 28px #0005;
+    }
+    .portfolio-scroll-next.is-back-top span,.portfolio-scroll-next.is-back-top b { color:#10150c; }
+    .portfolio-scroll-next.is-back-top::before { opacity:.95; animation:backTopGlowLeft 1.15s ease-in-out infinite alternate; }
+    .portfolio-scroll-next.is-back-top::after { opacity:.95; animation:backTopGlowRight 1.15s ease-in-out infinite alternate; }
+    @keyframes backTopGlowLeft { from { transform:scaleY(.55) translateX(0); opacity:.45; } to { transform:scaleY(1.2) translateX(-3px); opacity:1; } }
+    @keyframes backTopGlowRight { from { transform:scaleY(.55) translateX(0); opacity:.45; } to { transform:scaleY(1.2) translateX(3px); opacity:1; } }
+    .site-footer { justify-content:flex-start; }
+    .site-footer .brand:hover { color:var(--text); }
+    @media(max-width:760px) {
+      .hero-project-slide-cafe .hero-cafe-copy { left:7%; width:80%; top:21%; }
+      .hero-cafe-copy h2 { font-size:clamp(33px,8.7vw,43px); }
+      .hero-cafe-seal { width:70px; height:70px; right:13px; bottom:55px; }
+      .hero-cafe-seal strong { font-size:9px; }
+      .hero-cafe-meta { padding:0 10px; font-size:6px; }
+      .cafe-window-chrome { padding:0 10px; }
+      .hero-project-hint { right:9px; bottom:48px; font-size:5px; }
+      .portfolio-scroll-next { width:146px; min-width:146px; }
+    }
+    @media(max-width:480px) {
+      .hero-project-next { padding:5px 6px; font-size:0; gap:0; }
+      .hero-project-next b { font-size:14px; }
+      .art-project-label { font-size:7px; }
+      .hero-cafe-seal { display:none; }
+      .hero-cafe-copy { width:85%; }
+      .hero-cafe-meta span:first-child { max-width:75%; font-size:5px; }
+      .portfolio-scroll-next { right:12px; bottom:12px; }
+    }
+    @media(prefers-reduced-motion:reduce) {
+      .hero-project-track { scroll-behavior:auto!important; }
+      .hero-cafe-photo,.hero-cafe-copy,.hero-project-hint>span { animation:none!important; }
+      .hero-cafe-photo { transform:none!important; }
+      .portfolio-scroll-next.is-back-top::before,.portfolio-scroll-next.is-back-top::after { animation:none!important; }
+    }
+
   </style>
   <script src="script.js" defer></script>
 </head>
@@ -170,14 +262,32 @@
           <div class="hero-actions"><a class="button button-primary" href="#work">Explore my work <span aria-hidden="true">↘</span></a><a class="text-link" href="#contact">Have a project in mind? <span aria-hidden="true">↗</span></a></div>
           <div class="hero-proof"><div class="proof-avatars" aria-hidden="true"><span>N</span><span>W</span><span>+</span></div><p><strong>Built with purpose.</strong><br><span>Clear scope. Thoughtful details. No inflated claims.</span></p></div>
         </div>
-        <div class="hero-art image-scroll" data-image-scroll aria-label="Abstract preview of a web interface">
-          <div class="art-top"><span class="window-dots"><i></i><i></i><i></i></span><span>PROJECT / 001</span><span class="art-live"><i></i> LIVE CONCEPT</span></div>
-          <div class="art-grid"></div>
-          <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
-          <div class="art-card card-main"><div class="mock-label">INVENTORY OVERVIEW <span>↗</span></div><div class="mock-heading">Your stock.<br><em>In control.</em></div><div class="mock-stats"><div><span>PRODUCTS</span><strong>1,284</strong><small>Across categories</small></div><div><span>LOW STOCK</span><strong class="lime-text">08</strong><small>Needs attention</small></div></div><div class="mock-chart"><div class="chart-line"></div><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div></div>
-          <div class="floating-tag tag-top"><span class="tag-icon">✳</span><span><strong>Built for clarity</strong><small>Every detail has a job</small></span></div>
-          <div class="floating-tag tag-bottom"><span class="tag-check">✓</span><span><strong>Responsive by design</strong><small>Small screen to desktop</small></span></div>
-          <div class="art-index"><span>SELECTED WORK</span><strong>01 — 03</strong></div>
+        <div class="hero-art image-scroll" data-image-scroll aria-label="Browse the featured projects. Swipe horizontally or use the project arrow.">
+          <div class="hero-project-track" id="heroProjectTrack" tabindex="0" aria-label="Scrollable selected-project previews">
+            <section class="hero-project-slide hero-project-slide-inventory" aria-label="Project 001: Inventory Management System">
+              <div class="art-top"><span class="window-dots"><i></i><i></i><i></i></span><span class="art-project-label">PROJECT / 001</span><button class="hero-project-next" type="button" data-project-target="1" aria-label="Scroll to Project 002, Neswef Café">PROJECT 002 <b>↘</b></button></div>
+              <div class="art-grid"></div>
+              <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+              <div class="art-card card-main"><div class="mock-label">INVENTORY OVERVIEW <span>↗</span></div><div class="mock-heading">Your stock.<br><em>In control.</em></div><div class="mock-stats"><div><span>PRODUCTS</span><strong>1,284</strong><small>Across categories</small></div><div><span>LOW STOCK</span><strong class="lime-text">08</strong><small>Needs attention</small></div></div><div class="mock-chart"><div class="chart-line"></div><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div></div>
+              <div class="floating-tag tag-top"><span class="tag-icon">✳</span><span><strong>Built for clarity</strong><small>Every detail has a job</small></span></div>
+              <div class="floating-tag tag-bottom"><span class="tag-check">✓</span><span><strong>Responsive by design</strong><small>Small screen to desktop</small></span></div>
+              <div class="art-index"><span>SELECTED WORK</span><strong>01 / 02</strong></div>
+            </section>
+            <section class="hero-project-slide hero-project-slide-cafe" aria-label="Project 002: Neswef Café website">
+              <img class="hero-cafe-photo" src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1400&q=88" alt="" aria-hidden="true" fetchpriority="low" decoding="async">
+              <div class="hero-cafe-scrim" aria-hidden="true"></div>
+              <div class="cafe-window-chrome"><span class="window-dots"><i></i><i></i><i></i></span><span>NESWEF / CAFÉ EXPERIENCE</span><button class="hero-project-next" type="button" data-project-target="0" aria-label="Return to Project 001, Inventory Management System"><b>↖</b> PROJECT 001</button></div>
+              <div class="hero-cafe-copy">
+                <span class="hero-cafe-eyebrow">PROJECT / 002 · BUSINESS WEBSITE</span>
+                <h2>Stay for a<br><em>little longer.</em></h2>
+                <p>A warmer digital home for good coffee, slow mornings, and little everyday rituals.</p>
+                <a class="hero-cafe-link" href="https://natexworks.github.io/Neswef/" target="_blank" rel="noopener noreferrer">ENTER NESWEF <span>↗</span></a>
+              </div>
+              <div class="hero-cafe-seal" aria-hidden="true"><span>BREWED</span><strong>WITH CARE</strong><i>NESWEF CAFÉ</i></div>
+              <div class="hero-cafe-meta"><span>BRAND · MENU · LOCAL DISCOVERY</span><span>02 / 02</span></div>
+            </section>
+          </div>
+          <div class="hero-project-hint"><span></span> SCROLL / SWIPE TO EXPLORE</div>
         </div>
         <div class="hero-bottom"><span>SCROLL TO EXPLORE</span><span class="scroll-line"></span><span>DESIGN · DEVELOPMENT · DELIVERY</span></div>
       </section>
@@ -224,13 +334,13 @@
         <div class="service-grid">
           <article class="service-card reveal"><span class="service-number">01</span><div class="service-icon">↗</div><h3>Business websites</h3><p>Professional, responsive websites that explain what you offer and help customers contact or visit you.</p><span class="service-foot">LANDING PAGES · LOCAL BUSINESS</span></article>
           <article class="service-card reveal"><span class="service-number">02</span><div class="service-icon">⌘</div><h3>Custom-built solutions</h3><p>Purpose-built dashboards, inventory tools, and workflows shaped around the way your business actually operates.</p><span class="service-foot">SAAS · AUTOMATION · BUSINESS TOOLS</span></article>
-          <article class="service-card reveal"><span class="service-number">04</span><div class="service-icon">◎</div><h3>SEO & Google Maps</h3><p>Practical on-page SEO, local search setup, and Google Business Profile improvements to make your business easier to find. Rankings are never guaranteed.</p><span class="service-foot">LOCAL SEO · SEARCH · MAPS</span></article>
+          <article class="service-card reveal"><span class="service-number">04</span><div class="service-icon">◎</div><h3>SEO & Google Maps</h3><p>Practical on-page SEO, local search setup, and Google Business Profile improvements to help your business get discovered. Rankings can’t be guaranteed, but we’ll work consistently and strategically toward stronger visibility—and well-executed local SEO often delivers meaningful progress.</p><span class="service-foot">LOCAL SEO · SEARCH · MAPS</span></article>
           <article class="service-card reveal"><span class="service-number">03</span><div class="service-icon">✳</div><h3>Responsive polish</h3><p>Layout fixes, interaction improvements, and interface refinements across mobile, tablet, and desktop.</p><span class="service-foot">MOBILE-FIRST · UI IMPROVEMENTS</span></article>
         </div>
         <div class="services-more reveal"><p>Need more detail before deciding?</p><a class="text-link" href="services.html">Explore service details <span aria-hidden="true">↗</span></a></div>
       </section>
 
-      <section class="section skills-type-section reveal" id="skills"><div class="skills-copy"><div class="eyebrow">BUILT WITH THE MERN STACK</div><h2>From business problem<br>to <span class="headline-muted">working product.</span></h2><p>I enjoy the challenge of building complete products—from interface and data flow to the logic behind the scenes.</p><div class="stack-tags"><span>MongoDB</span><span>Express</span><span>React</span><span>Node.js</span></div></div><div class="typewriter-panel"><span class="terminal-top"><i></i><i></i><i></i> MANISH / BUILD LOG</span><p class="terminal-prompt">const focus = <span class="typewriter-text" data-rotate="custom business tools|SaaS products|useful web experiences">custom business tools</span><span class="type-cursor">▍</span></p><p class="terminal-note">Good software starts with the right problem.</p></div></section>
+      <section class="section skills-type-section reveal" id="skills"><div class="skills-copy"><div class="eyebrow">BUILT WITH THE MERN STACK</div><h2>From business problem<br>to <span class="headline-muted">working product.</span></h2><p>I enjoy the challenges of building complete products—from interface and data flow to the logic behind the scenes.</p><div class="stack-tags"><span>MongoDB</span><span>Express</span><span>React</span><span>Node.js</span></div></div><div class="typewriter-panel"><span class="terminal-top"><i></i><i></i><i></i> MANISH / BUILD LOG</span><p class="terminal-prompt">const focus = <span class="typewriter-text" data-rotate="custom business tools|SaaS products|useful web experiences">custom business tools</span><span class="type-cursor">▍</span></p><p class="terminal-note">Good software starts with the right problem.</p></div></section>
 
       <section class="section process-section" id="process">
         <div class="section-heading reveal"><div><div class="eyebrow">03 / HOW I WORK</div><h2>Clear steps.<br><span class="headline-muted">No surprises.</span></h2></div><p>Good work starts with understanding the problem—not jumping straight into code.</p></div>
@@ -247,28 +357,78 @@
       <section class="section contact-section" id="contact"><div class="contact-card reveal"><div class="contact-orb"></div><div class="eyebrow"><span class="status-dot"></span> HAVE A PROJECT IN MIND?</div><h2 class="contact-heading"><span class="contact-heading-line">Let's make something</span><br><span class="contact-heading-line contact-heading-accent">useful.</span></h2><p class="contact-copy">Tell me what you're building, what isn't working, or what you'd like to improve. We'll start with the problem and work from there.</p><a class="button button-primary" href="mailto:natexworks@gmail.com?subject=Project%20enquiry%20%E2%80%94%20NatexWorks">Start a conversation <span aria-hidden="true">↗</span></a><span class="contact-email">NATEXWORKS@GMAIL.COM</span></div></section>
     </main>
     <button class="portfolio-scroll-next" id="portfolioScrollNext" type="button" aria-label="Scroll to next section"><span>NEXT SECTION</span><b>↓</b></button>
-    <button class="portfolio-back-top" id="portfolioBackTop" type="button" aria-label="Back to top"><span>BACK TO TOP</span><b>↑</b></button>
-    <footer class="site-footer"><a class="brand" href="#home"><span class="brand-mark">N<span>×</span></span><span class="brand-wordmark"><span class="brand-word-natex">Natex</span><span class="brand-word-works">Works</span><span class="brand-dot">.</span></span></a><span>BUILT WITH INTENTION. <span id="year"></span></span><a href="#home">BACK TO TOP ↑</a></footer>
+    <footer class="site-footer"><a class="brand" href="#home" aria-label="NatexWorks home"><span class="brand-mark">N<span>×</span></span><span class="brand-wordmark"><span class="brand-word-natex">Natex</span><span class="brand-word-works">Works</span><span class="brand-dot">.</span></span></a></footer>
   </div>
   <script>
     (function () {
       const nextButton = document.getElementById('portfolioScrollNext');
-      const topButton = document.getElementById('portfolioBackTop');
+      const nextLabel = nextButton.querySelector('span');
+      const nextArrow = nextButton.querySelector('b');
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const getSections = () => Array.from(document.querySelectorAll('main > section, main > .feature-band')).filter(section => section.getBoundingClientRect().height > 0);
+      const getSections = () => Array.from(document.querySelectorAll('main > section, main > .feature-band'))
+        .filter(section => section.getBoundingClientRect().height > 0);
+
+      const isAtPageEnd = () => {
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        const pageHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+        return scrollY + window.innerHeight >= pageHeight - 36;
+      };
+      const syncNavigationButton = () => {
+        const backMode = isAtPageEnd();
+        nextButton.classList.toggle('is-back-top', backMode);
+        nextLabel.textContent = backMode ? 'BACK TO TOP' : 'NEXT SECTION';
+        nextArrow.textContent = backMode ? '↑' : '↓';
+        nextButton.setAttribute('aria-label', backMode ? 'Back to top' : 'Scroll to next section');
+        nextButton.setAttribute('title', backMode ? 'Back to top' : 'Scroll to next section');
+      };
+
       nextButton.addEventListener('click', function () {
-        const sections = getSections();
-        const threshold = window.scrollY + 100;
-        const next = sections.find(section => section.getBoundingClientRect().top + window.scrollY > threshold);
-        if (next) next.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
-        else document.getElementById('home').scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+        if (isAtPageEnd()) {
+          window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+          return;
+        }
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        const threshold = scrollY + Math.max(110, window.innerHeight * .16);
+        const next = getSections().find(section => section.getBoundingClientRect().top + scrollY > threshold);
+        if (next) {
+          next.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+        } else {
+          const pageHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+          window.scrollTo({ top: pageHeight, behavior: reducedMotion ? 'auto' : 'smooth' });
+        }
       });
-      topButton.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
-      });
-      const updateTopButton = () => topButton.classList.toggle('is-visible', window.scrollY > 550);
-      window.addEventListener('scroll', updateTopButton, { passive: true });
-      updateTopButton();
+      window.addEventListener('scroll', syncNavigationButton, { passive: true });
+      window.addEventListener('resize', syncNavigationButton, { passive: true });
+      syncNavigationButton();
+
+      // Two-panel horizontal showcase: native touch scrolling plus explicit project arrows.
+      const track = document.getElementById('heroProjectTrack');
+      if (track) {
+        const slides = Array.from(track.querySelectorAll('.hero-project-slide'));
+        const projectButtons = Array.from(track.querySelectorAll('[data-project-target]'));
+        projectButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const targetIndex = Number(button.dataset.projectTarget);
+            const target = slides[targetIndex];
+            if (target) track.scrollTo({ left: target.offsetLeft, behavior: reducedMotion ? 'auto' : 'smooth' });
+          });
+        });
+        let scrollFrame = 0;
+        const syncProjectSlides = () => {
+          scrollFrame = 0;
+          const activeIndex = Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / Math.max(1, track.clientWidth))));
+          slides.forEach((slide, index) => slide.setAttribute('aria-current', index === activeIndex ? 'true' : 'false'));
+        };
+        track.addEventListener('scroll', () => {
+          if (scrollFrame) return;
+          scrollFrame = window.requestAnimationFrame(syncProjectSlides);
+        }, { passive: true });
+        window.addEventListener('resize', () => {
+          const activeIndex = Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / Math.max(1, track.clientWidth))));
+          if (slides[activeIndex]) track.scrollTo({ left: slides[activeIndex].offsetLeft, behavior: 'auto' });
+        }, { passive: true });
+        syncProjectSlides();
+      }
     })();
   </script>
 </body>
