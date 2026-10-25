@@ -479,3 +479,7 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
   #process .process-step { padding: 14px 0; }
 }
 
+
+@media (max-width:760px) and (prefers-reduced-motion:reduce) {
+  #services .service-grid.service-stack-enabled { padding-bottom: 0 !important; }
+}
