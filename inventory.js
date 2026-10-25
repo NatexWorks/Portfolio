@@ -230,4 +230,118 @@
     }));
     calculate(true);
   }
+
+  // Mobile-only scroll-progress motion for the four workflow cards and their following section.
+  // The desktop/tablet layouts are not touched; the effect is initialized only at the mobile breakpoint.
+  const workflowMobileQuery = window.matchMedia('(max-width: 650px)');
+  let mobileWorkflowMotionInitialized = false;
+
+  const initMobileWorkflowMotion = () => {
+    if (mobileWorkflowMotionInitialized || !workflowMobileQuery.matches || reducedMotion) return;
+
+    const workflowSection = document.querySelector('#workflows.workflows');
+    const workflowGrid = workflowSection?.querySelector('.workflow-grid');
+    const workflowCards = Array.from(workflowGrid?.querySelectorAll('.workflow-card') || []);
+    const nextSection = document.querySelector('#compare');
+
+    if (!workflowSection || !workflowGrid || workflowCards.length !== 4 || !nextSection) return;
+
+    mobileWorkflowMotionInitialized = true;
+    document.documentElement.classList.add('mobile-workflow-motion');
+    workflowGrid.classList.add('mobile-workflow-stack');
+
+    workflowCards.forEach((card, index) => {
+      const side = index % 2 === 0 ? -1 : 1;
+      card.style.setProperty('--stack-index', String(index));
+      card.dataset.workflowProgress = '0';
+      card.style.setProperty('--entry-opacity', '0');
+      card.style.setProperty('--entry-x', `${side * 42}px`);
+      card.style.setProperty('--entry-y', '42px');
+      card.style.setProperty('--entry-z', '0px');
+      card.style.setProperty('--entry-rotate-x', '5deg');
+      card.style.setProperty('--entry-rotate-y', `${side * 6}deg`);
+      card.style.setProperty('--shadow-y', '10px');
+      card.style.setProperty('--shadow-blur', '22px');
+      card.style.setProperty('--card-glow', '0');
+    });
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+    let timelineStart = 0;
+    let timelineEnd = 0;
+    let framePending = false;
+
+    const measureTimeline = () => {
+      workflowSection.style.setProperty('--workflow-scale', '1');
+      workflowSection.style.setProperty('--workflow-tilt', '0deg');
+      workflowSection.style.setProperty('--workflow-rise', '0px');
+      workflowSection.style.setProperty('--workflow-opacity', '1');
+      nextSection.style.setProperty('--workflow-panel-shift', '0px');
+
+      timelineEnd = nextSection.getBoundingClientRect().top + window.scrollY;
+      timelineStart = timelineEnd - (window.innerHeight || 1) * 0.9;
+    };
+
+    const update = () => {
+      framePending = false;
+      if (!workflowMobileQuery.matches) return;
+
+      const viewportHeight = window.innerHeight || 1;
+      workflowCards.forEach((card, index) => {
+        const side = index % 2 === 0 ? -1 : 1;
+        const previousProgress = Number(card.dataset.workflowProgress || '0');
+        const rect = card.getBoundingClientRect();
+
+        // Remove the last frame's vertical entrance offset before measuring scroll progress.
+        const layoutTop = rect.top - (1 - previousProgress) * 42;
+        const targetTop = 70 + index * 12;
+        const startTop = viewportHeight * 0.8;
+        const progress = clamp((startTop - layoutTop) / Math.max(1, startTop - targetTop), 0, 1);
+        const remaining = 1 - progress;
+
+        card.dataset.workflowProgress = progress.toFixed(4);
+        card.style.setProperty('--entry-opacity', progress.toFixed(4));
+        card.style.setProperty('--entry-x', `${side * remaining * 42}px`);
+        card.style.setProperty('--entry-y', `${remaining * 42}px`);
+        card.style.setProperty('--entry-z', `${progress * 6}px`);
+        card.style.setProperty('--entry-rotate-x', `${remaining * 5}deg`);
+        card.style.setProperty('--entry-rotate-y', `${side * remaining * 6}deg`);
+        card.style.setProperty('--shadow-y', `${10 + progress * 10}px`);
+        card.style.setProperty('--shadow-blur', `${22 + progress * 20}px`);
+        card.style.setProperty('--card-glow', `${progress * 0.28}`);
+      });
+
+      // The panel starts just below the viewport and settles at its natural top position.
+      const rawProgress = clamp((window.scrollY - timelineStart) / Math.max(1, timelineEnd - timelineStart), 0, 1);
+      const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
+      workflowSection.style.setProperty('--workflow-scale', String(1 - 0.035 * progress));
+      workflowSection.style.setProperty('--workflow-tilt', `${-4.5 * progress}deg`);
+      workflowSection.style.setProperty('--workflow-rise', `${-16 * progress}px`);
+      workflowSection.style.setProperty('--workflow-opacity', String(1 - 0.1 * progress));
+      nextSection.style.setProperty('--workflow-panel-shift', `${viewportHeight * 0.15 * (1 - progress)}px`);
+    };
+
+    const requestUpdate = () => {
+      if (framePending) return;
+      framePending = true;
+      window.requestAnimationFrame(update);
+    };
+
+    const handleResize = () => {
+      measureTimeline();
+      requestUpdate();
+    };
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
+    measureTimeline();
+    update();
+  };
+
+  initMobileWorkflowMotion();
+  if (typeof workflowMobileQuery.addEventListener === 'function') {
+    workflowMobileQuery.addEventListener('change', event => {
+      if (event.matches) initMobileWorkflowMotion();
+    });
+  }
+
 })();
