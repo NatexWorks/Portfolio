@@ -361,15 +361,12 @@
 .scroll-next::before { left:-7px; }
 .scroll-next::after { right:-7px; }
 .scroll-next.is-back-top {
-  color:#10150c;
-  background:var(--lime);
   border-color:var(--lime);
-  box-shadow:0 0 0 1px #c5f36b50,0 0 19px #c5f36b55,0 8px 28px #0005;
 }
-.scroll-next.is-back-top span,.scroll-next.is-back-top b { color:#10150c; }
-.scroll-next.is-back-top::before { opacity:.95; animation:backTopGlowLeft 1.15s ease-in-out infinite alternate; }
-.scroll-next.is-back-top::after { opacity:.95; animation:backTopGlowRight 1.15s ease-in-out infinite alternate; }
-.scroll-next.is-back-top:hover { background:var(--lime); border-color:var(--lime); }
+.scroll-next.is-back-top:hover {
+  background:#171b14e8;
+  border-color:var(--lime);
+}
 .scroll-next:focus-visible { outline:1px solid var(--lime); outline-offset:4px; }
 @keyframes backTopGlowLeft { from { transform:scaleY(.55) translateX(0); opacity:.45; } to { transform:scaleY(1.2) translateX(-3px); opacity:1; } }
 @keyframes backTopGlowRight { from { transform:scaleY(.55) translateX(0); opacity:.45; } to { transform:scaleY(1.2) translateX(3px); opacity:1; } }
@@ -385,9 +382,13 @@
   transform: translateY(-2px);
 }
 .scroll-next.is-back-top:hover {
-  background: var(--lime);
-  border-color: var(--lime);
+  background:#171b14e8;
+  border-color:var(--lime);
 }
 
 .scroll-next:not(.is-back-top):hover::before { opacity:.75; animation:backTopGlowLeft 1.15s ease-in-out infinite alternate; }
 .scroll-next:not(.is-back-top):hover::after { opacity:.75; animation:backTopGlowRight 1.15s ease-in-out infinite alternate; }
+
+
+/* Keep the Inventory footer NatexWorks wordmark the same size as index.html. */
+.footer .brand > span:last-child { font-size:50px; line-height:1; }
