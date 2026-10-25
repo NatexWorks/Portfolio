@@ -296,7 +296,7 @@
   }
 
   // Mobile-only, gesture-stepped scroll choreography for the four workflow cards.
-  // A gesture can reveal only one card, regardless of swipe or wheel speed.
+  // Cards rise from below into a tight, lit stack; each gesture reveals one card.
   const workflowMobileQuery = window.matchMedia('(max-width: 650px)');
   let mobileWorkflowMotionInitialized = false;
   let teardownMobileWorkflowMotion = null;
@@ -324,7 +324,7 @@
       card.dataset.workflowProgress = '0';
       card.style.setProperty('--entry-opacity', '0');
       card.style.setProperty('--entry-x', '0px');
-      card.style.setProperty('--entry-y', '-' + entryYDistance + 'px');
+      card.style.setProperty('--entry-y', entryYDistance + 'px');
       card.style.setProperty('--entry-z', '0px');
       card.style.setProperty('--entry-rotate-x', '0deg');
       card.style.setProperty('--entry-rotate-y', '0deg');
@@ -400,20 +400,20 @@
       workflowCards.forEach((card, index) => {
         const entryStartY = cardDocumentTops[index] - stickyTopOffsets[index];
         const rawProgress = clamp((window.scrollY - entryStartY) / entranceDistance, 0, 1);
-        // Ease the entrance so opacity, depth and shadows settle gently at the stack.
+        // Smoothstep keeps the upward entrance fluid while the edge lighting stays crisp.
         const progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
         const remaining = 1 - progress;
 
         card.dataset.workflowProgress = progress.toFixed(4);
         card.style.setProperty('--entry-opacity', progress.toFixed(4));
         card.style.setProperty('--entry-x', '0px');
-        card.style.setProperty('--entry-y', (-remaining * entryYDistance) + 'px');
-        card.style.setProperty('--entry-z', (progress * 8) + 'px');
-        card.style.setProperty('--entry-rotate-x', '0deg');
-        card.style.setProperty('--entry-rotate-y', '0deg');
-        card.style.setProperty('--shadow-y', (10 + progress * 10) + 'px');
-        card.style.setProperty('--shadow-blur', (22 + progress * 20) + 'px');
-        card.style.setProperty('--card-glow', String(progress * 0.28));
+        card.style.setProperty('--entry-y', (remaining * entryYDistance) + 'px');
+        card.style.setProperty('--entry-z', (progress * 14) + 'px');
+        card.style.setProperty('--entry-rotate-x', (-2.2 * remaining) + 'deg');
+        card.style.setProperty('--entry-rotate-y', (index % 2 === 0 ? -1 : 1) * remaining * 1.2 + 'deg');
+        card.style.setProperty('--shadow-y', (12 + progress * 12) + 'px');
+        card.style.setProperty('--shadow-blur', (24 + progress * 24) + 'px');
+        card.style.setProperty('--card-glow', String(progress * 0.42));
       });
 
       // At card four's stop, keep the stack still. Exit motion starts only on another gesture.
