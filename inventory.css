@@ -346,16 +346,15 @@
   .topbar .back-link::before { margin-right: 1px; }
 
   html.mobile-workflow-motion #workflows .workflow-grid {
-    padding-bottom: min(8vh, 90px);
-    padding-bottom: min(8svh, 90px);
+    padding-bottom: 0;
   }
 
-  #workflows.section-space { padding-bottom: 20px; }
-  #compare > .wrap.section-space { padding-top: 25px; }
+  #workflows.section-space { padding-bottom: 10px; }
+  #compare > .wrap.section-space { padding-top: 12px; }
 
   .workflow-live-note {
     max-width: 100%;
-    margin-top: 5px;
+    margin-top: 3px;
     color: #a4ad98;
     font: 11px/1.75 var(--mono);
     letter-spacing: -.015em;
