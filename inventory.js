@@ -315,7 +315,7 @@
     document.documentElement.classList.add('mobile-workflow-motion');
     workflowGrid.classList.add('mobile-workflow-stack');
 
-    const stickyTopOffsets = [70, 80, 90, 100];
+    const stickyTopOffsets = [100, 90, 80, 70];
     const entryYDistance = 64;
     const entranceDistance = 118;
 
@@ -383,7 +383,9 @@
       cardDocumentTops = workflowCards.map(card => gridDocumentTop + card.offsetTop);
       stageTargets = cardDocumentTops.map((documentTop, index) => Math.max(0, documentTop - stickyTopOffsets[index] + entranceDistance));
       gateStartY = Math.max(0, stageTargets[0] - entranceDistance);
-      timelineStart = stageTargets[3];
+      // Keep the complete four-card stack parked after card four arrives.
+      // The following gesture then moves through a short, deliberate handoff runway.
+      timelineStart = stageTargets[3] + Math.min((window.innerHeight || 1) * 0.14, 110);
       timelineEnd = timelineStart + Math.min((window.innerHeight || 1) * 0.32, 260);
 
       motionProperties.forEach((property, index) => {
