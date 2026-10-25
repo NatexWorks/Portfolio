@@ -198,11 +198,17 @@
   }
 
   html.mobile-workflow-motion #workflows .workflow-grid {
-    padding-bottom: 50vh;
-    padding-bottom: 50svh;
+    /* Keep only a compact scroll runway for the final overlap and next-panel reveal. */
+    padding-bottom: min(24vh, 200px);
+    padding-bottom: min(24svh, 200px);
     perspective: 1000px;
     transform-style: preserve-3d;
   }
+
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(1) { top: 100px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(2) { top: 90px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(3) { top: 80px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(4) { top: 70px; }
 
   html.mobile-workflow-motion #workflows .workflow-card {
     height: 220px;
