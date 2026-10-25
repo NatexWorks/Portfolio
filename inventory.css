@@ -198,17 +198,17 @@
   }
 
   html.mobile-workflow-motion #workflows .workflow-grid {
-    /* Keep only a compact scroll runway for the final overlap and next-panel reveal. */
-    padding-bottom: min(24vh, 200px);
-    padding-bottom: min(24svh, 200px);
+    /* Reserve only the space needed to keep the disclaimer 15px below the settled card stack. */
+    padding-bottom: var(--stack-note-tail-space, 0px);
     perspective: 1000px;
     transform-style: preserve-3d;
   }
 
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(1) { top: 100px; }
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(2) { top: 90px; }
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(3) { top: 80px; }
-  html.mobile-workflow-motion #workflows .workflow-card:nth-child(4) { top: 70px; }
+  /* Later cards sit progressively lower, leaving the earlier cards' top edges visible. */
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(1) { top: 70px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(2) { top: 80px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(3) { top: 90px; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(4) { top: 100px; }
 
   html.mobile-workflow-motion #workflows .workflow-card {
     height: 220px;
@@ -272,10 +272,12 @@
   html.mobile-workflow-motion #compare {
     position: relative;
     z-index: 5;
-    transform: translate3d(0, var(--workflow-panel-shift, 0px), 0);
+    /* Reveal the panel from the bottom while keeping its layout position fixed (no blank gap). */
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(var(--workflow-panel-clip, 100vh) 0 0 0);
     box-shadow: 0 -28px 62px #0009;
     border-top-color: #49583a;
-    will-change: transform;
+    will-change: clip-path;
     backface-visibility: hidden;
   }
 }
@@ -346,15 +348,15 @@
   .topbar .back-link::before { margin-right: 1px; }
 
   html.mobile-workflow-motion #workflows .workflow-grid {
-    padding-bottom: 0;
+    padding-bottom: var(--stack-note-tail-space, 0px);
   }
 
-  #workflows.section-space { padding-bottom: 10px; }
-  #compare > .wrap.section-space { padding-top: 12px; }
+  #workflows.section-space { padding-bottom: 0; }
+  #compare > .wrap.section-space { padding-top: 0; }
 
   .workflow-live-note {
     max-width: 100%;
-    margin-top: 3px;
+    margin: 15px 0 0;
     color: #a4ad98;
     font: 11px/1.75 var(--mono);
     letter-spacing: -.015em;
