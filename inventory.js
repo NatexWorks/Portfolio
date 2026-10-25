@@ -407,7 +407,7 @@
       stageTargets = cardDocumentTops.map((documentTop, index) => Math.max(0, documentTop - stickyTopOffsets[index] + entranceDistance));
       gateStartY = Math.max(0, stageTargets[0] - entranceDistance);
       timelineStart = stageTargets[3];
-      timelineEnd = timelineStart + Math.min(viewportHeight * 0.18, 140);
+      timelineEnd = timelineStart + Math.min(viewportHeight * 0.13, 96);
 
       if (workflowLiveNote) {
         const naturalNoteTop = window.scrollY + workflowLiveNote.getBoundingClientRect().top;
