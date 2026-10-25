@@ -54,27 +54,40 @@
   const nav = document.querySelector('#primary-nav');
 
   if (menuButton && nav) {
+    const menuLinks = Array.from(nav.querySelectorAll('a[href]'));
+    const setMenuOpen = (open, restoreFocus = false) => {
+      menuButton.setAttribute('aria-expanded', String(open));
+      menuButton.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+      nav.classList.toggle('is-open', open);
+      if (open) menuLinks[0]?.focus();
+      else if (restoreFocus) menuButton.focus();
+    };
+
     menuButton.addEventListener('click', () => {
-      const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
-      menuButton.setAttribute('aria-expanded', String(!isOpen));
-      menuButton.setAttribute('aria-label', isOpen ? 'Open navigation' : 'Close navigation');
-      nav.classList.toggle('is-open', !isOpen);
+      setMenuOpen(menuButton.getAttribute('aria-expanded') !== 'true');
     });
 
-    nav.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => {
-        menuButton.setAttribute('aria-expanded', 'false');
-        menuButton.setAttribute('aria-label', 'Open navigation');
-        nav.classList.remove('is-open');
-      });
+    menuLinks.forEach((link) => {
+      link.addEventListener('click', () => setMenuOpen(false));
     });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && nav.classList.contains('is-open')) {
-        menuButton.setAttribute('aria-expanded', 'false');
-        menuButton.setAttribute('aria-label', 'Open navigation');
-        nav.classList.remove('is-open');
-        menuButton.focus();
+      if (!nav.classList.contains('is-open')) return;
+      if (event.key === 'Escape') {
+        setMenuOpen(false, true);
+        return;
+      }
+      if (event.key !== 'Tab' || menuLinks.length === 0) return;
+
+      const firstLink = menuLinks[0];
+      const lastLink = menuLinks[menuLinks.length - 1];
+      const focusOutsideMenu = !nav.contains(document.activeElement) && document.activeElement !== menuButton;
+      if (focusOutsideMenu || (event.shiftKey && (document.activeElement === firstLink || document.activeElement === menuButton))) {
+        event.preventDefault();
+        lastLink.focus();
+      } else if (!event.shiftKey && (document.activeElement === lastLink || document.activeElement === menuButton)) {
+        event.preventDefault();
+        firstLink.focus();
       }
     });
   }
