@@ -242,7 +242,7 @@
     const stackTop = Math.max(82, Math.min(108, viewportHeight * 0.13));
     const gridTop = serviceDocumentTop(serviceStackGrid);
     const gridStyles = window.getComputedStyle(serviceStackGrid);
-    const gridGap = parseFloat(gridStyles.rowGap || gridStyles.gap) || 18;
+    const gridGap = parseFloat(gridStyles.rowGap || gridStyles.gap || '0') || 0;
     const gridPaddingTop = parseFloat(gridStyles.paddingTop) || 0;
     let cursor = gridTop + gridPaddingTop;
     const entries = [];
