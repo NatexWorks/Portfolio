@@ -185,7 +185,7 @@
 .topbar .back-link:hover::before{transform:translateY(-2px)}
 
 
-/* Mobile-only workflow scroll choreography: eased top-down card entrances, gesture-by-gesture sequencing, and a foreground section reveal. */
+/* Mobile-only workflow scroll choreography: smooth upward entrances, tight card layering, crisp edge light, and a foreground section reveal. */
 @media (max-width: 650px) {
   html.mobile-workflow-motion #workflows {
     position: relative;
@@ -217,18 +217,31 @@
     transform-origin: center top;
     transform-style: preserve-3d;
     backface-visibility: hidden;
-    box-shadow: 0 var(--shadow-y, 14px) var(--shadow-blur, 30px) #0008, inset 0 1px 0 #ffffff12, inset 0 -1px 0 #0004;
+    border-color: #697b4b;
+    box-shadow:
+      0 var(--shadow-y, 14px) var(--shadow-blur, 30px) #0009,
+      0 0 0 1px #bfe96812,
+      inset 0 1px 0 #f2ffd45c,
+      inset 0 -1px 0 #0007;
     transition: none;
     will-change: transform, opacity, box-shadow;
   }
 
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(1) { z-index: 1; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(2) { z-index: 2; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(3) { z-index: 3; }
+  html.mobile-workflow-motion #workflows .workflow-card:nth-child(4) { z-index: 4; }
+
   html.mobile-workflow-motion #workflows .workflow-card::before {
     opacity: var(--card-glow, 0);
+    filter: saturate(1.15);
   }
 
   html.mobile-workflow-motion #workflows .workflow-grid .workflow-card.reveal {
     opacity: var(--entry-opacity, 1);
     transform: perspective(950px) translate3d(var(--entry-x, 0px), var(--entry-y, 0px), var(--entry-z, 0px)) rotateX(var(--entry-rotate-x, 0deg)) rotateY(var(--entry-rotate-y, 0deg));
+    outline: 1px solid #d9ff9b24;
+    outline-offset: -1px;
     transition: none;
   }
 
