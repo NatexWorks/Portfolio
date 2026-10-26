@@ -46,6 +46,152 @@
     @media(prefers-reduced-motion:reduce) {
       .services-scroll-next,.services-scroll-next::before,.services-scroll-next::after { transition:none!important; animation:none!important; }
     }
+
+    /* Desktop/tablet motion system for the Services page.
+       Leaves service-detail motion and all hover behavior untouched. */
+    @media (min-width:761px) {
+      .services-page-hero > .eyebrow,
+      .services-page-hero h1,
+      .services-page-hero > p,
+      .services-page-hero .hero-actions {
+        opacity:0;
+        animation:servicesHeroReveal .68s cubic-bezier(.16,.72,.12,1) both;
+      }
+      .services-page-hero > .eyebrow { animation-delay:.02s; }
+      .services-page-hero h1 { animation-delay:.09s; }
+      .services-page-hero > p { animation-delay:.17s; }
+      .services-page-hero .hero-actions { animation-delay:.25s; }
+
+      .services-process {
+        display:block;
+        padding-top:28px;
+        padding-bottom:80px;
+      }
+      .services-process-heading {
+        display:flex;
+        align-items:flex-end;
+        justify-content:space-between;
+        gap:40px;
+        margin-bottom:10px;
+      }
+      .services-process-heading h2 {
+        max-width:660px;
+        margin:17px 0 0;
+        font-size:clamp(32px,4.1vw,49px);
+        line-height:1.1;
+        letter-spacing:-.065em;
+      }
+      .services-process-heading > p {
+        max-width:330px;
+        margin:0 0 3px;
+        color:#9ea393;
+        font-size:12px;
+        line-height:1.85;
+      }
+      .services-process-list {
+        list-style:none;
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:28px;
+        position:relative;
+        margin:36px 0 0;
+        padding:0;
+      }
+      .services-process-list::before,
+      .services-process-list::after {
+        content:"";
+        position:absolute;
+        left:0;
+        top:12px;
+        height:1px;
+        pointer-events:none;
+      }
+      .services-process-list::before {
+        right:0;
+        background:#394130;
+      }
+      .services-process-list::after {
+        width:0;
+        background:var(--lime);
+        transition:width .85s cubic-bezier(.2,.7,.2,1);
+      }
+      .services-process-list.is-in-view::after { width:100%; }
+      .services-process-step {
+        position:relative;
+        min-width:0;
+        padding-top:38px;
+      }
+      .services-process-step::before {
+        content:"";
+        position:absolute;
+        top:6px;
+        left:0;
+        width:13px;
+        height:13px;
+        border:1px solid #68784e;
+        border-radius:50%;
+        background:var(--bg);
+        z-index:1;
+        transition:background .25s ease,border-color .25s ease,box-shadow .25s ease;
+      }
+      .services-process-step h3 {
+        margin:0 0 9px;
+        font-size:18px;
+        letter-spacing:-.04em;
+      }
+      .services-process-step p {
+        max-width:330px;
+        margin:0;
+        color:#a8b09d;
+        font-size:12px;
+        line-height:1.9;
+      }
+      .services-process-step .process-kicker {
+        display:block;
+        margin-bottom:10px;
+        color:var(--lime);
+        font:9px var(--mono);
+        letter-spacing:.08em;
+      }
+      .services-motion-on .services-process-step[data-services-motion],
+      .services-motion-on .site-footer[data-services-motion] {
+        opacity:0;
+        transform:translateY(14px);
+        transition:opacity .55s ease,transform .55s cubic-bezier(.2,.7,.2,1);
+      }
+      .services-motion-on .services-process-step[data-services-motion].is-in-view,
+      .services-motion-on .site-footer[data-services-motion].is-in-view {
+        opacity:1;
+        transform:translateY(0);
+      }
+      .services-motion-on .services-process-step[data-services-motion].is-in-view::before {
+        background:var(--lime);
+        border-color:var(--lime);
+        box-shadow:0 0 0 5px #c5f36b12;
+      }
+      .services-motion-on .services-process-step[data-services-motion="process-step"]:nth-child(2) { transition-delay:.08s; }
+      .services-motion-on .services-process-step[data-services-motion="process-step"]:nth-child(3) { transition-delay:.16s; }
+      .services-motion-on .site-footer[data-services-motion="footer"] {
+        transition-duration:.65s;
+        transition-delay:.06s;
+      }
+      .services-motion-on .service-page-contact .contact-card[data-services-motion="contact"] {
+        transform:translateY(22px) scale(.99);
+        transition:opacity .65s ease,transform .65s cubic-bezier(.2,.7,.2,1);
+      }
+      .services-motion-on .service-page-contact .contact-card[data-services-motion="contact"].is-in-view {
+        transform:translateY(0) scale(1);
+      }
+    }
+    @keyframes servicesHeroReveal {
+      from { opacity:0; transform:translateY(18px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    @media(max-width:760px) {
+      /* Keep the existing phone page and its spacing/content unchanged. */
+      .services-process { display:none !important; }
+    }
+
     /* Match the 20px footer wordmark size used on index.html. */
     .site-footer .brand > span:last-child { font-size:20px; line-height:1; }
   </style>
@@ -75,15 +221,41 @@
         <article class="service-detail reveal"><span class="service-detail-number">03</span><div><h2>SEO & Google Maps visibility</h2><p>Improve the foundations that help search engines and nearby customers understand a business. Local SEO includes Google Business Profile setup or improvement, accurate business details, and a website that supports local intent.</p></div><ul><li>On-page SEO fundamentals</li><li>Google Business Profile review</li><li>Consistent name, address and phone details</li><li>Local landing-page recommendations</li></ul></article>
         <article class="service-detail reveal"><span class="service-detail-number">04</span><div><h2>Interface fixes & responsive polish</h2><p>Improve an existing website's layout, navigation, usability, and behavior across different screen sizes without rebuilding everything unnecessarily.</p></div><ul><li>Mobile and tablet layout fixes</li><li>Navigation and interaction improvements</li><li>Visual consistency and accessibility basics</li><li>Focused UI refinements</li></ul></article>
       </section>
-      <section class="section">
+            <section class="section services-process" aria-labelledby="services-process-title">
+        <div class="services-process-heading">
+          <div>
+            <div class="eyebrow"><span class="status-dot"></span> HOW I WORK / FROM BRIEF TO HANDOVER</div>
+            <h2 id="services-process-title">Clear steps.<br><span class="headline-accent">No guesswork.</span></h2>
+          </div>
+          <p>Each project has an agreed direction, useful review points, and a final check before handover.</p>
+        </div>
+        <ol class="services-process-list" data-services-motion="process-track">
+          <li class="services-process-step" data-services-motion="process-step">
+            <span class="process-kicker">STEP 01 / ALIGN</span>
+            <h3>Understand the goal</h3>
+            <p>Clarify the problem, priorities, constraints, and what a successful outcome should look like before work begins.</p>
+          </li>
+          <li class="services-process-step" data-services-motion="process-step">
+            <span class="process-kicker">STEP 02 / BUILD</span>
+            <h3>Build and refine</h3>
+            <p>Shape the experience around the agreed scope, then review the important parts and refine them with feedback.</p>
+          </li>
+          <li class="services-process-step" data-services-motion="process-step">
+            <span class="process-kicker">STEP 03 / VERIFY</span>
+            <h3>Test and hand over</h3>
+            <p>Check key screens, interactions, and responsive behavior; resolve issues and make the completed work clear.</p>
+          </li>
+        </ol>
+      </section>
+<section class="section">
         <div class="service-principle reveal"><h2>Visibility is a process,<br><span class="headline-muted">not a ranking promise.</span></h2><p>Google Search and Google Maps results depend on competition, relevance, location, business information, reviews, and other factors. I can improve the setup and technical foundations, but no one can honestly guarantee a particular position or timeline.</p></div>
       </section>
       <section class="section service-page-contact" id="contact">
-        <div class="contact-card reveal"><div><div class="eyebrow"><span class="status-dot"></span> START WITH THE PROBLEM</div><h2>What do you need<br><span>to improve?</span></h2><p>Share the goal, what you have already, and the main obstacle. We can define a practical scope before committing to a build.</p></div><div class="contact-actions"><a class="button button-primary" href="mailto:natexworks@gmail.com?subject=Project%20enquiry%20%E2%80%94%20NatexWorks">Start a conversation <span aria-hidden="true">↗</span></a><span class="contact-email">NATEXWORKS@GMAIL.COM</span></div></div>
+        <div class="contact-card reveal" data-services-motion="contact"><div><div class="eyebrow"><span class="status-dot"></span> START WITH THE PROBLEM</div><h2>What do you need<br><span>to improve?</span></h2><p>Share the goal, what you have already, and the main obstacle. We can define a practical scope before committing to a build.</p></div><div class="contact-actions"><a class="button button-primary" href="mailto:natexworks@gmail.com?subject=Project%20enquiry%20%E2%80%94%20NatexWorks">Start a conversation <span aria-hidden="true">↗</span></a><span class="contact-email">NATEXWORKS@GMAIL.COM</span></div></div>
       </section>
     </main>
     <button class="services-scroll-next" id="servicesScrollNext" type="button" aria-label="Scroll to next section"><span>NEXT SECTION</span><b>↓</b></button>
-    <footer class="site-footer"><a class="brand" href="index.html#home"><span class="brand-mark">N<span>×</span></span><span>NatexWorks<span class="brand-dot">.</span></span></a><span>BUILT WITH INTENTION. <span id="year"></span></span></footer>
+    <footer class="site-footer" data-services-motion="footer"><a class="brand" href="index.html#home"><span class="brand-mark">N<span>×</span></span><span>NatexWorks<span class="brand-dot">.</span></span></a><span>BUILT WITH INTENTION. <span id="year"></span></span></footer>
   </div>
   <script>
     (function () {
@@ -128,6 +300,23 @@
       window.addEventListener('scroll', syncButton, { passive: true });
       window.addEventListener('resize', syncButton);
       syncButton();
+    })();
+
+    /* Motion enhancements run on desktop/tablet only; reduced-motion users see static content. */
+    (function () {
+      const desktopOrTablet = window.matchMedia('(min-width: 761px)');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const targets = document.querySelectorAll('[data-services-motion]');
+      if (!desktopOrTablet.matches || reducedMotion || !('IntersectionObserver' in window) || !targets.length) return;
+      document.documentElement.classList.add('services-motion-on');
+      const observer = new IntersectionObserver((entries, currentObserver) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-in-view');
+          currentObserver.unobserve(entry.target);
+        });
+      }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+      targets.forEach((target) => observer.observe(target));
     })();
   </script>
 </body>
