@@ -329,48 +329,34 @@
       const entranceProgress = clampServiceProgress(
         (entry.stickyTop + entranceDistance - constrainedTop) / entranceDistance
       );
-      // Card 1 is the lead motion; cards 2–4 blend distinct diagonal 3D entrances.
-      // Every transform is derived from scroll progress, never from event counts.
+      // Keep the original upward/diagonal card travel, with no card tilt or strong depth.
+      // Every transform remains tied directly to scroll progress.
       const approach = 1 - entranceProgress;
       const sideDistance = Math.min(18, Math.max(12, (window.innerWidth || 360) * 0.045));
       let x = 0;
       let y = approach * 24;
-      let z = approach * -28;
-      let rotateX = approach * -3.6;
-      let rotateY = 0;
-      let rotateZ = 0;
-      let scale = 0.958 + entranceProgress * 0.042;
+      let z = approach * -12;
+      let scale = 0.985 + entranceProgress * 0.015;
 
       if (entry.index === 1) {
         x = -sideDistance * approach;
         y = 27 * approach;
-        z = -22 * approach;
-        rotateX = -2.2 * approach;
-        rotateY = -6.2 * approach;
-        rotateZ = -1.3 * approach;
-        scale = 0.966 + entranceProgress * 0.034;
+        z = -10 * approach;
+        scale = 0.986 + entranceProgress * 0.014;
       } else if (entry.index === 2) {
         x = sideDistance * approach;
         y = 22 * approach;
-        z = -20 * approach;
-        rotateX = 1.8 * approach;
-        rotateY = 5.8 * approach;
-        rotateZ = 1.1 * approach;
-        scale = 0.972 + entranceProgress * 0.028;
+        z = -10 * approach;
+        scale = 0.988 + entranceProgress * 0.012;
       } else if (entry.index === 3) {
         x = -sideDistance * 0.65 * approach;
         y = 30 * approach;
-        z = -30 * approach;
-        rotateX = -2.8 * approach;
-        rotateY = -3.5 * approach;
-        rotateZ = 1.6 * approach;
-        scale = 0.954 + entranceProgress * 0.046;
+        z = -14 * approach;
+        scale = 0.984 + entranceProgress * 0.016;
       }
 
       entry.card.style.transform =
-        `perspective(1000px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) ` +
-        `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ` +
-        `rotateZ(${rotateZ.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+        `perspective(1000px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
     });
 
     if (scrollY >= metrics.triggerY) {
@@ -378,12 +364,10 @@
         (scrollY - metrics.triggerY) / metrics.exitDuration
       );
       const translateY = -18 * exitProgress;
-      const rotateX = 9 * exitProgress;
-      const scale = 1 - 0.055 * exitProgress;
+      const scale = 1 - 0.025 * exitProgress;
       const panelRise = 84 * (1 - exitProgress);
       serviceStackGrid.style.transform =
-        `perspective(1100px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
-        `rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+        `perspective(1100px) translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
       serviceStackNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
     } else {
       serviceStackGrid.style.removeProperty('transform');
@@ -541,47 +525,33 @@
       const approach = 1 - progress;
       let x = 0;
       let y = 34 * approach;
-      let z = -44 * approach;
-      let rotateX = -4.5 * approach;
-      let rotateY = 0;
-      let rotateZ = 0;
-      let scale = 0.94 + progress * 0.06;
+      let z = -18 * approach;
+      let scale = 0.98 + progress * 0.02;
 
       if (entry.index === 1) {
         x = -sideDistance * approach;
         y = 38 * approach;
-        z = -36 * approach;
-        rotateX = -2.8 * approach;
-        rotateY = -8.5 * approach;
-        rotateZ = -2.4 * approach;
-        scale = 0.935 + progress * 0.065;
+        z = -16 * approach;
+        scale = 0.98 + progress * 0.02;
       } else if (entry.index === 2) {
         x = sideDistance * approach;
         y = 28 * approach;
-        z = -32 * approach;
-        rotateX = 2.2 * approach;
-        rotateY = 7.5 * approach;
-        rotateZ = 2.2 * approach;
-        scale = 0.945 + progress * 0.055;
+        z = -14 * approach;
+        scale = 0.982 + progress * 0.018;
       } else if (entry.index === 3) {
         x = -sideDistance * 0.62 * approach;
         y = 43 * approach;
-        z = -48 * approach;
-        rotateX = -4.2 * approach;
-        rotateY = -4.5 * approach;
-        rotateZ = 3.2 * approach;
-        scale = 0.925 + progress * 0.075;
+        z = -18 * approach;
+        scale = 0.978 + progress * 0.022;
       }
 
-      entry.card.style.opacity = String(Math.min(1, progress * 1.12));
+      entry.card.style.opacity = String(Math.min(1, progress * 1.08));
       if (progress < 1) {
         entry.card.style.transform =
-          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) ` +
-          `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ` +
-          `rotateZ(${rotateZ.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-        const shadowY = 5 + progress * 11;
-        const shadowBlur = 14 + progress * 18;
-        const shadowAlpha = 0.1 + progress * 0.12;
+          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
+        const shadowY = 4 + progress * 5;
+        const shadowBlur = 10 + progress * 8;
+        const shadowAlpha = 0.06 + progress * 0.06;
         entry.card.style.boxShadow =
           `0 ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, ${shadowAlpha.toFixed(3)})`;
       } else {
@@ -599,13 +569,11 @@
     );
     if (scrollY >= exitTransitionStart) {
       const translateY = -16 * exitProgress;
-      const rotateX = 7.5 * exitProgress;
-      const scale = 1 - 0.045 * exitProgress;
+      const scale = 1 - 0.025 * exitProgress;
       const panelRise = 76 * (1 - exitProgress);
       serviceMotionSection.style.transformOrigin = 'center bottom';
       serviceMotionSection.style.transform =
-        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
-        `rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
       serviceMotionNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
     } else {
       serviceMotionSection.style.removeProperty('transform');
@@ -637,6 +605,111 @@
       if (serviceMotionActive) measureServiceCardMotion();
       scheduleServiceCardMotion();
     }, { passive: true });
+  }
+
+  // Services page: scroll-linked entrance for Business websites, Custom web applications, and SEO.
+  // This runs independently of the homepage stack; no rotations, only a restrained bottom/right settle.
+  const servicesDetailList = document.querySelector('.service-detail-list');
+  const servicesDetailCards = servicesDetailList
+    ? Array.from(servicesDetailList.querySelectorAll(':scope > .service-detail')).slice(0, 3)
+    : [];
+
+  if (servicesDetailList && servicesDetailCards.length === 3 && !reducedMotion) {
+    let servicesDetailFrame = 0;
+    let servicesDetailMetrics = [];
+    servicesDetailList.classList.add('services-scroll-motion-enabled');
+
+    const measureServicesDetailMotion = () => {
+      const viewportHeight = Math.max(1, window.innerHeight || document.documentElement.clientHeight);
+      const travel = Math.max(viewportHeight * 0.42, 220);
+      servicesDetailMetrics = servicesDetailCards.map((card, index) => {
+        const top = serviceDocumentTop(card);
+        const start = top - viewportHeight * 0.84 + index * viewportHeight * 0.025;
+        return { card, start, end: start + travel };
+      });
+    };
+
+    const updateServicesDetailMotion = () => {
+      servicesDetailFrame = 0;
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+      servicesDetailMetrics.forEach((entry) => {
+        const progress = clampServiceProgress((scrollY - entry.start) / (entry.end - entry.start));
+        const approach = 1 - progress;
+        const x = 24 * approach;
+        const y = 24 * approach;
+        const z = -12 * approach;
+        const scale = 0.985 + progress * 0.015;
+
+        entry.card.style.opacity = String(progress);
+        if (progress < 1) {
+          entry.card.style.transform =
+            `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
+        } else {
+          entry.card.style.removeProperty('transform');
+          entry.card.style.opacity = '1';
+        }
+      });
+    };
+
+    const scheduleServicesDetailMotion = () => {
+      if (servicesDetailFrame) return;
+      servicesDetailFrame = window.requestAnimationFrame(updateServicesDetailMotion);
+    };
+
+    measureServicesDetailMotion();
+    scheduleServicesDetailMotion();
+    window.addEventListener('scroll', scheduleServicesDetailMotion, { passive: true });
+    window.addEventListener('resize', () => {
+      measureServicesDetailMotion();
+      scheduleServicesDetailMotion();
+    }, { passive: true });
+  }
+
+  // Services hero paragraph: reveal one word every 100ms (1.75x a 175ms/word baseline).
+  const servicesHeroTypingTarget = document.querySelector('[data-services-hero-typewriter]');
+  if (
+    servicesHeroTypingTarget &&
+    !reducedMotion &&
+    'IntersectionObserver' in window
+  ) {
+    const fullText = servicesHeroTypingTarget.textContent.trim();
+    const words = fullText.split(/\\s+/);
+    const wordNodes = [];
+    servicesHeroTypingTarget.setAttribute('aria-label', fullText);
+    servicesHeroTypingTarget.replaceChildren();
+
+    words.forEach((word, index) => {
+      const span = document.createElement('span');
+      span.textContent = word + (index < words.length - 1 ? ' ' : '');
+      span.style.opacity = '0';
+      span.setAttribute('aria-hidden', 'true');
+      servicesHeroTypingTarget.appendChild(span);
+      wordNodes.push(span);
+    });
+
+    let typingStarted = false;
+    const beginWordTyping = () => {
+      if (typingStarted) return;
+      typingStarted = true;
+      let index = 0;
+      const showNextWord = () => {
+        if (index >= wordNodes.length) return;
+        wordNodes[index].style.opacity = '1';
+        index += 1;
+        if (index < wordNodes.length) window.setTimeout(showNextWord, 100);
+      };
+      showNextWord();
+    };
+
+    const servicesHeroTypingObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          observer.unobserve(entry.target);
+          beginWordTyping();
+        }
+      });
+    }, { threshold: 0.12 });
+    servicesHeroTypingObserver.observe(servicesHeroTypingTarget);
   }
 
   // Start the process motion-graphic when it enters view, then keep it looping.
