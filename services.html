@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css?v=20261025-9">
+  <link rel="stylesheet" href="style.css?v=20261026-09">
   <style>
     /* Fixed Next Section / Back to Top control for the services page. */
     .services-scroll-next {
@@ -308,8 +308,14 @@
 
     /* Match the 20px footer wordmark size used on index.html. */
     .site-footer .brand > span:last-child { font-size:20px; line-height:1; }
+
+    /* Scroll-linked entrance only for the first three detailed services; JS disables it for reduced motion. */
+    .service-detail-list.services-scroll-motion-enabled > .service-detail:nth-child(-n+3) {
+      transition: none !important;
+      will-change: transform, opacity;
+    }
   </style>
-  <script src="script.js?v=20261025-2" defer></script>
+  <script src="script.js?v=20261026-10" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -376,8 +382,8 @@
     <main id="main">
       <section class="section services-page-hero">
         <div class="eyebrow"><span class="status-dot"></span> SERVICES / BUILT AROUND YOUR GOAL</div>
-        <h1>Clear problems.<br><span class="headline-accent">Practical solutions.</span></h1>
-        <p>Choose the help that fits your business: a better website, a custom tool, or a clearer path for local customers to find you. Scope and deliverables are agreed before work begins.</p>
+        <h1>Less <span class="headline-muted">guesswork.</span><br><span class="headline-accent">More control.</span></h1>
+        <p data-services-hero-typewriter>Choose the help that fits your business: a better website, a custom tool, or a clearer path for local customers to find you. Scope and deliverables are agreed before work begins.</p>
         <div class="hero-actions"><a class="button button-primary" href="#contact">Discuss your project <span aria-hidden="true">↘</span></a><a class="text-link" href="index.html#work">View selected work <span aria-hidden="true">↗</span></a></div>
       </section>
       <section class="section service-detail-list" aria-label="Service details">
