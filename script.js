@@ -328,12 +328,48 @@
       const entranceProgress = clampServiceProgress(
         (entry.stickyTop + entranceDistance - constrainedTop) / entranceDistance
       );
-      // The card stays horizontally centred: only a short vertical settle is used.
-      // Reverse sticky offsets place each newer card above the previous one by 10px.
-      const y = (1 - entranceProgress) * 18;
-      const scale = 0.992 + entranceProgress * 0.008;
+      // Card 1 is the lead motion; cards 2–4 blend distinct diagonal 3D entrances.
+      // Every transform is derived from scroll progress, never from event counts.
+      const approach = 1 - entranceProgress;
+      const sideDistance = Math.min(18, Math.max(12, (window.innerWidth || 360) * 0.045));
+      let x = 0;
+      let y = approach * 24;
+      let z = approach * -28;
+      let rotateX = approach * -3.6;
+      let rotateY = 0;
+      let rotateZ = 0;
+      let scale = 0.958 + entranceProgress * 0.042;
+
+      if (entry.index === 1) {
+        x = -sideDistance * approach;
+        y = 27 * approach;
+        z = -22 * approach;
+        rotateX = -2.2 * approach;
+        rotateY = -6.2 * approach;
+        rotateZ = -1.3 * approach;
+        scale = 0.966 + entranceProgress * 0.034;
+      } else if (entry.index === 2) {
+        x = sideDistance * approach;
+        y = 22 * approach;
+        z = -20 * approach;
+        rotateX = 1.8 * approach;
+        rotateY = 5.8 * approach;
+        rotateZ = 1.1 * approach;
+        scale = 0.972 + entranceProgress * 0.028;
+      } else if (entry.index === 3) {
+        x = -sideDistance * 0.65 * approach;
+        y = 30 * approach;
+        z = -30 * approach;
+        rotateX = -2.8 * approach;
+        rotateY = -3.5 * approach;
+        rotateZ = 1.6 * approach;
+        scale = 0.954 + entranceProgress * 0.046;
+      }
+
       entry.card.style.transform =
-        `perspective(1000px) translate3d(0, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+        `perspective(1000px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) ` +
+        `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ` +
+        `rotateZ(${rotateZ.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
     });
 
     if (scrollY >= metrics.triggerY) {
