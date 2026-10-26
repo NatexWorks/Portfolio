@@ -407,7 +407,7 @@
         entries,
         gridBottom: gridTop + workflowGrid.offsetHeight,
         triggerY,
-        exitDuration: Math.max(viewportHeight * 0.30, 180),
+        exitDuration: Math.max(viewportHeight * 0.24, 140),
         viewportHeight
       };
     };
@@ -429,33 +429,22 @@
         const entranceProgress = clamp(
           (entry.stickyTop + entranceDistance - constrainedTop) / entranceDistance
         );
-        // Alternate left/right diagonal entry; every value follows scroll progress, never scroll-event counts.
-        const direction = entry.index % 2 === 0 ? -1 : 1;
-        const sideDistance = Math.min(16, Math.max(12, (window.innerWidth || 360) * 0.045));
-        const x = direction * sideDistance * (1 - entranceProgress);
-        const y = (1 - entranceProgress) * 22;
-        const z = (1 - entranceProgress) * -20;
-        const rotateX = (1 - entranceProgress) * -2.2;
-        const rotateY = direction * (1 - entranceProgress) * 5.2;
-        const rotateZ = direction * (1 - entranceProgress) * 1.1;
-        const scale = 0.975 + entranceProgress * 0.025;
+        const y = (1 - entranceProgress) * 18;
+        const scale = 0.992 + entranceProgress * 0.008;
 
+        // Match index.html: a small vertical settle and a restrained scale, tied directly to scrolling.
         entry.card.style.transform =
-          'perspective(900px) translate3d(' + x.toFixed(2) + 'px, ' +
-          y.toFixed(2) + 'px, ' + z.toFixed(2) + 'px) rotateX(' +
-          rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) +
-          'deg) rotateZ(' + rotateZ.toFixed(2) + 'deg) scale(' +
-          scale.toFixed(4) + ')';
+          'translate3d(0, ' + y.toFixed(2) + 'px, 0) scale(' + scale.toFixed(4) + ')';
       });
 
       if (scrollY >= metrics.triggerY) {
         const exitProgress = clamp((scrollY - metrics.triggerY) / metrics.exitDuration);
         const progress = smoothstep(exitProgress);
-        workflowSection.style.setProperty('--workflow-rise', (-20 * progress).toFixed(2) + 'px');
-        workflowSection.style.setProperty('--workflow-tilt', (7 * progress).toFixed(2) + 'deg');
-        workflowSection.style.setProperty('--workflow-scale', (1 - 0.04 * progress).toFixed(4));
+        workflowSection.style.setProperty('--workflow-rise', (-18 * progress).toFixed(2) + 'px');
+        workflowSection.style.setProperty('--workflow-tilt', (2.5 * progress).toFixed(2) + 'deg');
+        workflowSection.style.setProperty('--workflow-scale', (1 - 0.025 * progress).toFixed(4));
         workflowSection.style.setProperty('--workflow-opacity', '1');
-        nextSection.style.setProperty('--workflow-panel-rise', (92 * (1 - progress)).toFixed(2) + 'px');
+        nextSection.style.setProperty('--workflow-panel-rise', (84 * (1 - progress)).toFixed(2) + 'px');
       } else {
         workflowSection.style.setProperty('--workflow-rise', '0px');
         workflowSection.style.setProperty('--workflow-tilt', '0deg');
