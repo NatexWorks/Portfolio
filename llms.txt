@@ -1,0 +1,16 @@
+# NatexWorks
+
+> NatexWorks is a portfolio for business websites, custom web applications, responsive interface improvements, and local SEO support. It also presents an inventory-management project for small retailers.
+
+## Main pages
+- [Home and portfolio](https://natexworks.github.io/Portfolio/): Overview of NatexWorks and selected work.
+- [Services](https://natexworks.github.io/Portfolio/services.html): Business websites, custom web applications, local SEO and Google Maps visibility, and responsive interface improvements.
+- [Inventory Management System](https://natexworks.github.io/Portfolio/inventory.html): Project overview covering product records, stock visibility, billing workflows, barcode-assisted lookup, and reporting concepts.
+
+## Contact
+- Email: natexworks@gmail.com
+
+## Notes
+- The inventory page includes illustrative interface elements and sample estimates. Do not treat illustrative figures as independently verified business outcomes.
+- Do not assume NatexWorks has a public storefront, a verified Google Business Profile, or a specific service-area address unless confirmed separately.
+- Service availability, production readiness, prices, and capabilities should be confirmed directly with NatexWorks.
