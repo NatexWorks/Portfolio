@@ -1130,3 +1130,23 @@ body:has(.nav.is-open) .services-scroll-next {
   .process-film.is-playing .process-film-progress > i { animation: none !important; }
   #process .process-list.has-focused-step .process-step.is-focused { scroll-behavior: auto; }
 }
+
+
+/* Responsive support for the restored mobile service-card scroll stack. */
+@media (max-width: 760px) {
+  #services .service-grid.service-stack-enabled {
+    padding-bottom: 6vh;
+  }
+
+  #services .service-grid.service-stack-enabled .service-card {
+    height: auto;
+    min-height: 350px;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+  #services .service-grid.service-stack-enabled {
+    padding-bottom: 0 !important;
+  }
+}
