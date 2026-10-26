@@ -242,6 +242,61 @@
       .services-process { display:none !important; }
     }
 
+
+    /* Service descriptions: restore the four-card square layout on laptop/tablet.
+       Mobile keeps its existing stacked service-detail layout. */
+    @media (min-width:761px) {
+      .service-detail-list {
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:18px;
+        align-items:stretch;
+        padding-block:42px 60px;
+      }
+      .service-detail-list > .service-detail {
+        display:flex;
+        flex-direction:column;
+        align-items:stretch;
+        gap:16px;
+        min-width:0;
+        aspect-ratio:1 / 1;
+        padding:clamp(22px,2.5vw,34px);
+        border:1px solid #30372b;
+        background:linear-gradient(145deg,#191e15,#12150f);
+        box-shadow:0 10px 24px rgba(0,0,0,.16);
+        transition:transform .3s ease,border-color .3s ease,background .3s ease,box-shadow .3s ease;
+      }
+      .service-detail-list > .service-detail:first-child { border-top:1px solid #30372b; }
+      .service-detail-list > .service-detail:hover {
+        transform:translateY(-4px);
+        border-color:#687d4d;
+        background:linear-gradient(145deg,#20281a,#151a12);
+        box-shadow:0 16px 32px rgba(0,0,0,.25);
+      }
+      .service-detail-number { padding-top:0; }
+      .service-detail-list > .service-detail > div { min-width:0; }
+      .service-detail-list .service-detail h2 {
+        margin-bottom:10px;
+        font-size:clamp(22px,2.3vw,31px);
+        line-height:1.2;
+      }
+      .service-detail-list .service-detail p {
+        max-width:none;
+        font-size:clamp(11px,.95vw,13px);
+        line-height:1.75;
+      }
+      .service-detail-list .service-detail ul {
+        margin-top:auto;
+        padding-top:14px;
+        font-size:clamp(10px,.85vw,11px);
+        line-height:1.9;
+      }
+    }
+    @media (min-width:761px) and (prefers-reduced-motion:reduce) {
+      .service-detail-list > .service-detail { transition:none; }
+      .service-detail-list > .service-detail:hover { transform:none; }
+    }
+
     /* Match the 20px footer wordmark size used on index.html. */
     .site-footer .brand > span:last-child { font-size:20px; line-height:1; }
   </style>
