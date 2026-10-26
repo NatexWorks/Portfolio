@@ -673,7 +673,7 @@
     'IntersectionObserver' in window
   ) {
     const fullText = servicesHeroTypingTarget.textContent.trim();
-    const words = fullText.split(/\\s+/);
+    const words = fullText.split(/\s+/);
     const wordNodes = [];
     servicesHeroTypingTarget.setAttribute('aria-label', fullText);
     servicesHeroTypingTarget.replaceChildren();
