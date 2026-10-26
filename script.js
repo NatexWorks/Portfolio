@@ -207,16 +207,18 @@
     window.setTimeout(() => { deleting = true; type(); }, 1200);
   }
 
-  // Mobile-only scroll-progress service stack. The desktop/tablet layout is untouched.
-  const serviceStackMedia = window.matchMedia('(max-width: 760px)');
-  const serviceStackGrid = document.querySelector('#services .service-grid');
-  const serviceStackNext = document.querySelector('#skills');
-  let serviceStackCards = serviceStackGrid
-    ? Array.from(serviceStackGrid.querySelectorAll('.service-card'))
+  // Desktop/tablet-only scroll-progress motion for the four homepage service cards.
+  // The phone layout is deliberately left to its existing responsive CSS.
+  const serviceMotionMedia = window.matchMedia('(min-width: 761px)');
+  const serviceMotionSection = document.querySelector('#services.services-section');
+  const serviceMotionGrid = document.querySelector('#services .service-grid');
+  const serviceMotionNext = document.querySelector('#skills');
+  let serviceMotionCards = serviceMotionGrid
+    ? Array.from(serviceMotionGrid.querySelectorAll('.service-card'))
     : [];
-  let serviceStackActive = false;
-  let serviceStackFrame = 0;
-  let serviceStackMetrics = null;
+  let serviceMotionActive = false;
+  let serviceMotionFrame = 0;
+  let serviceMotionMetrics = null;
 
   const clampServiceProgress = (value) => Math.max(0, Math.min(1, value));
 
@@ -230,188 +232,195 @@
     return top;
   };
 
-  const resetServiceStack = () => {
-    if (serviceStackFrame) {
-      window.cancelAnimationFrame(serviceStackFrame);
-      serviceStackFrame = 0;
+  const resetServiceCardMotion = () => {
+    if (serviceMotionFrame) {
+      window.cancelAnimationFrame(serviceMotionFrame);
+      serviceMotionFrame = 0;
     }
-    if (!serviceStackActive) return;
-    serviceStackGrid.classList.remove('service-stack-enabled');
-    serviceStackNext.classList.remove('service-stack-foreground');
-    serviceStackGrid.style.removeProperty('transform');
-    serviceStackGrid.style.removeProperty('transform-origin');
-    serviceStackNext.style.removeProperty('transform');
-    serviceStackCards.forEach((card) => {
-      card.style.removeProperty('top');
-      card.style.removeProperty('z-index');
+    if (serviceMotionGrid) serviceMotionGrid.classList.remove('service-scroll-motion-enabled');
+    if (serviceMotionSection) {
+      serviceMotionSection.classList.remove('service-exit-motion-enabled');
+      serviceMotionSection.style.removeProperty('transform');
+      serviceMotionSection.style.removeProperty('transform-origin');
+    }
+    if (serviceMotionNext) {
+      serviceMotionNext.classList.remove('service-foreground-enabled');
+      serviceMotionNext.style.removeProperty('transform');
+    }
+    serviceMotionCards.forEach((card) => {
+      card.style.removeProperty('opacity');
       card.style.removeProperty('transform');
+      card.style.removeProperty('box-shadow');
     });
-    serviceStackActive = false;
-    serviceStackMetrics = null;
+    serviceMotionActive = false;
+    serviceMotionMetrics = null;
   };
 
-  const measureServiceStack = () => {
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    const stackTop = Math.max(82, Math.min(108, viewportHeight * 0.13));
-    const gridTop = serviceDocumentTop(serviceStackGrid);
-    const gridStyles = window.getComputedStyle(serviceStackGrid);
-    const gridGap = parseFloat(gridStyles.rowGap || gridStyles.gap || '0') || 0;
-    const gridPaddingTop = parseFloat(gridStyles.paddingTop) || 0;
-    let cursor = gridTop + gridPaddingTop;
-    const entries = [];
-
-    serviceStackCards.forEach((card, index) => {
-      const height = card.offsetHeight || 300;
-      const stickyTop = stackTop + (serviceStackCards.length - index - 1) * 10;
-      entries.push({ card, index, staticTop: cursor, stickyTop, height });
-      cursor += height + (index < serviceStackCards.length - 1 ? gridGap : 0);
+  const sortServiceCardsForVisualOrder = () => {
+    if (!serviceMotionGrid) return [];
+    return Array.from(serviceMotionGrid.querySelectorAll('.service-card')).sort((a, b) => {
+      const styleA = window.getComputedStyle(a);
+      const styleB = window.getComputedStyle(b);
+      const rowA = Number.parseInt(styleA.gridRowStart, 10) || 1;
+      const rowB = Number.parseInt(styleB.gridRowStart, 10) || 1;
+      const colA = Number.parseInt(styleA.gridColumnStart, 10) || 1;
+      const colB = Number.parseInt(styleB.gridColumnStart, 10) || 1;
+      return rowA - rowB || colA - colB;
     });
+  };
 
-    const finalCard = entries[entries.length - 1];
-    serviceStackMetrics = {
+  const measureServiceCardMotion = () => {
+    if (!serviceMotionSection || !serviceMotionGrid || !serviceMotionNext) return;
+    const viewportHeight = Math.max(1, window.innerHeight || document.documentElement.clientHeight);
+    serviceMotionCards = sortServiceCardsForVisualOrder();
+
+    const stagger = viewportHeight * 0.035;
+    const travel = Math.max(viewportHeight * 0.42, 220);
+    const entries = serviceMotionCards.map((card, index) => {
+      const top = serviceDocumentTop(card);
+      const start = top - viewportHeight * 0.84 + index * stagger;
+      return { card, index, top, start, end: start + travel };
+    });
+    const finalEntry = entries.reduce((latest, entry) => entry.end > latest.end ? entry : latest, entries[0]);
+    const sectionTop = serviceDocumentTop(serviceMotionSection);
+    const sectionBottom = sectionTop + serviceMotionSection.offsetHeight;
+
+    serviceMotionMetrics = {
       entries,
-      gridBottom: gridTop + serviceStackGrid.offsetHeight,
-      triggerY: finalCard.staticTop - finalCard.stickyTop,
-      exitDuration: Math.max(viewportHeight * 0.24, 140),
       viewportHeight,
-      stackTop
+      exitStart: Math.max(sectionBottom - viewportHeight * 0.84, finalEntry.end),
+      exitDuration: Math.max(viewportHeight * 0.28, 180)
     };
-
-    serviceStackGrid.style.setProperty('--service-stack-top', `${stackTop}px`);
-    serviceStackGrid.style.transformOrigin = 'center top';
-    entries.forEach((entry) => {
-      entry.card.style.top = `${entry.stickyTop}px`;
-      entry.card.style.zIndex = String(entry.index + 1);
-    });
   };
 
-  const activateServiceStack = () => {
+  const activateServiceCardMotion = () => {
     if (
-      serviceStackActive ||
-      !serviceStackMedia.matches ||
+      serviceMotionActive ||
+      !serviceMotionMedia.matches ||
       reducedMotion ||
-      !serviceStackGrid ||
-      !serviceStackNext ||
-      serviceStackCards.length !== 4
+      !serviceMotionSection ||
+      !serviceMotionGrid ||
+      !serviceMotionNext ||
+      serviceMotionCards.length !== 4
     ) return;
 
-    serviceStackCards.sort((a, b) => {
-      return Number.parseInt(window.getComputedStyle(a).order, 10) -
-        Number.parseInt(window.getComputedStyle(b).order, 10);
-    });
-    serviceStackGrid.classList.add('service-stack-enabled');
-    serviceStackNext.classList.add('service-stack-foreground');
-    serviceStackActive = true;
-    measureServiceStack();
+    serviceMotionGrid.classList.add('service-scroll-motion-enabled');
+    serviceMotionSection.classList.add('service-exit-motion-enabled');
+    serviceMotionNext.classList.add('service-foreground-enabled');
+    serviceMotionActive = true;
+    measureServiceCardMotion();
   };
 
-  const updateServiceStack = () => {
-    serviceStackFrame = 0;
-    if (!serviceStackMedia.matches || reducedMotion) {
-      resetServiceStack();
+  const updateServiceCardMotion = () => {
+    serviceMotionFrame = 0;
+    if (!serviceMotionMedia.matches || reducedMotion) {
+      resetServiceCardMotion();
       return;
     }
-    activateServiceStack();
-    if (!serviceStackActive || !serviceStackMetrics) return;
+    activateServiceCardMotion();
+    if (!serviceMotionActive || !serviceMotionMetrics) return;
 
-    const metrics = serviceStackMetrics;
+    const metrics = serviceMotionMetrics;
     const scrollY = window.scrollY || window.pageYOffset || 0;
-    const entranceDistance = Math.min(260, metrics.viewportHeight * 0.38);
+    const sideDistance = Math.min(56, Math.max(24, (window.innerWidth || 1024) * 0.035));
 
     metrics.entries.forEach((entry) => {
-      const naturalTop = entry.staticTop - scrollY;
-      const parentBottom = metrics.gridBottom - scrollY;
-      const constrainedTop = Math.min(
-        Math.max(naturalTop, entry.stickyTop),
-        parentBottom - entry.height
-      );
-      const entranceProgress = clampServiceProgress(
-        (entry.stickyTop + entranceDistance - constrainedTop) / entranceDistance
-      );
-      // Card 1 is the lead motion; cards 2–4 blend distinct diagonal 3D entrances.
-      // Every transform is derived from scroll progress, never from event counts.
-      const approach = 1 - entranceProgress;
-      const sideDistance = Math.min(18, Math.max(12, (window.innerWidth || 360) * 0.045));
+      const progress = clampServiceProgress((scrollY - entry.start) / (entry.end - entry.start));
+      const approach = 1 - progress;
       let x = 0;
-      let y = approach * 24;
-      let z = approach * -28;
-      let rotateX = approach * -3.6;
+      let y = 34 * approach;
+      let z = -44 * approach;
+      let rotateX = -4.5 * approach;
       let rotateY = 0;
       let rotateZ = 0;
-      let scale = 0.958 + entranceProgress * 0.042;
+      let scale = 0.94 + progress * 0.06;
 
       if (entry.index === 1) {
         x = -sideDistance * approach;
-        y = 27 * approach;
-        z = -22 * approach;
-        rotateX = -2.2 * approach;
-        rotateY = -6.2 * approach;
-        rotateZ = -1.3 * approach;
-        scale = 0.966 + entranceProgress * 0.034;
+        y = 38 * approach;
+        z = -36 * approach;
+        rotateX = -2.8 * approach;
+        rotateY = -8.5 * approach;
+        rotateZ = -2.4 * approach;
+        scale = 0.935 + progress * 0.065;
       } else if (entry.index === 2) {
         x = sideDistance * approach;
-        y = 22 * approach;
-        z = -20 * approach;
-        rotateX = 1.8 * approach;
-        rotateY = 5.8 * approach;
-        rotateZ = 1.1 * approach;
-        scale = 0.972 + entranceProgress * 0.028;
+        y = 28 * approach;
+        z = -32 * approach;
+        rotateX = 2.2 * approach;
+        rotateY = 7.5 * approach;
+        rotateZ = 2.2 * approach;
+        scale = 0.945 + progress * 0.055;
       } else if (entry.index === 3) {
-        x = -sideDistance * 0.65 * approach;
-        y = 30 * approach;
-        z = -30 * approach;
-        rotateX = -2.8 * approach;
-        rotateY = -3.5 * approach;
-        rotateZ = 1.6 * approach;
-        scale = 0.954 + entranceProgress * 0.046;
+        x = -sideDistance * 0.62 * approach;
+        y = 43 * approach;
+        z = -48 * approach;
+        rotateX = -4.2 * approach;
+        rotateY = -4.5 * approach;
+        rotateZ = 3.2 * approach;
+        scale = 0.925 + progress * 0.075;
       }
 
-      entry.card.style.transform =
-        `perspective(1000px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) ` +
-        `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ` +
-        `rotateZ(${rotateZ.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+      entry.card.style.opacity = String(Math.min(1, progress * 1.12));
+      if (progress < 1) {
+        entry.card.style.transform =
+          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) ` +
+          `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ` +
+          `rotateZ(${rotateZ.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+        const shadowY = 5 + progress * 11;
+        const shadowBlur = 14 + progress * 18;
+        const shadowAlpha = 0.1 + progress * 0.12;
+        entry.card.style.boxShadow =
+          `0 ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, ${shadowAlpha.toFixed(3)})`;
+      } else {
+        entry.card.style.removeProperty('transform');
+        entry.card.style.opacity = '1';
+        entry.card.style.removeProperty('box-shadow');
+      }
     });
 
-    if (scrollY >= metrics.triggerY) {
-      const exitProgress = clampServiceProgress(
-        (scrollY - metrics.triggerY) / metrics.exitDuration
-      );
-      const translateY = -18 * exitProgress;
-      const rotateX = 9 * exitProgress;
-      const scale = 1 - 0.055 * exitProgress;
-      const panelRise = 84 * (1 - exitProgress);
-      serviceStackGrid.style.transform =
-        `perspective(1100px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
+    const exitProgress = clampServiceProgress(
+      (scrollY - metrics.exitStart) / metrics.exitDuration
+    );
+    if (scrollY >= metrics.exitStart) {
+      const translateY = -16 * exitProgress;
+      const rotateX = 7.5 * exitProgress;
+      const scale = 1 - 0.045 * exitProgress;
+      const panelRise = 76 * (1 - exitProgress);
+      serviceMotionSection.style.transformOrigin = 'center bottom';
+      serviceMotionSection.style.transform =
+        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
         `rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-      serviceStackNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
+      serviceMotionNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
     } else {
-      serviceStackGrid.style.removeProperty('transform');
-      serviceStackNext.style.removeProperty('transform');
+      serviceMotionSection.style.removeProperty('transform');
+      serviceMotionSection.style.removeProperty('transform-origin');
+      serviceMotionNext.style.removeProperty('transform');
     }
   };
 
-  const scheduleServiceStackUpdate = () => {
-    if (!serviceStackMedia.matches || reducedMotion) {
-      resetServiceStack();
+  const scheduleServiceCardMotion = () => {
+    if (!serviceMotionMedia.matches || reducedMotion) {
+      resetServiceCardMotion();
       return;
     }
-    if (!serviceStackFrame) {
-      serviceStackFrame = window.requestAnimationFrame(updateServiceStack);
+    if (!serviceMotionFrame) {
+      serviceMotionFrame = window.requestAnimationFrame(updateServiceCardMotion);
     }
   };
 
-  if (serviceStackGrid && serviceStackNext && serviceStackCards.length === 4) {
-    activateServiceStack();
-    scheduleServiceStackUpdate();
-    window.addEventListener('scroll', scheduleServiceStackUpdate, { passive: true });
+  if (serviceMotionSection && serviceMotionGrid && serviceMotionNext && serviceMotionCards.length === 4) {
+    activateServiceCardMotion();
+    scheduleServiceCardMotion();
+    window.addEventListener('scroll', scheduleServiceCardMotion, { passive: true });
     window.addEventListener('resize', () => {
-      if (!serviceStackMedia.matches || reducedMotion) {
-        resetServiceStack();
+      if (!serviceMotionMedia.matches || reducedMotion) {
+        resetServiceCardMotion();
         return;
       }
-      activateServiceStack();
-      if (serviceStackActive) measureServiceStack();
-      scheduleServiceStackUpdate();
+      activateServiceCardMotion();
+      if (serviceMotionActive) measureServiceCardMotion();
+      scheduleServiceCardMotion();
     }, { passive: true });
   }
 
