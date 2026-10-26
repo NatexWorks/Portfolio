@@ -828,3 +828,163 @@ body:has(.nav.is-open) .services-scroll-next {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+
+/* Desktop + tablet service cards: even 2x2 layout, safer copy spacing, and orbital landing entrance.
+   Intentionally scoped above the existing mobile breakpoint; phone layout remains unchanged. */
+@media (min-width: 761px) {
+  #services.services-section {
+    padding-bottom: 22px !important;
+  }
+
+  #skills.skills-type-section {
+    padding-top: 32px !important;
+  }
+
+  #services .service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(340px, 1fr));
+    gap: 0;
+    perspective: 1200px;
+    transform-style: preserve-3d;
+    overflow: visible;
+  }
+
+  #services .service-grid > .service-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 340px;
+    height: 100%;
+    padding: 25px 28px 24px;
+    position: relative;
+    border: 0;
+    background: #10120f;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .16);
+    transform: none;
+    transition: transform .3s ease, background .25s ease, border-color .25s ease, box-shadow .3s ease;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+
+  /* Numbered sequence stays 01, 02, 03, 04 on wider screens. */
+  #services .service-grid > .service-card:nth-child(1) { grid-column: 1; grid-row: 1; }
+  #services .service-grid > .service-card:nth-child(2) { grid-column: 2; grid-row: 1; }
+  #services .service-grid > .service-card:nth-child(4) { grid-column: 1; grid-row: 2; }
+  #services .service-grid > .service-card:nth-child(3) { grid-column: 2; grid-row: 2; }
+
+  #services .service-grid > .service-card:nth-child(2),
+  #services .service-grid > .service-card:nth-child(3) {
+    border-left: 1px solid #30372b;
+  }
+
+  #services .service-grid > .service-card:nth-child(3),
+  #services .service-grid > .service-card:nth-child(4) {
+    border-top: 1px solid #30372b;
+  }
+
+  #services .service-grid > .service-card p {
+    max-width: none;
+    margin: 0;
+    line-height: 1.8;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  #services .service-grid > .service-card h3 {
+    line-height: 1.25;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  #services .service-grid > .service-card .service-foot {
+    position: static;
+    inset: auto;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin-top: auto;
+    padding-top: 18px;
+    font-size: 8px;
+    line-height: 1.55;
+    letter-spacing: .07em;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  #services .service-grid > .service-card.reveal {
+    transform: none;
+  }
+
+  #services .service-grid > .service-card.reveal:hover {
+    transform: translateY(-5px);
+  }
+
+  .js-motion #services .service-grid > .service-card.reveal.is-visible {
+    animation: serviceCardOrbitalLanding 1.95s cubic-bezier(.16, .72, .12, 1) backwards;
+  }
+
+  .js-motion #services .service-grid > .service-card:nth-child(1).reveal.is-visible { animation-delay: 0s; }
+  .js-motion #services .service-grid > .service-card:nth-child(2).reveal.is-visible { animation-delay: .09s; }
+  .js-motion #services .service-grid > .service-card:nth-child(4).reveal.is-visible { animation-delay: .18s; }
+  .js-motion #services .service-grid > .service-card:nth-child(3).reveal.is-visible { animation-delay: .27s; }
+}
+
+@keyframes serviceCardOrbitalLanding {
+  0% {
+    opacity: 0;
+    transform: perspective(1100px) translate3d(34px, 28px, 72px) rotateX(16deg) rotateY(-18deg) rotateZ(33deg) scale(.72);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  14% {
+    opacity: .96;
+    transform: perspective(1100px) translate3d(25px, 8px, 60px) rotateX(12deg) rotateY(-11deg) rotateZ(20deg) scale(.82);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .12);
+  }
+  30% {
+    transform: perspective(1100px) translate3d(6px, -17px, 52px) rotateX(8deg) rotateY(-4deg) rotateZ(3deg) scale(.9);
+  }
+  48% {
+    transform: perspective(1100px) translate3d(-18px, -18px, 44px) rotateX(6deg) rotateY(4deg) rotateZ(-15deg) scale(.94);
+  }
+  65% {
+    transform: perspective(1100px) translate3d(-24px, 4px, 30px) rotateX(8deg) rotateY(9deg) rotateZ(-27deg) scale(.94);
+  }
+  79.8% {
+    transform: perspective(1100px) translate3d(-8px, 18px, 24px) rotateX(10deg) rotateY(12deg) rotateZ(-34deg) scale(.93);
+  }
+  /* A quick clockwise snap at ~80%, then the card recedes in 3D before landing. */
+  80.5% {
+    transform: perspective(1100px) translate3d(10px, -18px, -82px) rotateX(-13deg) rotateY(13deg) rotateZ(24deg) scale(.82);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+  }
+  87% {
+    transform: perspective(1100px) translate3d(4px, -25px, -90px) rotateX(8deg) rotateY(8deg) rotateZ(14deg) scale(.86);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .2);
+  }
+  92% {
+    transform: perspective(1100px) translate3d(0, -17px, -48px) rotateX(3deg) rotateY(-4deg) rotateZ(7deg) scale(.94);
+    box-shadow: 0 16px 23px rgba(0, 0, 0, .24);
+  }
+  96% {
+    transform: perspective(1100px) translate3d(0, 7px, 12px) rotateX(0) rotateY(0) rotateZ(-1deg) scale(1.015);
+    box-shadow: 0 30px 24px rgba(0, 0, 0, .25);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1100px) translate3d(0, 0, 0) rotateX(0) rotateY(0) rotateZ(0) scale(1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .16);
+  }
+}
+
+@media (min-width: 761px) and (prefers-reduced-motion: reduce) {
+  .js-motion #services .service-grid > .service-card.reveal,
+  .js-motion #services .service-grid > .service-card.reveal.is-visible {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
