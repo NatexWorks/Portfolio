@@ -938,36 +938,36 @@ body:has(.nav.is-open) .services-scroll-next {
     transform: perspective(1100px) translate3d(34px, 28px, 72px) rotateX(16deg) rotateY(-18deg) rotateZ(33deg) scale(.72);
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
-  12% {
+  8% {
     opacity: .96;
     transform: perspective(1100px) translate3d(25px, 8px, 60px) rotateX(12deg) rotateY(-11deg) rotateZ(20deg) scale(.82);
   }
-  30% {
+  23% {
     transform: perspective(1100px) translate3d(6px, -17px, 52px) rotateX(8deg) rotateY(-4deg) rotateZ(3deg) scale(.9);
   }
-  50% {
+  40% {
     transform: perspective(1100px) translate3d(-18px, -18px, 44px) rotateX(6deg) rotateY(4deg) rotateZ(-15deg) scale(.94);
   }
-  70% {
+  55% {
     transform: perspective(1100px) translate3d(-24px, 4px, 30px) rotateX(8deg) rotateY(9deg) rotateZ(-27deg) scale(.94);
   }
-  99.5% {
+  62.5% {
     transform: perspective(1100px) translate3d(-8px, 18px, 24px) rotateX(10deg) rotateY(12deg) rotateZ(-34deg) scale(.93);
   }
-  /* Clockwise snap starts at 0.5s: complete the snap and 3D retreat in the next 0.3s. */
-  99.8% {
+  /* First anticlockwise round: 0.5s. Clockwise snap + 3D landing: next 0.3s. */
+  63% {
     transform: perspective(1100px) translate3d(10px, -18px, -82px) rotateX(-13deg) rotateY(13deg) rotateZ(24deg) scale(.82);
     box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
   }
-  99.9% {
+  72% {
     transform: perspective(1100px) translate3d(4px, -25px, -90px) rotateX(8deg) rotateY(8deg) rotateZ(14deg) scale(.86);
     box-shadow: 0 6px 14px rgba(0, 0, 0, .2);
   }
-  99.95% {
+  84% {
     transform: perspective(1100px) translate3d(0, -17px, -48px) rotateX(3deg) rotateY(-4deg) rotateZ(7deg) scale(.94);
     box-shadow: 0 16px 23px rgba(0, 0, 0, .24);
   }
-  99.98% {
+  94% {
     transform: perspective(1100px) translate3d(0, 7px, 12px) rotateX(0) rotateY(0) rotateZ(-1deg) scale(1.015);
     box-shadow: 0 30px 24px rgba(0, 0, 0, .25);
   }
