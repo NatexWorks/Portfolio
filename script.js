@@ -429,4 +429,50 @@
     }, { passive: true });
   }
 
+  // Play the responsive process motion-graphic once when visible, then scroll to the four cards.
+  // Reduced-motion visitors get a static first frame and retain normal manual scrolling.
+  const processFilm = document.querySelector('#processFilm');
+  const processList = document.querySelector('#process .process-list');
+  const processFilmMedia = window.matchMedia('(min-width: 761px)');
+  if (processFilm && processList && !reducedMotion && 'IntersectionObserver' in window) {
+    let processFilmStarted = false;
+    let processFilmFinished = false;
+    const finishProcessFilm = () => {
+      if (processFilmFinished) return;
+      processFilmFinished = true;
+      processFilm.classList.remove('is-playing');
+      processFilm.classList.add('is-complete');
+      if (processFilmMedia.matches) {
+        processList.classList.add('is-preparing');
+        processList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.setTimeout(() => {
+          processList.classList.remove('is-preparing');
+          processList.classList.add('is-staged');
+        }, 420);
+      } else {
+        processList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    };
+    const startProcessFilm = () => {
+      if (processFilmStarted || processFilmFinished) return;
+      processFilmStarted = true;
+      if (processFilmMedia.matches) processList.classList.add('is-preparing');
+      processFilm.classList.add('is-playing');
+      const progress = processFilm.querySelector('.process-film-progress > i');
+      if (progress) progress.addEventListener('animationend', event => {
+        if (event.animationName === 'processFilmProgress') finishProcessFilm();
+      }, { once: true });
+      window.setTimeout(finishProcessFilm, 7600);
+    };
+    const filmObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+          observer.unobserve(entry.target);
+          startProcessFilm();
+        }
+      });
+    }, { threshold: [0.3, 0.45] });
+    filmObserver.observe(processFilm);
+  }
+
 })();
