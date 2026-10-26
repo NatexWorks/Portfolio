@@ -207,6 +207,216 @@
     window.setTimeout(() => { deleting = true; type(); }, 1200);
   }
 
+{
+  // Mobile-only scroll-progress service stack. The desktop/tablet layout is untouched.
+  const serviceStackMedia = window.matchMedia('(max-width: 760px)');
+  const serviceStackGrid = document.querySelector('#services .service-grid');
+  const serviceStackNext = document.querySelector('#skills');
+  let serviceStackCards = serviceStackGrid
+    ? Array.from(serviceStackGrid.querySelectorAll('.service-card'))
+    : [];
+  let serviceStackActive = false;
+  let serviceStackFrame = 0;
+  let serviceStackMetrics = null;
+
+  const clampServiceProgress = (value) => Math.max(0, Math.min(1, value));
+
+  const serviceDocumentTop = (element) => {
+    let top = 0;
+    let current = element;
+    while (current && current !== document.body && current !== document.documentElement) {
+      top += current.offsetTop || 0;
+      current = current.offsetParent;
+    }
+    return top;
+  };
+
+  const resetServiceStack = () => {
+    if (serviceStackFrame) {
+      window.cancelAnimationFrame(serviceStackFrame);
+      serviceStackFrame = 0;
+    }
+    if (!serviceStackActive) return;
+    serviceStackGrid.classList.remove('service-stack-enabled');
+    serviceStackNext.classList.remove('service-stack-foreground');
+    serviceStackGrid.style.removeProperty('transform');
+    serviceStackGrid.style.removeProperty('transform-origin');
+    serviceStackNext.style.removeProperty('transform');
+    serviceStackCards.forEach((card) => {
+      card.style.removeProperty('top');
+      card.style.removeProperty('z-index');
+      card.style.removeProperty('transform');
+    });
+    serviceStackActive = false;
+    serviceStackMetrics = null;
+  };
+
+  const measureServiceStack = () => {
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const stackTop = Math.max(82, Math.min(108, viewportHeight * 0.13));
+    const gridTop = serviceDocumentTop(serviceStackGrid);
+    const gridStyles = window.getComputedStyle(serviceStackGrid);
+    const gridGap = parseFloat(gridStyles.rowGap || gridStyles.gap || '0') || 0;
+    const gridPaddingTop = parseFloat(gridStyles.paddingTop) || 0;
+    let cursor = gridTop + gridPaddingTop;
+    const entries = [];
+
+    serviceStackCards.forEach((card, index) => {
+      const height = card.offsetHeight || 300;
+      const stickyTop = stackTop + (serviceStackCards.length - index - 1) * 10;
+      entries.push({ card, index, staticTop: cursor, stickyTop, height });
+      cursor += height + (index < serviceStackCards.length - 1 ? gridGap : 0);
+    });
+
+    const finalCard = entries[entries.length - 1];
+    serviceStackMetrics = {
+      entries,
+      gridBottom: gridTop + serviceStackGrid.offsetHeight,
+      triggerY: finalCard.staticTop - finalCard.stickyTop,
+      exitDuration: Math.max(viewportHeight * 0.24, 140),
+      viewportHeight,
+      stackTop
+    };
+
+    serviceStackGrid.style.setProperty('--service-stack-top', `${stackTop}px`);
+    serviceStackGrid.style.transformOrigin = 'center top';
+    entries.forEach((entry) => {
+      entry.card.style.top = `${entry.stickyTop}px`;
+      entry.card.style.zIndex = String(entry.index + 1);
+    });
+  };
+
+  const activateServiceStack = () => {
+    if (
+      serviceStackActive ||
+      !serviceStackMedia.matches ||
+      reducedMotion ||
+      !serviceStackGrid ||
+      !serviceStackNext ||
+      serviceStackCards.length !== 4
+    ) return;
+
+    serviceStackCards.sort((a, b) => {
+      return Number.parseInt(window.getComputedStyle(a).order, 10) -
+        Number.parseInt(window.getComputedStyle(b).order, 10);
+    });
+    serviceStackGrid.classList.add('service-stack-enabled');
+    serviceStackNext.classList.add('service-stack-foreground');
+    serviceStackActive = true;
+    measureServiceStack();
+  };
+
+  const updateServiceStack = () => {
+    serviceStackFrame = 0;
+    if (!serviceStackMedia.matches || reducedMotion) {
+      resetServiceStack();
+      return;
+    }
+    activateServiceStack();
+    if (!serviceStackActive || !serviceStackMetrics) return;
+
+    const metrics = serviceStackMetrics;
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    const entranceDistance = Math.min(260, metrics.viewportHeight * 0.38);
+
+    metrics.entries.forEach((entry) => {
+      const naturalTop = entry.staticTop - scrollY;
+      const parentBottom = metrics.gridBottom - scrollY;
+      const constrainedTop = Math.min(
+        Math.max(naturalTop, entry.stickyTop),
+        parentBottom - entry.height
+      );
+      const entranceProgress = clampServiceProgress(
+        (entry.stickyTop + entranceDistance - constrainedTop) / entranceDistance
+      );
+      // Card 1 is the lead motion; cards 2–4 blend distinct diagonal 3D entrances.
+      // Every transform is derived from scroll progress, never from event counts.
+      const approach = 1 - entranceProgress;
+      const sideDistance = Math.min(18, Math.max(12, (window.innerWidth || 360) * 0.045));
+      let x = 0;
+      let y = approach * 24;
+      let z = approach * -28;
+      let rotateX = approach * -3.6;
+      let rotateY = 0;
+      let rotateZ = 0;
+      let scale = 0.958 + entranceProgress * 0.042;
+
+      if (entry.index === 1) {
+        x = -sideDistance * approach;
+        y = 27 * approach;
+        z = -22 * approach;
+        rotateX = -2.2 * approach;
+        rotateY = -6.2 * approach;
+        rotateZ = -1.3 * approach;
+        scale = 0.966 + entranceProgress * 0.034;
+      } else if (entry.index === 2) {
+        x = sideDistance * approach;
+        y = 22 * approach;
+        z = -20 * approach;
+        rotateX = 1.8 * approach;
+        rotateY = 5.8 * approach;
+        rotateZ = 1.1 * approach;
+        scale = 0.972 + entranceProgress * 0.028;
+      } else if (entry.index === 3) {
+        x = -sideDistance * 0.65 * approach;
+        y = 30 * approach;
+        z = -30 * approach;
+        rotateX = -2.8 * approach;
+        rotateY = -3.5 * approach;
+        rotateZ = 1.6 * approach;
+        scale = 0.954 + entranceProgress * 0.046;
+      }
+
+      entry.card.style.transform =
+        `perspective(1000px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) ` +
+        `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ` +
+        `rotateZ(${rotateZ.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+    });
+
+    if (scrollY >= metrics.triggerY) {
+      const exitProgress = clampServiceProgress(
+        (scrollY - metrics.triggerY) / metrics.exitDuration
+      );
+      const translateY = -18 * exitProgress;
+      const rotateX = 9 * exitProgress;
+      const scale = 1 - 0.055 * exitProgress;
+      const panelRise = 84 * (1 - exitProgress);
+      serviceStackGrid.style.transform =
+        `perspective(1100px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
+        `rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+      serviceStackNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
+    } else {
+      serviceStackGrid.style.removeProperty('transform');
+      serviceStackNext.style.removeProperty('transform');
+    }
+  };
+
+  const scheduleServiceStackUpdate = () => {
+    if (!serviceStackMedia.matches || reducedMotion) {
+      resetServiceStack();
+      return;
+    }
+    if (!serviceStackFrame) {
+      serviceStackFrame = window.requestAnimationFrame(updateServiceStack);
+    }
+  };
+
+  if (serviceStackGrid && serviceStackNext && serviceStackCards.length === 4) {
+    activateServiceStack();
+    scheduleServiceStackUpdate();
+    window.addEventListener('scroll', scheduleServiceStackUpdate, { passive: true });
+    window.addEventListener('resize', () => {
+      if (!serviceStackMedia.matches || reducedMotion) {
+        resetServiceStack();
+        return;
+      }
+      activateServiceStack();
+      if (serviceStackActive) measureServiceStack();
+      scheduleServiceStackUpdate();
+    }, { passive: true });
+  }
+}
+
   // Desktop/tablet-only scroll-progress motion for the four homepage service cards.
   // The phone layout is deliberately left to its existing responsive CSS.
   const serviceMotionMedia = window.matchMedia('(min-width: 761px)');
