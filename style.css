@@ -920,14 +920,14 @@ body:has(.nav.is-open) .services-scroll-next {
 .film-product section>div{flex:1;min-width:0;padding:13px}.film-product section>div>b{display:block;width:48%;height:9px;background:#34402b}.film-product section>div>span{display:block;width:72%;height:4px;margin-top:8px;background:#96a486}.film-product footer{display:flex;align-items:end;gap:5px;height:42px;padding:6px;margin-top:9px;border:1px solid #c5cfc0;background:#f7f9f3}.film-product footer i{flex:1;background:#829d65}.film-product footer i:nth-child(1){height:25%}.film-product footer i:nth-child(2){height:47%}.film-product footer i:nth-child(3){height:35%}.film-product footer i:nth-child(4){height:70%}.film-product footer i:nth-child(5){height:95%}
 .process-visual-delivery>strong{position:absolute;right:0;bottom:0;display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--lime);border-radius:50%;background:#151b10;color:var(--lime);font-size:19px;box-shadow:0 0 24px #c5f36b3b}
 .process-film-progress{height:2px;background:#293122}.process-film-progress>i{display:block;width:0;height:100%;background:var(--lime);box-shadow:0 0 12px #c5f36b80}
-.process-film.is-playing .process-film-progress>i{animation:processFilmProgress 7.2s linear forwards}
+.process-film.is-playing .process-film-progress>i{animation:processFilmProgress 9.6s linear infinite}
 .process-film:not(.is-playing):not(.is-complete) .process-film-scene-one,.process-film.is-complete .process-film-scene-four{opacity:1;transform:none}
-.process-film.is-playing .process-film-scene-one{animation:processSceneOne 7.2s linear both}.process-film.is-playing .process-film-scene-two{animation:processSceneTwo 7.2s linear both}.process-film.is-playing .process-film-scene-three{animation:processSceneThree 7.2s linear both}.process-film.is-playing .process-film-scene-four{animation:processSceneFour 7.2s linear both}
+.process-film.is-playing .process-film-scene-one{animation:processSceneOne 9.6s linear infinite}.process-film.is-playing .process-film-scene-two{animation:processSceneTwo 9.6s linear infinite}.process-film.is-playing .process-film-scene-three{animation:processSceneThree 9.6s linear infinite}.process-film.is-playing .process-film-scene-four{animation:processSceneFour 9.6s linear infinite}
 @keyframes processFilmProgress{to{width:100%}}
 @keyframes processSceneOne{0%,3%{opacity:0;transform:translate3d(0,15px,0) scale(.985)}8%,19%{opacity:1;transform:none}26%,100%{opacity:0;transform:translate3d(-12px,-2px,0) scale(.99)}}
 @keyframes processSceneTwo{0%,21%{opacity:0;transform:translate3d(16px,8px,0) scale(.985)}27%,44%{opacity:1;transform:none}51%,100%{opacity:0;transform:translate3d(-12px,0,0) scale(.99)}}
 @keyframes processSceneThree{0%,46%{opacity:0;transform:translate3d(15px,0,0) scale(.985)}52%,69%{opacity:1;transform:none}76%,100%{opacity:0;transform:translate3d(-10px,0,0) scale(.99)}}
-@keyframes processSceneFour{0%,71%{opacity:0;transform:translate3d(12px,8px,0) scale(.985)}78%,100%{opacity:1;transform:none}}
+@keyframes processSceneFour{0%,71%{opacity:0;transform:translate3d(12px,8px,0) scale(.985)}78%,92%{opacity:1;transform:none}100%{opacity:0;transform:translate3d(-10px,0,0) scale(.99)}}
 .process-film.is-playing .process-visual-discovery>b{animation:filmPulse 1.2s ease-in-out infinite}.process-film.is-playing .process-visual-plan>div{animation:filmFloat 1.8s ease-in-out infinite alternate}.process-film.is-playing .film-code-cursor{animation:filmBlink .72s steps(2,end) infinite}.process-film.is-playing .process-visual-delivery>strong{animation:filmCheck .6s .5s cubic-bezier(.2,.8,.2,1.35) both}
 @keyframes filmPulse{50%{box-shadow:0 0 0 18px #c5f36b08,0 0 48px #c5f36b99}}@keyframes filmFloat{to{transform:rotateY(-2deg) translateY(-4px)}}@keyframes filmBlink{to{opacity:.1}}@keyframes filmCheck{from{opacity:0;transform:scale(.5) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 
@@ -969,4 +969,71 @@ body:has(.nav.is-open) .services-scroll-next {
  .process-film .process-film-scene{opacity:0;transform:none}
  .process-film:not(.is-complete) .process-film-scene-one,.process-film.is-complete .process-film-scene-four{opacity:1}
  #process .process-list.is-preparing .process-step{opacity:1!important;transform:none!important}
+}
+
+
+/* Interactive process steps: focus one card at a time without changing the default layout. */
+#process .process-step { cursor: pointer; }
+#process .process-step:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
+#process .process-list.has-focused-step .process-step:not(.is-focused) { display: none !important; }
+#process .process-list.has-focused-step .process-step.is-focused {
+  grid-column: 1 / -1;
+  aspect-ratio: auto;
+  width: 100%;
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: clamp(22px, 4vw, 42px);
+  overflow: visible;
+  border: 1px solid #728953;
+  background: linear-gradient(145deg, #20281a, #141810);
+  box-shadow: 0 20px 48px #0005;
+  transform: none;
+  animation: none;
+  cursor: default;
+}
+#process .process-list.has-focused-step .process-step.is-focused > div {
+  margin-top: auto;
+  max-width: 780px;
+}
+#process .process-list.has-focused-step .process-step.is-focused h3 {
+  font-size: clamp(22px, 2.8vw, 32px);
+  line-height: 1.15;
+}
+#process .process-list.has-focused-step .process-step.is-focused p {
+  max-width: 720px;
+  font-size: 14px;
+  line-height: 1.9;
+}
+#process .process-list.has-focused-step .process-step.is-focused .process-meta {
+  margin-top: 18px;
+  font-size: 9px;
+}
+#process .process-list.has-focused-step .process-step.is-focused .process-arrow {
+  top: clamp(22px, 4vw, 42px);
+  right: clamp(22px, 4vw, 42px);
+  font-size: 24px;
+}
+@media (max-width: 760px) {
+  #process .process-list.has-focused-step .process-step.is-focused {
+    min-height: 230px;
+    padding: 22px 20px;
+  }
+  #process .process-list.has-focused-step .process-step.is-focused h3 {
+    font-size: clamp(21px, 6vw, 28px);
+  }
+  #process .process-list.has-focused-step .process-step.is-focused p {
+    font-size: 12px;
+  }
+  #process .process-list.has-focused-step .process-step.is-focused .process-arrow {
+    top: 22px;
+    right: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .process-film.is-playing .process-film-scene,
+  .process-film.is-playing .process-film-progress > i { animation: none !important; }
+  #process .process-list.has-focused-step .process-step.is-focused { scroll-behavior: auto; }
 }
