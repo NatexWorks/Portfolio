@@ -309,6 +309,11 @@
     /* Match the 20px footer wordmark size used on index.html. */
     .site-footer .brand > span:last-child { font-size:20px; line-height:1; }
 
+    /* Scroll-linked entrance only for the first three detailed services; JS disables it for reduced motion. */
+    .service-detail-list.services-scroll-motion-enabled > .service-detail:nth-child(-n+3) {
+      transition: none !important;
+      will-change: transform, opacity;
+    }
   </style>
   <script src="script.js?v=20261026-12" defer></script>
   <script type="application/ld+json">
@@ -378,7 +383,7 @@
       <section class="section services-page-hero">
         <div class="eyebrow"><span class="status-dot"></span> SERVICES / BUILT AROUND YOUR GOAL</div>
         <h1>Less<br><span class="headline-muted">guesswork</span>.<br><em><span class="headline-accent">More control</span></em>.</h1>
-        <p>Choose the help that fits your business: a better website, a custom tool, or a clearer path for local customers to find you. Scope and deliverables are agreed before work begins.</p>
+        <p data-services-hero-typewriter>Choose the help that fits your business: a better website, a custom tool, or a clearer path for local customers to find you. Scope and deliverables are agreed before work begins.</p>
         <div class="hero-actions"><a class="button button-primary" href="#contact">Discuss your project <span aria-hidden="true">↘</span></a><a class="text-link" href="index.html#work">View selected work <span aria-hidden="true">↗</span></a></div>
       </section>
       <section class="section service-detail-list" aria-label="Service details">
