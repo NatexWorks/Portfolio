@@ -379,7 +379,7 @@
       scheduleServiceStackUpdate();
     }, { passive: true });
   }
-}
+  }
 
   // Desktop/tablet-only scroll-progress motion for the four homepage service cards.
   // The phone layout is deliberately left to its existing responsive CSS.
@@ -603,146 +603,16 @@
     }, { passive: true });
   }
 
-    // Services page: scroll-linked entrance for Business websites, Custom web applications, and SEO.
-  // This runs independently of the homepage stack; no rotations, only a restrained bottom/right settle.
-  const servicesDetailList = document.querySelector('.service-detail-list');
-  const servicesDetailCards = servicesDetailList
-    ? Array.from(servicesDetailList.querySelectorAll(':scope > .service-detail')).slice(0, 3)
-    : [];
-
-  if (servicesDetailList && servicesDetailCards.length === 3 && !reducedMotion && window.matchMedia('(min-width: 761px)').matches) {
-    let servicesDetailFrame = 0;
-    let servicesDetailMetrics = [];
-    servicesDetailList.classList.add('services-scroll-motion-enabled');
-
-    const measureServicesDetailMotion = () => {
-      const viewportHeight = Math.max(1, window.innerHeight || document.documentElement.clientHeight);
-      const travel = Math.max(viewportHeight * 0.42, 220);
-      servicesDetailMetrics = servicesDetailCards.map((card, index) => {
-        const top = serviceDocumentTop(card);
-        const start = top - viewportHeight * 0.84 + index * viewportHeight * 0.025;
-        return { card, start, end: start + travel };
-      });
-    };
-
-    const updateServicesDetailMotion = () => {
-      servicesDetailFrame = 0;
-      const scrollY = window.scrollY || window.pageYOffset || 0;
-      servicesDetailMetrics.forEach((entry) => {
-        const progress = clampServiceProgress((scrollY - entry.start) / (entry.end - entry.start));
-        const approach = 1 - progress;
-        const x = 24 * approach;
-        const y = 24 * approach;
-        const z = -12 * approach;
-        const scale = 0.985 + progress * 0.015;
-
-        entry.card.style.opacity = String(progress);
-        if (progress < 1) {
-          entry.card.style.transform =
-            `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
-        } else {
-          entry.card.style.removeProperty('transform');
-          entry.card.style.opacity = '1';
-        }
-      });
-    };
-
-    const scheduleServicesDetailMotion = () => {
-      if (servicesDetailFrame) return;
-      servicesDetailFrame = window.requestAnimationFrame(updateServicesDetailMotion);
-    };
-
-    measureServicesDetailMotion();
-    scheduleServicesDetailMotion();
-    window.addEventListener('scroll', scheduleServicesDetailMotion, { passive: true });
-    window.addEventListener('resize', () => {
-      measureServicesDetailMotion();
-      scheduleServicesDetailMotion();
-    }, { passive: true });
-  }
-
-  // Services hero paragraph: reveal one word every 100ms (1.75x a 175ms/word baseline).
-  const servicesHeroTypingTarget = document.querySelector('[data-services-hero-typewriter]');
-  if (
-    servicesHeroTypingTarget &&
-    window.matchMedia('(min-width: 761px)').matches &&
-    !reducedMotion &&
-    'IntersectionObserver' in window
-  ) {
-    const fullText = servicesHeroTypingTarget.textContent.trim();
-    const words = fullText.split(/\s+/);
-    const wordNodes = [];
-    servicesHeroTypingTarget.setAttribute('aria-label', fullText);
-    servicesHeroTypingTarget.replaceChildren();
-
-    words.forEach((word, index) => {
-      const span = document.createElement('span');
-      span.textContent = word + (index < words.length - 1 ? ' ' : '');
-      span.style.opacity = '0';
-      span.setAttribute('aria-hidden', 'true');
-      servicesHeroTypingTarget.appendChild(span);
-      wordNodes.push(span);
-    });
-
-    let typingStarted = false;
-    const beginWordTyping = () => {
-      if (typingStarted) return;
-      typingStarted = true;
-      let index = 0;
-      const showNextWord = () => {
-        if (index >= wordNodes.length) return;
-        wordNodes[index].style.opacity = '1';
-        index += 1;
-        if (index < wordNodes.length) window.setTimeout(showNextWord, 100);
-      };
-      showNextWord();
-    };
-
-    const servicesHeroTypingObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          observer.unobserve(entry.target);
-          beginWordTyping();
-        }
-      });
-    }, { threshold: 0.12 });
-    servicesHeroTypingObserver.observe(servicesHeroTypingTarget);
-  }
-
-  // Play the responsive process motion-graphic once when visible, then scroll to the four cards.
-  // Reduced-motion visitors get a static first frame and retain normal manual scrolling.
+  // Start the process motion-graphic when it enters view, then keep it looping.
+  // Respect reduced-motion preferences and never force-scroll the visitor to the cards.
   const processFilm = document.querySelector('#processFilm');
-  const processList = document.querySelector('#process .process-list');
-  const processFilmMedia = window.matchMedia('(min-width: 761px)');
-  if (processFilm && processList && !reducedMotion && 'IntersectionObserver' in window) {
+  if (processFilm && !reducedMotion && 'IntersectionObserver' in window) {
     let processFilmStarted = false;
-    let processFilmFinished = false;
-    const finishProcessFilm = () => {
-      if (processFilmFinished) return;
-      processFilmFinished = true;
-      processFilm.classList.remove('is-playing');
-      processFilm.classList.add('is-complete');
-      if (processFilmMedia.matches) {
-        processList.classList.add('is-preparing');
-        processList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        window.setTimeout(() => {
-          processList.classList.remove('is-preparing');
-          processList.classList.add('is-staged');
-        }, 420);
-      } else {
-        processList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    };
     const startProcessFilm = () => {
-      if (processFilmStarted || processFilmFinished) return;
+      if (processFilmStarted) return;
       processFilmStarted = true;
-      if (processFilmMedia.matches) processList.classList.add('is-preparing');
+      processFilm.classList.remove('is-complete');
       processFilm.classList.add('is-playing');
-      const progress = processFilm.querySelector('.process-film-progress > i');
-      if (progress) progress.addEventListener('animationend', event => {
-        if (event.animationName === 'processFilmProgress') finishProcessFilm();
-      }, { once: true });
-      window.setTimeout(finishProcessFilm, 7600);
     };
     const filmObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
@@ -754,4 +624,59 @@
     }, { threshold: [0.3, 0.45] });
     filmObserver.observe(processFilm);
   }
+
+  // Clicking a process step focuses that card and hides the other three.
+  // Click it again or press Escape to restore the full list.
+  const processList = document.querySelector('#process .process-list');
+  if (processList) {
+    const processSteps = Array.from(processList.querySelectorAll('[data-process-step]'));
+    const clearFocusedProcessStep = (returnFocus = false) => {
+      const focusedStep = processList.querySelector('.process-step.is-focused');
+      processList.classList.remove('has-focused-step');
+      processSteps.forEach(step => {
+        step.classList.remove('is-focused');
+        step.setAttribute('aria-pressed', 'false');
+        const number = step.dataset.processStep;
+        const title = step.querySelector('h3')?.textContent?.trim() || 'process step';
+        step.setAttribute('aria-label', `Focus on process step ${number}: ${title}`);
+      });
+      if (returnFocus && focusedStep) focusedStep.focus({ preventScroll: true });
+    };
+    const focusProcessStep = (step) => {
+      const isAlreadyFocused = step.classList.contains('is-focused');
+      if (isAlreadyFocused) {
+        clearFocusedProcessStep();
+        step.setAttribute('aria-label', 'Focus on process step ' + step.dataset.processStep + ': ' + (step.querySelector('h3')?.textContent?.trim() || 'process step'));
+        return;
+      }
+      processList.classList.add('has-focused-step');
+      processSteps.forEach(item => {
+        const selected = item === step;
+        item.classList.toggle('is-focused', selected);
+        item.setAttribute('aria-pressed', String(selected));
+        const number = item.dataset.processStep;
+        const title = item.querySelector('h3')?.textContent?.trim() || 'process step';
+        item.setAttribute('aria-label', selected
+          ? 'Show all process steps. Focused: ' + title
+          : 'Focus on process step ' + number + ': ' + title);
+      });
+      step.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
+    };
+    processSteps.forEach(step => {
+      step.addEventListener('click', () => focusProcessStep(step));
+      step.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          focusProcessStep(step);
+        }
+      });
+    });
+    processList.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && processList.classList.contains('has-focused-step')) {
+        event.preventDefault();
+        clearFocusedProcessStep(true);
+      }
+    });
+  }
+
 })();
