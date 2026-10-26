@@ -329,34 +329,12 @@
       const entranceProgress = clampServiceProgress(
         (entry.stickyTop + entranceDistance - constrainedTop) / entranceDistance
       );
-      // Keep the original upward/diagonal card travel, with no card tilt or strong depth.
-      // Every transform remains tied directly to scroll progress.
-      const approach = 1 - entranceProgress;
-      const sideDistance = Math.min(18, Math.max(12, (window.innerWidth || 360) * 0.045));
-      let x = 0;
-      let y = approach * 24;
-      let z = approach * -12;
-      let scale = 0.985 + entranceProgress * 0.015;
-
-      if (entry.index === 1) {
-        x = -sideDistance * approach;
-        y = 27 * approach;
-        z = -10 * approach;
-        scale = 0.986 + entranceProgress * 0.014;
-      } else if (entry.index === 2) {
-        x = sideDistance * approach;
-        y = 22 * approach;
-        z = -10 * approach;
-        scale = 0.988 + entranceProgress * 0.012;
-      } else if (entry.index === 3) {
-        x = -sideDistance * 0.65 * approach;
-        y = 30 * approach;
-        z = -14 * approach;
-        scale = 0.984 + entranceProgress * 0.016;
-      }
-
+      // The card stays horizontally centred: only a short vertical settle is used.
+      // Reverse sticky offsets place each newer card above the previous one by 10px.
+      const y = (1 - entranceProgress) * 18;
+      const scale = 0.992 + entranceProgress * 0.008;
       entry.card.style.transform =
-        `perspective(1000px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
+        `perspective(1000px) translate3d(0, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
     });
 
     if (scrollY >= metrics.triggerY) {
@@ -364,10 +342,12 @@
         (scrollY - metrics.triggerY) / metrics.exitDuration
       );
       const translateY = -18 * exitProgress;
-      const scale = 1 - 0.025 * exitProgress;
+      const rotateX = 9 * exitProgress;
+      const scale = 1 - 0.055 * exitProgress;
       const panelRise = 84 * (1 - exitProgress);
       serviceStackGrid.style.transform =
-        `perspective(1100px) translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+        `perspective(1100px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
+        `rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
       serviceStackNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
     } else {
       serviceStackGrid.style.removeProperty('transform');
@@ -525,33 +505,47 @@
       const approach = 1 - progress;
       let x = 0;
       let y = 34 * approach;
-      let z = -18 * approach;
-      let scale = 0.98 + progress * 0.02;
+      let z = -44 * approach;
+      let rotateX = -4.5 * approach;
+      let rotateY = 0;
+      let rotateZ = 0;
+      let scale = 0.94 + progress * 0.06;
 
       if (entry.index === 1) {
         x = -sideDistance * approach;
         y = 38 * approach;
-        z = -16 * approach;
-        scale = 0.98 + progress * 0.02;
+        z = -36 * approach;
+        rotateX = -2.8 * approach;
+        rotateY = -8.5 * approach;
+        rotateZ = -2.4 * approach;
+        scale = 0.935 + progress * 0.065;
       } else if (entry.index === 2) {
         x = sideDistance * approach;
         y = 28 * approach;
-        z = -14 * approach;
-        scale = 0.982 + progress * 0.018;
+        z = -32 * approach;
+        rotateX = 2.2 * approach;
+        rotateY = 7.5 * approach;
+        rotateZ = 2.2 * approach;
+        scale = 0.945 + progress * 0.055;
       } else if (entry.index === 3) {
         x = -sideDistance * 0.62 * approach;
         y = 43 * approach;
-        z = -18 * approach;
-        scale = 0.978 + progress * 0.022;
+        z = -48 * approach;
+        rotateX = -4.2 * approach;
+        rotateY = -4.5 * approach;
+        rotateZ = 3.2 * approach;
+        scale = 0.925 + progress * 0.075;
       }
 
-      entry.card.style.opacity = String(Math.min(1, progress * 1.08));
+      entry.card.style.opacity = String(Math.min(1, progress * 1.12));
       if (progress < 1) {
         entry.card.style.transform =
-          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
-        const shadowY = 4 + progress * 5;
-        const shadowBlur = 10 + progress * 8;
-        const shadowAlpha = 0.06 + progress * 0.06;
+          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) ` +
+          `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ` +
+          `rotateZ(${rotateZ.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+        const shadowY = 5 + progress * 11;
+        const shadowBlur = 14 + progress * 18;
+        const shadowAlpha = 0.1 + progress * 0.12;
         entry.card.style.boxShadow =
           `0 ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, ${shadowAlpha.toFixed(3)})`;
       } else {
@@ -569,11 +563,13 @@
     );
     if (scrollY >= exitTransitionStart) {
       const translateY = -16 * exitProgress;
-      const scale = 1 - 0.025 * exitProgress;
+      const rotateX = 7.5 * exitProgress;
+      const scale = 1 - 0.045 * exitProgress;
       const panelRise = 76 * (1 - exitProgress);
       serviceMotionSection.style.transformOrigin = 'center bottom';
       serviceMotionSection.style.transform =
-        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
+        `rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
       serviceMotionNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
     } else {
       serviceMotionSection.style.removeProperty('transform');
@@ -607,14 +603,14 @@
     }, { passive: true });
   }
 
-  // Services page: scroll-linked entrance for Business websites, Custom web applications, and SEO.
+    // Services page: scroll-linked entrance for Business websites, Custom web applications, and SEO.
   // This runs independently of the homepage stack; no rotations, only a restrained bottom/right settle.
   const servicesDetailList = document.querySelector('.service-detail-list');
   const servicesDetailCards = servicesDetailList
     ? Array.from(servicesDetailList.querySelectorAll(':scope > .service-detail')).slice(0, 3)
     : [];
 
-  if (servicesDetailList && servicesDetailCards.length === 3 && !reducedMotion) {
+  if (servicesDetailList && servicesDetailCards.length === 3 && !reducedMotion && window.matchMedia('(min-width: 761px)').matches) {
     let servicesDetailFrame = 0;
     let servicesDetailMetrics = [];
     servicesDetailList.classList.add('services-scroll-motion-enabled');
@@ -669,6 +665,7 @@
   const servicesHeroTypingTarget = document.querySelector('[data-services-hero-typewriter]');
   if (
     servicesHeroTypingTarget &&
+    window.matchMedia('(min-width: 761px)').matches &&
     !reducedMotion &&
     'IntersectionObserver' in window
   ) {
@@ -712,16 +709,40 @@
     servicesHeroTypingObserver.observe(servicesHeroTypingTarget);
   }
 
-  // Start the process motion-graphic when it enters view, then keep it looping.
-  // Respect reduced-motion preferences and never force-scroll the visitor to the cards.
+  // Play the responsive process motion-graphic once when visible, then scroll to the four cards.
+  // Reduced-motion visitors get a static first frame and retain normal manual scrolling.
   const processFilm = document.querySelector('#processFilm');
-  if (processFilm && !reducedMotion && 'IntersectionObserver' in window) {
+  const processList = document.querySelector('#process .process-list');
+  const processFilmMedia = window.matchMedia('(min-width: 761px)');
+  if (processFilm && processList && !reducedMotion && 'IntersectionObserver' in window) {
     let processFilmStarted = false;
+    let processFilmFinished = false;
+    const finishProcessFilm = () => {
+      if (processFilmFinished) return;
+      processFilmFinished = true;
+      processFilm.classList.remove('is-playing');
+      processFilm.classList.add('is-complete');
+      if (processFilmMedia.matches) {
+        processList.classList.add('is-preparing');
+        processList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.setTimeout(() => {
+          processList.classList.remove('is-preparing');
+          processList.classList.add('is-staged');
+        }, 420);
+      } else {
+        processList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    };
     const startProcessFilm = () => {
-      if (processFilmStarted) return;
+      if (processFilmStarted || processFilmFinished) return;
       processFilmStarted = true;
-      processFilm.classList.remove('is-complete');
+      if (processFilmMedia.matches) processList.classList.add('is-preparing');
       processFilm.classList.add('is-playing');
+      const progress = processFilm.querySelector('.process-film-progress > i');
+      if (progress) progress.addEventListener('animationend', event => {
+        if (event.animationName === 'processFilmProgress') finishProcessFilm();
+      }, { once: true });
+      window.setTimeout(finishProcessFilm, 7600);
     };
     const filmObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
@@ -733,59 +754,4 @@
     }, { threshold: [0.3, 0.45] });
     filmObserver.observe(processFilm);
   }
-
-  // Clicking a process step focuses that card and hides the other three.
-  // Click it again or press Escape to restore the full list.
-  const processList = document.querySelector('#process .process-list');
-  if (processList) {
-    const processSteps = Array.from(processList.querySelectorAll('[data-process-step]'));
-    const clearFocusedProcessStep = (returnFocus = false) => {
-      const focusedStep = processList.querySelector('.process-step.is-focused');
-      processList.classList.remove('has-focused-step');
-      processSteps.forEach(step => {
-        step.classList.remove('is-focused');
-        step.setAttribute('aria-pressed', 'false');
-        const number = step.dataset.processStep;
-        const title = step.querySelector('h3')?.textContent?.trim() || 'process step';
-        step.setAttribute('aria-label', `Focus on process step ${number}: ${title}`);
-      });
-      if (returnFocus && focusedStep) focusedStep.focus({ preventScroll: true });
-    };
-    const focusProcessStep = (step) => {
-      const isAlreadyFocused = step.classList.contains('is-focused');
-      if (isAlreadyFocused) {
-        clearFocusedProcessStep();
-        step.setAttribute('aria-label', 'Focus on process step ' + step.dataset.processStep + ': ' + (step.querySelector('h3')?.textContent?.trim() || 'process step'));
-        return;
-      }
-      processList.classList.add('has-focused-step');
-      processSteps.forEach(item => {
-        const selected = item === step;
-        item.classList.toggle('is-focused', selected);
-        item.setAttribute('aria-pressed', String(selected));
-        const number = item.dataset.processStep;
-        const title = item.querySelector('h3')?.textContent?.trim() || 'process step';
-        item.setAttribute('aria-label', selected
-          ? 'Show all process steps. Focused: ' + title
-          : 'Focus on process step ' + number + ': ' + title);
-      });
-      step.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
-    };
-    processSteps.forEach(step => {
-      step.addEventListener('click', () => focusProcessStep(step));
-      step.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          focusProcessStep(step);
-        }
-      });
-    });
-    processList.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && processList.classList.contains('has-focused-step')) {
-        event.preventDefault();
-        clearFocusedProcessStep(true);
-      }
-    });
-  }
-
 })();
