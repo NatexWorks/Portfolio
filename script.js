@@ -285,11 +285,13 @@
     const sectionTop = serviceDocumentTop(serviceMotionSection);
     const sectionBottom = sectionTop + serviceMotionSection.offsetHeight;
 
+    const exitDuration = Math.max(viewportHeight * 0.28, 180);
     serviceMotionMetrics = {
       entries,
       viewportHeight,
-      exitStart: Math.max(sectionBottom - viewportHeight * 0.84, finalEntry.end),
-      exitDuration: Math.max(viewportHeight * 0.28, 180)
+      // Start the section transition only after the last card has completed its entrance.
+      exitStart: Math.max(sectionBottom - viewportHeight * 0.84, finalEntry.end + exitDuration),
+      exitDuration
     };
   };
 
@@ -379,10 +381,13 @@
       }
     });
 
+    // Begin the panel rise just below the viewport, then finish the transition after
+    // every card has settled. This avoids a visible jump when the section boundary is crossed.
+    const exitTransitionStart = metrics.exitStart - metrics.exitDuration;
     const exitProgress = clampServiceProgress(
-      (scrollY - metrics.exitStart) / metrics.exitDuration
+      (scrollY - exitTransitionStart) / metrics.exitDuration
     );
-    if (scrollY >= metrics.exitStart) {
+    if (scrollY >= exitTransitionStart) {
       const translateY = -16 * exitProgress;
       const rotateX = 7.5 * exitProgress;
       const scale = 1 - 0.045 * exitProgress;
