@@ -429,40 +429,16 @@
     }, { passive: true });
   }
 
-  // Play the responsive process motion-graphic once when visible, then scroll to the four cards.
-  // Reduced-motion visitors get a static first frame and retain normal manual scrolling.
+  // Start the process motion-graphic when it enters view, then keep it looping.
+  // Respect reduced-motion preferences and never force-scroll the visitor to the cards.
   const processFilm = document.querySelector('#processFilm');
-  const processList = document.querySelector('#process .process-list');
-  const processFilmMedia = window.matchMedia('(min-width: 761px)');
-  if (processFilm && processList && !reducedMotion && 'IntersectionObserver' in window) {
+  if (processFilm && !reducedMotion && 'IntersectionObserver' in window) {
     let processFilmStarted = false;
-    let processFilmFinished = false;
-    const finishProcessFilm = () => {
-      if (processFilmFinished) return;
-      processFilmFinished = true;
-      processFilm.classList.remove('is-playing');
-      processFilm.classList.add('is-complete');
-      if (processFilmMedia.matches) {
-        processList.classList.add('is-preparing');
-        processList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        window.setTimeout(() => {
-          processList.classList.remove('is-preparing');
-          processList.classList.add('is-staged');
-        }, 420);
-      } else {
-        processList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    };
     const startProcessFilm = () => {
-      if (processFilmStarted || processFilmFinished) return;
+      if (processFilmStarted) return;
       processFilmStarted = true;
-      if (processFilmMedia.matches) processList.classList.add('is-preparing');
+      processFilm.classList.remove('is-complete');
       processFilm.classList.add('is-playing');
-      const progress = processFilm.querySelector('.process-film-progress > i');
-      if (progress) progress.addEventListener('animationend', event => {
-        if (event.animationName === 'processFilmProgress') finishProcessFilm();
-      }, { once: true });
-      window.setTimeout(finishProcessFilm, 7600);
     };
     const filmObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
@@ -473,6 +449,60 @@
       });
     }, { threshold: [0.3, 0.45] });
     filmObserver.observe(processFilm);
+  }
+
+  // Clicking a process step focuses that card and hides the other three.
+  // Click it again or press Escape to restore the full list.
+  const processList = document.querySelector('#process .process-list');
+  if (processList) {
+    const processSteps = Array.from(processList.querySelectorAll('[data-process-step]'));
+    const clearFocusedProcessStep = (returnFocus = false) => {
+      const focusedStep = processList.querySelector('.process-step.is-focused');
+      processList.classList.remove('has-focused-step');
+      processSteps.forEach(step => {
+        step.classList.remove('is-focused');
+        step.setAttribute('aria-pressed', 'false');
+        const number = step.dataset.processStep;
+        const title = step.querySelector('h3')?.textContent?.trim() || 'process step';
+        step.setAttribute('aria-label', `Focus on process step ${number}: ${title}`);
+      });
+      if (returnFocus && focusedStep) focusedStep.focus({ preventScroll: true });
+    };
+    const focusProcessStep = (step) => {
+      const isAlreadyFocused = step.classList.contains('is-focused');
+      if (isAlreadyFocused) {
+        clearFocusedProcessStep();
+        step.setAttribute('aria-label', 'Focus on process step ' + step.dataset.processStep + ': ' + (step.querySelector('h3')?.textContent?.trim() || 'process step'));
+        return;
+      }
+      processList.classList.add('has-focused-step');
+      processSteps.forEach(item => {
+        const selected = item === step;
+        item.classList.toggle('is-focused', selected);
+        item.setAttribute('aria-pressed', String(selected));
+        const number = item.dataset.processStep;
+        const title = item.querySelector('h3')?.textContent?.trim() || 'process step';
+        item.setAttribute('aria-label', selected
+          ? 'Show all process steps. Focused: ' + title
+          : 'Focus on process step ' + number + ': ' + title);
+      });
+      step.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
+    };
+    processSteps.forEach(step => {
+      step.addEventListener('click', () => focusProcessStep(step));
+      step.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          focusProcessStep(step);
+        }
+      });
+    });
+    processList.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && processList.classList.contains('has-focused-step')) {
+        event.preventDefault();
+        clearFocusedProcessStep(true);
+      }
+    });
   }
 
 })();
