@@ -212,7 +212,10 @@
     transform-origin: center top;
     border-color: #59664a;
     /* A single soft shadow preserves depth without heavy stacked effects. */
-    box-shadow: 0 10px 22px #0005;
+    box-shadow: 0 16px 30px rgba(0,0,0,.32), 0 3px 9px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.025);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform;
     transition: none;
   }
 
@@ -237,7 +240,7 @@
     z-index: 9;
     border-top: 1px solid #49583a;
     background: linear-gradient(180deg, #171c14 0%, #10120f 22%);
-    box-shadow: 0 -14px 32px #0006;
+    box-shadow: 0 -18px 38px rgba(0,0,0,.38), 0 -2px 8px rgba(0,0,0,.22);
     transform: translate3d(0, var(--workflow-panel-rise, 0px), 0);
     will-change: transform;
   }
@@ -245,6 +248,7 @@
 
 /* Mobile visitors who prefer reduced motion get the same cards in a normal, non-sticky flow. */
 @media (max-width: 650px) and (prefers-reduced-motion: reduce) {
+  html.mobile-workflow-motion #workflows .workflow-card { will-change: auto; transform-style: flat; backface-visibility: visible; }
   #workflows {
     padding-bottom: 0;
     transform: none !important;
