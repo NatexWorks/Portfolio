@@ -50,6 +50,56 @@
     /* Desktop/tablet motion system for the Services page.
        Leaves service-detail motion and all hover behavior untouched. */
     @media (min-width:761px) {
+      /* The visibility disclaimer rises into view while a restrained lime glow drifts behind it. */
+      .js-motion .service-principle.reveal {
+        position:relative;
+        isolation:isolate;
+        overflow:hidden;
+        transform:translateY(30px) scale(.985);
+        filter:blur(7px);
+        transition:opacity .82s ease,transform .82s cubic-bezier(.16,.72,.12,1),filter .82s ease;
+      }
+      .js-motion .service-principle.reveal.is-visible {
+        transform:translateY(0) scale(1);
+        filter:blur(0);
+      }
+      .service-principle[data-services-motion="visibility-note"]::before {
+        content:"";
+        position:absolute;
+        z-index:0;
+        inset:-38% -18%;
+        pointer-events:none;
+        opacity:0;
+        background:
+          radial-gradient(ellipse at 22% 48%,rgba(197,243,107,.13),transparent 42%),
+          radial-gradient(ellipse at 82% 62%,rgba(197,243,107,.07),transparent 38%);
+        transform:translate3d(-3%,3%,0) scale(.96);
+      }
+      .service-principle[data-services-motion="visibility-note"] > * {
+        position:relative;
+        z-index:1;
+      }
+      .service-principle[data-services-motion="visibility-note"].is-in-view::before {
+        opacity:1;
+        animation:visibilityGlowDrift 1.7s cubic-bezier(.2,.7,.2,1) both;
+      }
+      .visibility-underline {
+        position:relative;
+        display:inline;
+        background-image:linear-gradient(var(--lime),var(--lime));
+        background-repeat:no-repeat;
+        background-position:left bottom;
+        background-size:0 1px;
+        transition:background-size .78s cubic-bezier(.2,.7,.2,1) .28s;
+      }
+      .service-principle[data-services-motion="visibility-note"].is-in-view .visibility-underline {
+        background-size:100% 1px;
+      }
+      @keyframes visibilityGlowDrift {
+        0% { opacity:0; transform:translate3d(-4%,4%,0) scale(.94); }
+        65% { opacity:1; }
+        100% { opacity:1; transform:translate3d(2%,-2%,0) scale(1.04); }
+      }
       .services-page-hero > .eyebrow,
       .services-page-hero h1,
       .services-page-hero > p,
@@ -248,7 +298,10 @@
         </ol>
       </section>
 <section class="section">
-        <div class="service-principle reveal"><h2>Visibility is a process,<br><span class="headline-muted">not a ranking promise.</span></h2><p>Google Search and Google Maps results depend on competition, relevance, location, business information, reviews, and other factors. I can improve the setup and technical foundations, but no one can honestly guarantee a particular position or timeline.</p></div>
+        <div class="service-principle reveal" data-services-motion="visibility-note">
+          <h2>Visibility is a process,<br><span class="headline-muted visibility-underline">not a ranking promise.</span></h2>
+          <p>Google Search and Google Maps results depend on competition, relevance, location, business information, reviews, and other factors. I can improve the setup and technical foundations, but <span class="visibility-underline">no one can honestly guarantee</span> a particular position or timeline.</p>
+        </div>
       </section>
       <section class="section service-page-contact" id="contact">
         <div class="contact-card reveal" data-services-motion="contact"><div><div class="eyebrow"><span class="status-dot"></span> START WITH THE PROBLEM</div><h2>What do you need<br><span>to improve?</span></h2><p>Share the goal, what you have already, and the main obstacle. We can define a practical scope before committing to a build.</p></div><div class="contact-actions"><a class="button button-primary" href="mailto:natexworks@gmail.com?subject=Project%20enquiry%20%E2%80%94%20NatexWorks">Start a conversation <span aria-hidden="true">↗</span></a><span class="contact-email">NATEXWORKS@GMAIL.COM</span></div></div>
