@@ -1069,8 +1069,9 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
 @keyframes fogTraceIn { to { transform:scaleX(1); } }
 @keyframes visibilityTraceIn { to { transform:scaleX(1); } }
 @keyframes mobileWordReveal { to { opacity:1; filter:blur(0); transform:translateY(0); } }
-@keyframes mobileLineReveal { to { opacity:1; filter:blur(0); } }
+@keyframes mobileLineReveal { to { opacity:1; filter:blur(0); transform:translateY(0); } }
 @media (prefers-reduced-motion:reduce) {
+  .mobile-reveal-word { animation:none !important; opacity:1 !important; filter:none !important; transform:none !important; }
   .about-word-heading .headline-muted::after,
   .services-page-hero h1 .headline-muted::after,
   .service-principle .visibility-underline::after { animation:none !important; transform:scaleX(1); }
