@@ -285,11 +285,13 @@
     const sectionTop = serviceDocumentTop(serviceMotionSection);
     const sectionBottom = sectionTop + serviceMotionSection.offsetHeight;
 
+    const exitDuration = Math.max(viewportHeight * 0.28, 180);
     serviceMotionMetrics = {
       entries,
       viewportHeight,
-      exitStart: Math.max(sectionBottom - viewportHeight * 0.84, finalEntry.end),
-      exitDuration: Math.max(viewportHeight * 0.28, 180)
+      // Start the section transition only after the last card has completed its entrance.
+      exitStart: Math.max(sectionBottom - viewportHeight * 0.84, finalEntry.end + exitDuration),
+      exitDuration
     };
   };
 
@@ -329,47 +331,33 @@
       const approach = 1 - progress;
       let x = 0;
       let y = 34 * approach;
-      let z = -44 * approach;
-      let rotateX = -4.5 * approach;
-      let rotateY = 0;
-      let rotateZ = 0;
-      let scale = 0.94 + progress * 0.06;
+      let z = -18 * approach;
+      let scale = 0.98 + progress * 0.02;
 
       if (entry.index === 1) {
         x = -sideDistance * approach;
         y = 38 * approach;
-        z = -36 * approach;
-        rotateX = -2.8 * approach;
-        rotateY = -8.5 * approach;
-        rotateZ = -2.4 * approach;
-        scale = 0.935 + progress * 0.065;
+        z = -16 * approach;
+        scale = 0.98 + progress * 0.02;
       } else if (entry.index === 2) {
         x = sideDistance * approach;
         y = 28 * approach;
-        z = -32 * approach;
-        rotateX = 2.2 * approach;
-        rotateY = 7.5 * approach;
-        rotateZ = 2.2 * approach;
-        scale = 0.945 + progress * 0.055;
+        z = -14 * approach;
+        scale = 0.982 + progress * 0.018;
       } else if (entry.index === 3) {
         x = -sideDistance * 0.62 * approach;
         y = 43 * approach;
-        z = -48 * approach;
-        rotateX = -4.2 * approach;
-        rotateY = -4.5 * approach;
-        rotateZ = 3.2 * approach;
-        scale = 0.925 + progress * 0.075;
+        z = -18 * approach;
+        scale = 0.978 + progress * 0.022;
       }
 
-      entry.card.style.opacity = String(Math.min(1, progress * 1.12));
+      entry.card.style.opacity = String(Math.min(1, progress * 1.08));
       if (progress < 1) {
         entry.card.style.transform =
-          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) ` +
-          `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ` +
-          `rotateZ(${rotateZ.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-        const shadowY = 5 + progress * 11;
-        const shadowBlur = 14 + progress * 18;
-        const shadowAlpha = 0.1 + progress * 0.12;
+          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
+        const shadowY = 4 + progress * 5;
+        const shadowBlur = 10 + progress * 8;
+        const shadowAlpha = 0.06 + progress * 0.06;
         entry.card.style.boxShadow =
           `0 ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, ${shadowAlpha.toFixed(3)})`;
       } else {
@@ -379,18 +367,19 @@
       }
     });
 
+    // Begin the panel rise just below the viewport, then finish the transition after
+    // every card has settled. This avoids a visible jump when the section boundary is crossed.
+    const exitTransitionStart = metrics.exitStart - metrics.exitDuration;
     const exitProgress = clampServiceProgress(
-      (scrollY - metrics.exitStart) / metrics.exitDuration
+      (scrollY - exitTransitionStart) / metrics.exitDuration
     );
-    if (scrollY >= metrics.exitStart) {
+    if (scrollY >= exitTransitionStart) {
       const translateY = -16 * exitProgress;
-      const rotateX = 7.5 * exitProgress;
-      const scale = 1 - 0.045 * exitProgress;
+      const scale = 1 - 0.025 * exitProgress;
       const panelRise = 76 * (1 - exitProgress);
       serviceMotionSection.style.transformOrigin = 'center bottom';
       serviceMotionSection.style.transform =
-        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
-        `rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
       serviceMotionNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
     } else {
       serviceMotionSection.style.removeProperty('transform');
@@ -423,7 +412,6 @@
       scheduleServiceCardMotion();
     }, { passive: true });
   }
-
 
   // Services page: scroll-linked entrance for Business websites, Custom web applications, and SEO.
   // This runs independently of the homepage stack; no rotations, only a restrained bottom/right settle.
