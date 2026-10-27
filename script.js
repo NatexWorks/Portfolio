@@ -324,37 +324,17 @@
 
     const metrics = serviceMotionMetrics;
     const scrollY = window.scrollY || window.pageYOffset || 0;
-    const sideDistance = Math.min(56, Math.max(24, (window.innerWidth || 1024) * 0.035));
-
     metrics.entries.forEach((entry) => {
       const progress = clampServiceProgress((scrollY - entry.start) / (entry.end - entry.start));
       const approach = 1 - progress;
-      let x = 0;
-      let y = 34 * approach;
-      let z = -18 * approach;
-      let scale = 0.98 + progress * 0.02;
-
-      if (entry.index === 1) {
-        x = -sideDistance * approach;
-        y = 38 * approach;
-        z = -16 * approach;
-        scale = 0.98 + progress * 0.02;
-      } else if (entry.index === 2) {
-        x = sideDistance * approach;
-        y = 28 * approach;
-        z = -14 * approach;
-        scale = 0.982 + progress * 0.018;
-      } else if (entry.index === 3) {
-        x = -sideDistance * 0.62 * approach;
-        y = 43 * approach;
-        z = -18 * approach;
-        scale = 0.978 + progress * 0.022;
-      }
+      const verticalOffset = (entry.index === 1 ? 38 : entry.index === 2 ? 28 : entry.index === 3 ? 43 : 34) * approach;
+      const depthOffset = (entry.index === 1 ? 16 : entry.index === 2 ? 14 : 18) * approach;
+      const scale = entry.index === 2 ? 0.982 + progress * 0.018 : entry.index === 3 ? 0.978 + progress * 0.022 : 0.98 + progress * 0.02;
 
       entry.card.style.opacity = String(Math.min(1, progress * 1.08));
       if (progress < 1) {
         entry.card.style.transform =
-          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
+          `perspective(1200px) translate3d(0, ${verticalOffset.toFixed(2)}px, ${(-depthOffset).toFixed(2)}px) scale(${scale.toFixed(4)})`;
         const shadowY = 4 + progress * 5;
         const shadowBlur = 10 + progress * 8;
         const shadowAlpha = 0.06 + progress * 0.06;
