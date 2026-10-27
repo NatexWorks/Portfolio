@@ -34,386 +34,9 @@
     window.setTimeout(() => {
       introMark.classList.add('is-revealed');
       window.setTimeout(() => {
-        const targetRect = targetMark.getBoundingClientRect();
-        const travel = introMark.animate([
-          { left: '50%', top: '50%', width: '58px', height: '58px', fontSize: '25px', transform: 'translate(-50%, -50%) scale(1)', filter: 'drop-shadow(0 0 18px #c5f36b55)' },
-          { left: `${targetRect.left}px`, top: `${targetRect.top}px`, width: `${targetRect.width}px`, height: `${targetRect.height}px`, fontSize: '14px', transform: 'translate(0, 0) scale(1)', filter: 'drop-shadow(0 0 0 transparent)' }
-        ], { duration: 780, easing: 'cubic-bezier(.2,.75,.2,1)', fill: 'forwards' });
-        travel.onfinish = () => {
-          brandIntro.remove();
-          document.documentElement.classList.remove('brand-intro-running');
-          if (mobileBrandFX) document.documentElement.classList.add('hero-content-ready');
-        };
-      }, 260);
-    }, 850);
-  } else if (brandIntro) {
-    brandIntro?.remove();
-  }
 
-  const menuButton = document.querySelector('.menu-toggle');
-  const nav = document.querySelector('#primary-nav');
-
-  if (menuButton && nav) {
-    const menuLinks = Array.from(nav.querySelectorAll('a[href]'));
-    const setMenuOpen = (open, restoreFocus = false) => {
-      menuButton.setAttribute('aria-expanded', String(open));
-      menuButton.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
-      nav.classList.toggle('is-open', open);
-      if (open) menuLinks[0]?.focus();
-      else if (restoreFocus) menuButton.focus();
-    };
-
-    menuButton.addEventListener('click', () => {
-      setMenuOpen(menuButton.getAttribute('aria-expanded') !== 'true');
-    });
-
-    menuLinks.forEach((link) => {
-      link.addEventListener('click', () => setMenuOpen(false));
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (!nav.classList.contains('is-open')) return;
-      if (event.key === 'Escape') {
-        setMenuOpen(false, true);
-        return;
-      }
-      if (event.key !== 'Tab' || menuLinks.length === 0) return;
-
-      const firstLink = menuLinks[0];
-      const lastLink = menuLinks[menuLinks.length - 1];
-      const focusOutsideMenu = !nav.contains(document.activeElement) && document.activeElement !== menuButton;
-      if (focusOutsideMenu || (event.shiftKey && (document.activeElement === firstLink || document.activeElement === menuButton))) {
-        event.preventDefault();
-        lastLink.focus();
-      } else if (!event.shiftKey && (document.activeElement === lastLink || document.activeElement === menuButton)) {
-        event.preventDefault();
-        firstLink.focus();
-      }
-    });
-  }
-
-  // Reveal project visuals as they enter the viewport; avoid scroll-jacking/parallax.
-  const scrollImages = document.querySelectorAll('[data-image-scroll]');
-  if (!reducedMotion && 'IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('image-in-view');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.18, rootMargin: '0px 0px -24px 0px' });
-    scrollImages.forEach((item) => imageObserver.observe(item));
-  } else {
-    scrollImages.forEach((item) => item.classList.add('image-in-view'));
-  }
-
-  const year = document.querySelector('#year');
-  if (year) year.textContent = new Date().getFullYear();
-
-  // Keep content visible by default. Scroll reveals are enabled only when
-  // IntersectionObserver is available and the visitor hasn't requested less motion.
-  if (!reducedMotion && 'IntersectionObserver' in window) {
-    document.documentElement.classList.add('js-motion');
-    const revealItems = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries, currentObserver) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          currentObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -36px 0px' });
-
-    revealItems.forEach((item) => observer.observe(item));
-  }
-  
-  // About copy types character-by-character in paced sequences when it enters view.
-  const typingLines = Array.from(document.querySelectorAll('.typing-line'));
-  if (typingLines.length && !reducedMotion) {
-    typingLines.forEach((line) => {
-      line.dataset.fullText = line.textContent;
-      line.setAttribute('aria-label', line.textContent);
-      line.textContent = '';
-    });
-    const typeLine = (line, done) => {
-      const fullText = line.dataset.fullText || '';
-      const speed = Number(line.dataset.typeSpeed) || 34;
-      let index = 0;
-      line.classList.add('is-typing');
-      const typeNext = () => {
-        index += 1;
-        line.textContent = fullText.slice(0, index);
-        if (index < fullText.length) {
-          window.setTimeout(typeNext, speed);
-        } else {
-          line.classList.remove('is-typing');
-          if (done) window.setTimeout(done, 220);
-        }
-      };
-      typeNext();
-    };
-    const aboutCopy = document.querySelector('.about-inner');
-    if ('IntersectionObserver' in window && aboutCopy) {
-      const typingObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            observer.unobserve(entry.target);
-            let lineIndex = 0;
-            const typeSequence = () => {
-              if (lineIndex >= typingLines.length) return;
-              typeLine(typingLines[lineIndex], () => {
-                lineIndex += 1;
-                typeSequence();
-              });
-            };
-            typeSequence();
-          }
-        });
-      }, { threshold: 0.18 });
-      typingObserver.observe(aboutCopy);
-    } else {
-      typingLines.forEach((line) => { line.textContent = line.dataset.fullText || ''; });
-    }
-  }
-
-  // Typewriter phrases: short, quick, and disabled for reduced-motion visitors.
-  const typeTarget = document.querySelector('[data-rotate]');
-  if (typeTarget && !reducedMotion) {
-    const phrases = (typeTarget.dataset.rotate || '').split('|').filter(Boolean);
-    let phraseIndex = 0;
-    let charIndex = phrases[0]?.length || 0;
-    let deleting = false;
-    const type = () => {
-      const phrase = phrases[phraseIndex] || '';
-      if (!deleting) {
-        charIndex = Math.min(charIndex + 1, phrase.length);
-        typeTarget.textContent = phrase.slice(0, charIndex);
-        if (charIndex === phrase.length) {
-          deleting = true;
-          window.setTimeout(type, 850);
-          return;
-        }
-      } else {
-        charIndex = Math.max(0, charIndex - 1);
-        typeTarget.textContent = phrase.slice(0, charIndex);
-        if (charIndex === 0) {
-          deleting = false;
-          phraseIndex = (phraseIndex + 1) % phrases.length;
-        }
-      }
-      window.setTimeout(type, deleting ? 20 : 35);
-    };
-    window.setTimeout(() => { deleting = true; type(); }, 1200);
-  }
-
-  // Desktop/tablet-only scroll-progress motion for the four homepage service cards.
-  // The phone layout is deliberately left to its existing responsive CSS.
-  const serviceMotionMedia = window.matchMedia('(min-width: 761px)');
-  const serviceMotionSection = document.querySelector('#services.services-section');
-  const serviceMotionGrid = document.querySelector('#services .service-grid');
-  const serviceMotionNext = document.querySelector('#skills');
-  let serviceMotionCards = serviceMotionGrid
-    ? Array.from(serviceMotionGrid.querySelectorAll('.service-card'))
-    : [];
-  let serviceMotionActive = false;
-  let serviceMotionFrame = 0;
-  let serviceMotionMetrics = null;
-
-  const clampServiceProgress = (value) => Math.max(0, Math.min(1, value));
-
-  const serviceDocumentTop = (element) => {
-    let top = 0;
-    let current = element;
-    while (current && current !== document.body && current !== document.documentElement) {
-      top += current.offsetTop || 0;
-      current = current.offsetParent;
-    }
-    return top;
-  };
-
-  const resetServiceCardMotion = () => {
-    if (serviceMotionFrame) {
-      window.cancelAnimationFrame(serviceMotionFrame);
-      serviceMotionFrame = 0;
-    }
-    if (serviceMotionGrid) serviceMotionGrid.classList.remove('service-scroll-motion-enabled');
-    if (serviceMotionSection) {
-      serviceMotionSection.classList.remove('service-exit-motion-enabled');
-      serviceMotionSection.style.removeProperty('transform');
-      serviceMotionSection.style.removeProperty('transform-origin');
-    }
-    if (serviceMotionNext) {
-      serviceMotionNext.classList.remove('service-foreground-enabled');
-      serviceMotionNext.style.removeProperty('transform');
-    }
-    serviceMotionCards.forEach((card) => {
-      card.style.removeProperty('opacity');
-      card.style.removeProperty('transform');
-      card.style.removeProperty('box-shadow');
-    });
-    serviceMotionActive = false;
-    serviceMotionMetrics = null;
-  };
-
-  const sortServiceCardsForVisualOrder = () => {
-    if (!serviceMotionGrid) return [];
-    return Array.from(serviceMotionGrid.querySelectorAll('.service-card')).sort((a, b) => {
-      const styleA = window.getComputedStyle(a);
-      const styleB = window.getComputedStyle(b);
-      const rowA = Number.parseInt(styleA.gridRowStart, 10) || 1;
-      const rowB = Number.parseInt(styleB.gridRowStart, 10) || 1;
-      const colA = Number.parseInt(styleA.gridColumnStart, 10) || 1;
-      const colB = Number.parseInt(styleB.gridColumnStart, 10) || 1;
-      return rowA - rowB || colA - colB;
-    });
-  };
-
-  const measureServiceCardMotion = () => {
-    if (!serviceMotionSection || !serviceMotionGrid || !serviceMotionNext) return;
-    const viewportHeight = Math.max(1, window.innerHeight || document.documentElement.clientHeight);
-    serviceMotionCards = sortServiceCardsForVisualOrder();
-
-    const stagger = viewportHeight * 0.035;
-    const travel = Math.max(viewportHeight * 0.42, 220);
-    const entries = serviceMotionCards.map((card, index) => {
-      const top = serviceDocumentTop(card);
-      const start = top - viewportHeight * 0.84 + index * stagger;
-      return { card, index, top, start, end: start + travel };
-    });
-    const finalEntry = entries.reduce((latest, entry) => entry.end > latest.end ? entry : latest, entries[0]);
-    const sectionTop = serviceDocumentTop(serviceMotionSection);
-    const sectionBottom = sectionTop + serviceMotionSection.offsetHeight;
-
-    const exitDuration = Math.max(viewportHeight * 0.28, 180);
-    serviceMotionMetrics = {
-      entries,
-      viewportHeight,
-      // Start the section transition only after the last card has completed its entrance.
-      exitStart: Math.max(sectionBottom - viewportHeight * 0.84, finalEntry.end + exitDuration),
-      exitDuration
-    };
-  };
-
-  const activateServiceCardMotion = () => {
-    if (
-      serviceMotionActive ||
-      !serviceMotionMedia.matches ||
-      reducedMotion ||
-      !serviceMotionSection ||
-      !serviceMotionGrid ||
-      !serviceMotionNext ||
-      serviceMotionCards.length !== 4
-    ) return;
-
-    serviceMotionGrid.classList.add('service-scroll-motion-enabled');
-    serviceMotionSection.classList.add('service-exit-motion-enabled');
-    serviceMotionNext.classList.add('service-foreground-enabled');
-    serviceMotionActive = true;
-    measureServiceCardMotion();
-  };
-
-  const updateServiceCardMotion = () => {
-    serviceMotionFrame = 0;
-    if (!serviceMotionMedia.matches || reducedMotion) {
-      resetServiceCardMotion();
-      return;
-    }
-    activateServiceCardMotion();
-    if (!serviceMotionActive || !serviceMotionMetrics) return;
-
-    const metrics = serviceMotionMetrics;
-    const scrollY = window.scrollY || window.pageYOffset || 0;
-    const sideDistance = Math.min(56, Math.max(24, (window.innerWidth || 1024) * 0.035));
-
-    metrics.entries.forEach((entry) => {
-      const progress = clampServiceProgress((scrollY - entry.start) / (entry.end - entry.start));
-      const approach = 1 - progress;
-      let x = 0;
-      let y = 34 * approach;
-      let z = -18 * approach;
-      let scale = 0.98 + progress * 0.02;
-
-      if (entry.index === 1) {
-        x = -sideDistance * approach;
-        y = 38 * approach;
-        z = -16 * approach;
-        scale = 0.98 + progress * 0.02;
-      } else if (entry.index === 2) {
-        x = sideDistance * approach;
-        y = 28 * approach;
-        z = -14 * approach;
-        scale = 0.982 + progress * 0.018;
-      } else if (entry.index === 3) {
-        x = -sideDistance * 0.62 * approach;
-        y = 43 * approach;
-        z = -18 * approach;
-        scale = 0.978 + progress * 0.022;
-      }
-
-      entry.card.style.opacity = String(Math.min(1, progress * 1.08));
-      if (progress < 1) {
-        entry.card.style.transform =
-          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
-        const shadowY = 4 + progress * 5;
-        const shadowBlur = 10 + progress * 8;
-        const shadowAlpha = 0.06 + progress * 0.06;
-        entry.card.style.boxShadow =
-          `0 ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, ${shadowAlpha.toFixed(3)})`;
-      } else {
-        entry.card.style.removeProperty('transform');
-        entry.card.style.opacity = '1';
-        entry.card.style.removeProperty('box-shadow');
-      }
-    });
-
-    // Begin the panel rise just below the viewport, then finish the transition after
-    // every card has settled. This avoids a visible jump when the section boundary is crossed.
-    const exitTransitionStart = metrics.exitStart - metrics.exitDuration;
-    const exitProgress = clampServiceProgress(
-      (scrollY - exitTransitionStart) / metrics.exitDuration
-    );
-    if (scrollY >= exitTransitionStart) {
-      const translateY = -16 * exitProgress;
-      const scale = 1 - 0.025 * exitProgress;
-      const panelRise = 76 * (1 - exitProgress);
-      serviceMotionSection.style.transformOrigin = 'center bottom';
-      serviceMotionSection.style.transform =
-        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
-      serviceMotionNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
-    } else {
-      serviceMotionSection.style.removeProperty('transform');
-      serviceMotionSection.style.removeProperty('transform-origin');
-      serviceMotionNext.style.removeProperty('transform');
-    }
-  };
-
-  const scheduleServiceCardMotion = () => {
-    if (!serviceMotionMedia.matches || reducedMotion) {
-      resetServiceCardMotion();
-      return;
-    }
-    if (!serviceMotionFrame) {
-      serviceMotionFrame = window.requestAnimationFrame(updateServiceCardMotion);
-    }
-  };
-
-  if (serviceMotionSection && serviceMotionGrid && serviceMotionNext && serviceMotionCards.length === 4) {
-    activateServiceCardMotion();
-    scheduleServiceCardMotion();
-    window.addEventListener('scroll', scheduleServiceCardMotion, { passive: true });
-    window.addEventListener('resize', () => {
-      if (!serviceMotionMedia.matches || reducedMotion) {
-        resetServiceCardMotion();
-        return;
-      }
-      activateServiceCardMotion();
-      if (serviceMotionActive) measureServiceCardMotion();
-      scheduleServiceCardMotion();
-    }, { passive: true });
-  }
-
-  // Services page: scroll-linked entrance for Business websites, Custom web applications, and SEO.
+…[1 chars truncated — re-run with head/grep/tail for full output]…
+sites, Custom web applications, and SEO.
   // This runs independently of the homepage stack; no rotations, only a restrained bottom/right settle.
   const servicesDetailList = document.querySelector('.service-detail-list');
   const servicesDetailCards = servicesDetailList
@@ -597,19 +220,232 @@
 
 
 })();
-/* Mobile-only menu scroll lock, process touch feedback and services text reveal. */
-(()=>{
- const mq=window.matchMedia('(max-width:650px)'), reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- const button=document.querySelector('.menu-toggle'),nav=document.querySelector('#primary-nav');let prior='';
- if(button&&nav){
-  const sync=()=>{const open=nav.classList.contains('is-open');document.body.classList.toggle('mobile-menu-open',open&&mq.matches);if(open&&mq.matches&&document.body.style.overflow!=='hidden'){prior=document.body.style.overflow;document.body.style.overflow='hidden'}else if((!open||!mq.matches)&&document.body.style.overflow==='hidden'){document.body.style.overflow=prior}button.setAttribute('aria-expanded',String(open))};
-  new MutationObserver(sync).observe(nav,{attributes:true,attributeFilter:['class']});sync();mq.addEventListener?.('change',sync);
- }
- if(!mq.matches||reduce)return;
- document.querySelectorAll('.process-film-scene').forEach(card=>{card.addEventListener('touchstart',()=>card.classList.add('mobile-touch-active'),{passive:true});['touchend','touchcancel'].forEach(t=>card.addEventListener(t,()=>card.classList.remove('mobile-touch-active'),{passive:true}))});
- const words=el=>{if(!el||el.dataset.mobileWordReveal)return;const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),nodes=[];while(w.nextNode())nodes.push(w.currentNode);let i=0;nodes.forEach(node=>{if(!node.nodeValue.trim())return;const frag=document.createDocumentFragment();node.nodeValue.split(/(\\s+)/).forEach(part=>{if(!part)return;if(/^\\s+$/.test(part))frag.append(document.createTextNode(part));else{const s=document.createElement('span');s.setAttribute('aria-hidden','true');s.textContent=part;s.style.cssText='display:inline-block;opacity:0;filter:blur(4px);transform:translateY(7px);animation:mobileWordReveal .42s ease-out forwards;animation-delay:'+Math.min(i++*45,1400)+'ms';frag.append(s)}});node.replaceWith(frag)});el.dataset.mobileWordReveal='true'};
- words(document.querySelector('.services-page-hero h1'));words(document.querySelector('[data-services-hero-typewriter]'));
- const h=Array.from(document.querySelectorAll('.service-detail-list h2')).find(el=>el.textContent.includes('Visibility is a process'));
- const p=h?.parentElement?.querySelector('p');
- if(p&&'IntersectionObserver'in window){const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(!e.isIntersecting||p.dataset.mobileLineReveal)return;p.dataset.mobileLineReveal='true';p.style.opacity='1';p.animate([{opacity:0,transform:'translateY(10px)',filter:'blur(4px)'},{opacity:1,transform:'translateY(0)',filter:'blur(0)'}],{duration:650,easing:'ease-out',fill:'both'});io.disconnect()}),{threshold:.18});p.style.opacity='1';io.observe(p)}
+/* Mobile-only behavior: accessible glass navigation and scroll-progress card reveals. */
+(() => {
+  const mobileQuery = window.matchMedia('(max-width:650px)');
+  const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const menuButton = document.querySelector('.menu-toggle');
+  const nav = document.querySelector('#primary-nav');
+  let previousOverflow = null;
+
+  if (menuButton && nav) {
+    const syncMenuState = () => {
+      const open = nav.classList.contains('is-open');
+      const shouldLock = open && mobileQuery.matches;
+      document.body.classList.toggle('mobile-menu-open', shouldLock);
+      if (shouldLock && previousOverflow === null) {
+        previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+      } else if (!shouldLock && previousOverflow !== null) {
+        document.body.style.overflow = previousOverflow;
+        previousOverflow = null;
+      }
+      menuButton.setAttribute('aria-expanded', String(open));
+    };
+    new MutationObserver(syncMenuState).observe(nav, { attributes:true, attributeFilter:['class'] });
+    syncMenuState();
+    if (mobileQuery.addEventListener) mobileQuery.addEventListener('change', syncMenuState);
+    else if (mobileQuery.addListener) mobileQuery.addListener(syncMenuState);
+  }
+
+  if (!mobileQuery.matches || reduceQuery.matches) return;
+
+  // Keep the process cards touch-responsive; numbers remain in accessible labels, not as decoration.
+  document.querySelectorAll('#process .process-step, .process-film-scene').forEach((card) => {
+    card.addEventListener('touchstart', () => card.classList.add('mobile-touch-active'), { passive:true });
+    ['touchend','touchcancel','touchmove'].forEach((type) => {
+      card.addEventListener(type, () => card.classList.remove('mobile-touch-active'), { passive:true });
+    });
+  });
+
+  const wrapTextWords = (element, className, inlineBlock = false, hideFromAssistiveTech = true) => {
+    if (!element || element.dataset[className]) return [];
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+    const wrapped = [];
+    textNodes.forEach((node) => {
+      const value = node.nodeValue || '';
+      if (!value.trim()) return;
+      const fragment = document.createDocumentFragment();
+      value.split(/(\s+)/).forEach((part) => {
+        if (!part) return;
+        if (/^\s+$/.test(part)) {
+          fragment.appendChild(document.createTextNode(part));
+          return;
+        }
+        const span = document.createElement('span');
+        span.className = 'mobile-reveal-word';
+        if (hideFromAssistiveTech) span.setAttribute('aria-hidden', 'true');
+        span.textContent = part;
+        span.style.display = inlineBlock ? 'inline-block' : 'inline';
+        span.style.opacity = '0';
+        wrapped.push(span);
+        fragment.appendChild(span);
+      });
+      node.parentNode.replaceChild(fragment, node);
+    });
+    element.dataset[className] = 'true';
+    return wrapped;
+  };
+
+  // Service headline: words arrive diagonally, while the heading keeps one accessible text label.
+  const heroHeading = document.querySelector('.services-page-hero h1');
+  if (heroHeading) {
+    const label = heroHeading.innerText.replace(/\s+/g, ' ').replace(/\s+([.])/g, '$1').trim();
+    heroHeading.setAttribute('aria-label', label);
+    const wordSpans = wrapTextWords(heroHeading, 'mobileWordRevealDone', true);
+    wordSpans.forEach((span, index) => {
+      span.style.animation = `mobileWordReveal .42s ease-out ${Math.min(index * 45, 1400)}ms both`;
+    });
+  }
+
+  // Visibility paragraph: reveal the rendered lines once, preserving the existing inline emphasis.
+  const visibilityParagraph = document.querySelector('.service-principle > p');
+  if (visibilityParagraph) {
+    const words = wrapTextWords(visibilityParagraph, 'mobileLineRevealDone', false, false);
+    const revealLines = () => {
+      const lineTops = [];
+      const wordLines = words.map((word) => {
+        const top = Math.round(word.getBoundingClientRect().top / 2) * 2;
+        let line = lineTops.findIndex((existingTop) => Math.abs(existingTop - top) <= 2);
+        if (line < 0) { lineTops.push(top); line = lineTops.length - 1; }
+        return line;
+      });
+      words.forEach((word, index) => {
+        word.style.animation = `mobileLineReveal .55s ease-out ${wordLines[index] * 180}ms both`;
+      });
+    };
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries, currentObserver) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          currentObserver.unobserve(entry.target);
+          window.requestAnimationFrame(revealLines);
+        });
+      }, { threshold:.18 });
+      observer.observe(visibilityParagraph);
+    } else {
+      window.requestAnimationFrame(revealLines);
+    }
+  }
+
+  // Four homepage service cards: scroll progress drives diagonal entrance and the next-section panel rise.
+  const serviceSection = document.querySelector('#services.services-section');
+  const serviceGrid = serviceSection?.querySelector('.service-grid');
+  const serviceCards = serviceGrid ? Array.from(serviceGrid.querySelectorAll(':scope > .service-card')) : [];
+  const nextSection = document.querySelector('#skills');
+  if (!serviceSection || !serviceGrid || serviceCards.length !== 4 || !nextSection) return;
+
+  const clamp = (value) => Math.max(0, Math.min(1, value));
+  const documentTop = (element) => {
+    let top = 0;
+    let node = element;
+    while (node && node !== document.body && node !== document.documentElement) {
+      top += node.offsetTop || 0;
+      node = node.offsetParent;
+    }
+    return top;
+  };
+  let metrics = null;
+  let frame = 0;
+  let enabled = true;
+  const clearInlineMotion = () => {
+    serviceSection.style.removeProperty('transform');
+    serviceSection.style.removeProperty('transform-origin');
+    nextSection.style.removeProperty('transform');
+    serviceCards.forEach((card) => {
+      card.style.removeProperty('opacity');
+      card.style.removeProperty('transform');
+      card.style.removeProperty('box-shadow');
+    });
+    serviceSection.classList.remove('service-exit-motion-enabled');
+    nextSection.classList.remove('service-foreground-enabled');
+    enabled = false;
+  };
+  const measure = () => {
+    const vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight);
+    const travel = Math.max(vh * .38, 180);
+    const stagger = vh * .055;
+    const entries = serviceCards.map((card, index) => {
+      const start = documentTop(card) - vh * .82 + index * stagger;
+      return { card, index, start, end:start + travel };
+    });
+    const sectionTop = documentTop(serviceSection);
+    const sectionBottom = sectionTop + serviceSection.offsetHeight;
+    const lastEnd = Math.max(...entries.map((entry) => entry.end));
+    const exitDuration = Math.max(vh * .27, 160);
+    metrics = {
+      entries, vh, exitDuration,
+      exitStart:Math.max(sectionBottom - vh * .82, lastEnd + exitDuration + vh * .28)
+    };
+  };
+  const update = () => {
+    frame = 0;
+    if (!mobileQuery.matches || reduceQuery.matches) {
+      clearInlineMotion();
+      return;
+    }
+    if (!enabled) {
+      enabled = true;
+      serviceSection.classList.add('service-exit-motion-enabled');
+      nextSection.classList.add('service-foreground-enabled');
+      measure();
+    }
+    if (!metrics) measure();
+    const y = window.scrollY || window.pageYOffset || 0;
+    const side = Math.min(34, Math.max(18, window.innerWidth * .065));
+    metrics.entries.forEach(({card,index,start,end}) => {
+      const progress = clamp((y - start) / (end - start));
+      const approach = 1 - progress;
+      const direction = index % 2 === 0 ? -1 : 1;
+      const x = direction * side * approach;
+      const translateY = (30 + index * 3) * approach;
+      const z = -15 * approach;
+      const rotate = direction * 2.2 * approach;
+      const scale = .975 + .025 * progress;
+      card.style.opacity = String(.08 + .92 * progress);
+      if (progress < 1) {
+        card.style.transform = `perspective(1100px) translate3d(${x.toFixed(2)}px,${translateY.toFixed(2)}px,${z.toFixed(2)}px) rotateY(${rotate.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+        card.style.boxShadow = `0 ${(8 + progress * 9).toFixed(1)}px ${(22 + progress * 14).toFixed(1)}px rgba(0,0,0,${(.10 + progress * .08).toFixed(3)})`;
+      } else {
+        card.style.removeProperty('transform');
+        card.style.opacity = '1';
+        card.style.removeProperty('box-shadow');
+      }
+    });
+    const transitionStart = metrics.exitStart - metrics.exitDuration;
+    const progress = clamp((y - transitionStart) / metrics.exitDuration);
+    if (y >= transitionStart) {
+      serviceSection.style.transformOrigin = 'center bottom';
+      serviceSection.style.transform = `perspective(1100px) translate3d(0,${(-12 * progress).toFixed(2)}px,0) rotateX(${(3.2 * progress).toFixed(2)}deg) scale(${(1 - .032 * progress).toFixed(4)})`;
+      nextSection.style.transform = `translate3d(0,${(72 * (1 - progress)).toFixed(2)}px,0)`;
+    } else {
+      serviceSection.style.removeProperty('transform');
+      serviceSection.style.removeProperty('transform-origin');
+      nextSection.style.removeProperty('transform');
+    }
+  };
+  const schedule = () => {
+    if (!frame) frame = window.requestAnimationFrame(update);
+  };
+  const syncMotionPreference = () => {
+    if (!mobileQuery.matches || reduceQuery.matches) {
+      clearInlineMotion();
+      return;
+    }
+    enabled = true;
+    metrics = null;
+    schedule();
+  };
+  serviceSection.classList.add('service-exit-motion-enabled');
+  nextSection.classList.add('service-foreground-enabled');
+  measure();
+  schedule();
+  window.addEventListener('scroll', schedule, { passive:true });
+  window.addEventListener('resize', () => { metrics = null; schedule(); }, { passive:true });
+  if (mobileQuery.addEventListener) mobileQuery.addEventListener('change', syncMotionPreference);
+  else if (mobileQuery.addListener) mobileQuery.addListener(syncMotionPreference);
+  if (reduceQuery.addEventListener) reduceQuery.addEventListener('change', syncMotionPreference);
+  else if (reduceQuery.addListener) reduceQuery.addListener(syncMotionPreference);
 })();
