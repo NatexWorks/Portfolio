@@ -285,13 +285,11 @@
     const sectionTop = serviceDocumentTop(serviceMotionSection);
     const sectionBottom = sectionTop + serviceMotionSection.offsetHeight;
 
-    const exitDuration = Math.max(viewportHeight * 0.28, 180);
     serviceMotionMetrics = {
       entries,
       viewportHeight,
-      // Start the section transition only after the last card has completed its entrance.
-      exitStart: Math.max(sectionBottom - viewportHeight * 0.84, finalEntry.end + exitDuration),
-      exitDuration
+      exitStart: Math.max(sectionBottom - viewportHeight * 0.84, finalEntry.end),
+      exitDuration: Math.max(viewportHeight * 0.28, 180)
     };
   };
 
@@ -331,33 +329,47 @@
       const approach = 1 - progress;
       let x = 0;
       let y = 34 * approach;
-      let z = -18 * approach;
-      let scale = 0.98 + progress * 0.02;
+      let z = -44 * approach;
+      let rotateX = -4.5 * approach;
+      let rotateY = 0;
+      let rotateZ = 0;
+      let scale = 0.94 + progress * 0.06;
 
       if (entry.index === 1) {
         x = -sideDistance * approach;
         y = 38 * approach;
-        z = -16 * approach;
-        scale = 0.98 + progress * 0.02;
+        z = -36 * approach;
+        rotateX = -2.8 * approach;
+        rotateY = -8.5 * approach;
+        rotateZ = -2.4 * approach;
+        scale = 0.935 + progress * 0.065;
       } else if (entry.index === 2) {
         x = sideDistance * approach;
         y = 28 * approach;
-        z = -14 * approach;
-        scale = 0.982 + progress * 0.018;
+        z = -32 * approach;
+        rotateX = 2.2 * approach;
+        rotateY = 7.5 * approach;
+        rotateZ = 2.2 * approach;
+        scale = 0.945 + progress * 0.055;
       } else if (entry.index === 3) {
         x = -sideDistance * 0.62 * approach;
         y = 43 * approach;
-        z = -18 * approach;
-        scale = 0.978 + progress * 0.022;
+        z = -48 * approach;
+        rotateX = -4.2 * approach;
+        rotateY = -4.5 * approach;
+        rotateZ = 3.2 * approach;
+        scale = 0.925 + progress * 0.075;
       }
 
-      entry.card.style.opacity = String(Math.min(1, progress * 1.08));
+      entry.card.style.opacity = String(Math.min(1, progress * 1.12));
       if (progress < 1) {
         entry.card.style.transform =
-          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) scale(${scale.toFixed(4)})`;
-        const shadowY = 4 + progress * 5;
-        const shadowBlur = 10 + progress * 8;
-        const shadowAlpha = 0.06 + progress * 0.06;
+          `perspective(1200px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) ` +
+          `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ` +
+          `rotateZ(${rotateZ.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+        const shadowY = 5 + progress * 11;
+        const shadowBlur = 14 + progress * 18;
+        const shadowAlpha = 0.1 + progress * 0.12;
         entry.card.style.boxShadow =
           `0 ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, ${shadowAlpha.toFixed(3)})`;
       } else {
@@ -367,19 +379,18 @@
       }
     });
 
-    // Begin the panel rise just below the viewport, then finish the transition after
-    // every card has settled. This avoids a visible jump when the section boundary is crossed.
-    const exitTransitionStart = metrics.exitStart - metrics.exitDuration;
     const exitProgress = clampServiceProgress(
-      (scrollY - exitTransitionStart) / metrics.exitDuration
+      (scrollY - metrics.exitStart) / metrics.exitDuration
     );
-    if (scrollY >= exitTransitionStart) {
+    if (scrollY >= metrics.exitStart) {
       const translateY = -16 * exitProgress;
-      const scale = 1 - 0.025 * exitProgress;
+      const rotateX = 7.5 * exitProgress;
+      const scale = 1 - 0.045 * exitProgress;
       const panelRise = 76 * (1 - exitProgress);
       serviceMotionSection.style.transformOrigin = 'center bottom';
       serviceMotionSection.style.transform =
-        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+        `perspective(1200px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
+        `rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
       serviceMotionNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
     } else {
       serviceMotionSection.style.removeProperty('transform');
@@ -413,6 +424,7 @@
     }, { passive: true });
   }
 
+
   // Services page: scroll-linked entrance for Business websites, Custom web applications, and SEO.
   // This runs independently of the homepage stack; no rotations, only a restrained bottom/right settle.
   const servicesDetailList = document.querySelector('.service-detail-list');
@@ -420,7 +432,7 @@
     ? Array.from(servicesDetailList.querySelectorAll(':scope > .service-detail')).slice(0, 3)
     : [];
 
-  if (servicesDetailList && servicesDetailCards.length === 3 && !reducedMotion) {
+  if (servicesDetailList && servicesDetailCards.length === 3 && window.matchMedia('(min-width: 761px)').matches && !reducedMotion) {
     let servicesDetailFrame = 0;
     let servicesDetailMetrics = [];
     servicesDetailList.classList.add('services-scroll-motion-enabled');
@@ -475,6 +487,7 @@
   const servicesHeroTypingTarget = document.querySelector('[data-services-hero-typewriter]');
   if (
     servicesHeroTypingTarget &&
+    window.matchMedia('(min-width: 761px)').matches &&
     !reducedMotion &&
     'IntersectionObserver' in window
   ) {
@@ -594,179 +607,5 @@
     });
   }
 
-  {
-// Mobile-only scroll-progress service stack. The desktop/tablet layout is untouched.
-  const serviceStackMedia = window.matchMedia('(max-width: 760px)');
-  const serviceStackGrid = document.querySelector('#services .service-grid');
-  const serviceStackNext = document.querySelector('#skills');
-  let serviceStackCards = serviceStackGrid
-    ? Array.from(serviceStackGrid.querySelectorAll('.service-card'))
-    : [];
-  let serviceStackActive = false;
-  let serviceStackFrame = 0;
-  let serviceStackMetrics = null;
-
-  const clampServiceProgress = (value) => Math.max(0, Math.min(1, value));
-
-  const serviceDocumentTop = (element) => {
-    let top = 0;
-    let current = element;
-    while (current && current !== document.body && current !== document.documentElement) {
-      top += current.offsetTop || 0;
-      current = current.offsetParent;
-    }
-    return top;
-  };
-
-  const resetServiceStack = () => {
-    if (serviceStackFrame) {
-      window.cancelAnimationFrame(serviceStackFrame);
-      serviceStackFrame = 0;
-    }
-    if (!serviceStackActive) return;
-    serviceStackGrid.classList.remove('service-stack-enabled');
-    serviceStackNext.classList.remove('service-stack-foreground');
-    serviceStackGrid.style.removeProperty('transform');
-    serviceStackGrid.style.removeProperty('transform-origin');
-    serviceStackNext.style.removeProperty('transform');
-    serviceStackCards.forEach((card) => {
-      card.style.removeProperty('top');
-      card.style.removeProperty('z-index');
-      card.style.removeProperty('transform');
-    });
-    serviceStackActive = false;
-    serviceStackMetrics = null;
-  };
-
-  const measureServiceStack = () => {
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    const stackTop = Math.max(82, Math.min(108, viewportHeight * 0.13));
-    const gridTop = serviceDocumentTop(serviceStackGrid);
-    const gridStyles = window.getComputedStyle(serviceStackGrid);
-    const gridGap = parseFloat(gridStyles.rowGap || gridStyles.gap || '0') || 0;
-    const gridPaddingTop = parseFloat(gridStyles.paddingTop) || 0;
-    let cursor = gridTop + gridPaddingTop;
-    const entries = [];
-
-    serviceStackCards.forEach((card, index) => {
-      const height = card.offsetHeight || 300;
-      const stickyTop = stackTop + (serviceStackCards.length - index - 1) * 10;
-      entries.push({ card, index, staticTop: cursor, stickyTop, height });
-      cursor += height + (index < serviceStackCards.length - 1 ? gridGap : 0);
-    });
-
-    const finalCard = entries[entries.length - 1];
-    serviceStackMetrics = {
-      entries,
-      gridBottom: gridTop + serviceStackGrid.offsetHeight,
-      triggerY: finalCard.staticTop - finalCard.stickyTop,
-      exitDuration: Math.max(viewportHeight * 0.24, 140),
-      viewportHeight,
-      stackTop
-    };
-
-    serviceStackGrid.style.setProperty('--service-stack-top', `${stackTop}px`);
-    serviceStackGrid.style.transformOrigin = 'center top';
-    entries.forEach((entry) => {
-      entry.card.style.top = `${entry.stickyTop}px`;
-      entry.card.style.zIndex = String(entry.index + 1);
-    });
-  };
-
-  const activateServiceStack = () => {
-    if (
-      serviceStackActive ||
-      !serviceStackMedia.matches ||
-      reducedMotion ||
-      !serviceStackGrid ||
-      !serviceStackNext ||
-      serviceStackCards.length !== 4
-    ) return;
-
-    serviceStackCards.sort((a, b) => {
-      return Number.parseInt(window.getComputedStyle(a).order, 10) -
-        Number.parseInt(window.getComputedStyle(b).order, 10);
-    });
-    serviceStackGrid.classList.add('service-stack-enabled');
-    serviceStackNext.classList.add('service-stack-foreground');
-    serviceStackActive = true;
-    measureServiceStack();
-  };
-
-  const updateServiceStack = () => {
-    serviceStackFrame = 0;
-    if (!serviceStackMedia.matches || reducedMotion) {
-      resetServiceStack();
-      return;
-    }
-    activateServiceStack();
-    if (!serviceStackActive || !serviceStackMetrics) return;
-
-    const metrics = serviceStackMetrics;
-    const scrollY = window.scrollY || window.pageYOffset || 0;
-    const entranceDistance = Math.min(260, metrics.viewportHeight * 0.38);
-
-    metrics.entries.forEach((entry) => {
-      const naturalTop = entry.staticTop - scrollY;
-      const parentBottom = metrics.gridBottom - scrollY;
-      const constrainedTop = Math.min(
-        Math.max(naturalTop, entry.stickyTop),
-        parentBottom - entry.height
-      );
-      const entranceProgress = clampServiceProgress(
-        (entry.stickyTop + entranceDistance - constrainedTop) / entranceDistance
-      );
-      // The card stays horizontally centred: only a short vertical settle is used.
-      // Reverse sticky offsets place each newer card above the previous one by 10px.
-      const y = (1 - entranceProgress) * 18;
-      const scale = 0.992 + entranceProgress * 0.008;
-      entry.card.style.transform =
-        `perspective(1000px) translate3d(0, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
-    });
-
-    if (scrollY >= metrics.triggerY) {
-      const exitProgress = clampServiceProgress(
-        (scrollY - metrics.triggerY) / metrics.exitDuration
-      );
-      const translateY = -18 * exitProgress;
-      const rotateX = 9 * exitProgress;
-      const scale = 1 - 0.055 * exitProgress;
-      const panelRise = 84 * (1 - exitProgress);
-      serviceStackGrid.style.transform =
-        `perspective(1100px) translate3d(0, ${translateY.toFixed(2)}px, 0) ` +
-        `rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-      serviceStackNext.style.transform = `translate3d(0, ${panelRise.toFixed(2)}px, 0)`;
-    } else {
-      serviceStackGrid.style.removeProperty('transform');
-      serviceStackNext.style.removeProperty('transform');
-    }
-  };
-
-  const scheduleServiceStackUpdate = () => {
-    if (!serviceStackMedia.matches || reducedMotion) {
-      resetServiceStack();
-      return;
-    }
-    if (!serviceStackFrame) {
-      serviceStackFrame = window.requestAnimationFrame(updateServiceStack);
-    }
-  };
-
-  if (serviceStackGrid && serviceStackNext && serviceStackCards.length === 4) {
-    activateServiceStack();
-    scheduleServiceStackUpdate();
-    window.addEventListener('scroll', scheduleServiceStackUpdate, { passive: true });
-    window.addEventListener('resize', () => {
-      if (!serviceStackMedia.matches || reducedMotion) {
-        resetServiceStack();
-        return;
-      }
-      activateServiceStack();
-      if (serviceStackActive) measureServiceStack();
-      scheduleServiceStackUpdate();
-    }, { passive: true });
-  }
-
-  }
 
 })();
