@@ -344,8 +344,105 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
 }
 
 
+/* Mobile-only service-card stack: preserve the existing desktop/tablet grid. */
+@media (max-width: 760px) {
+  .service-foot {
+    max-width: 100%;
+    white-space: nowrap;
+    font-size: clamp(7px, 1.9vw, 8px);
+    letter-spacing: .025em;
+    word-spacing: .035em;
+    line-height: 1.4;
+  }
+
+  .service-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Mobile sequence: Business websites -> Custom build -> Responsive polish -> Local SEO. */
+  .service-card:nth-child(1) { order: 1; }
+  .service-card:nth-child(2) { order: 2; }
+  .service-card:nth-child(4) { order: 3; }
+  .service-card:nth-child(3) { order: 4; }
+
+  .service-grid.service-stack-enabled {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 0 55vh;
+    /* Retain the original thin frame around the collection, not a new box around every card. */
+    border: 1px solid #30372b;
+  }
+
+  .service-grid.service-stack-enabled .service-card {
+    position: sticky;
+    top: var(--service-stack-top, 92px);
+    height: 300px;
+    min-height: 300px;
+    margin: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: #171a16;
+    box-shadow: 0 12px 30px #0005;
+    transform-origin: center top;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .service-grid.service-stack-enabled .service-card:nth-child(n + 2) {
+    border-top: 1px solid #30372b;
+  }
+
+  .js-motion .service-grid.service-stack-enabled .service-card.reveal {
+    opacity: 1;
+  }
+
+  .service-stack-foreground {
+    position: relative;
+    z-index: 9;
+    border-top: 1px solid #39432f;
+    background: linear-gradient(180deg, #171c14 0%, #10120f 22%);
+    box-shadow: 0 -24px 58px #0008;
+    will-change: transform;
+  }
+
+  .js-motion .service-stack-foreground.reveal {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+  .service-grid.service-stack-enabled {
+    display: grid;
+    gap: 0;
+    padding-bottom: 0;
+  }
+
+  .service-grid.service-stack-enabled .service-card {
+    position: static;
+    top: auto;
+    height: auto;
+    min-height: 250px;
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .service-stack-foreground {
+    transform: none !important;
+    box-shadow: none;
+    will-change: auto;
+  }
+}
+
+
 /* Mobile-only spacing refinements requested for services, stack exit, MERN panel, and process. */
 @media (max-width:760px) {
+  #services .service-grid.service-stack-enabled {
+    padding-bottom: 6vh;
+  }
 
   /* Reduce the combined gap from Explore service details to the MERN section by about 40%. */
   #services.services-section { padding-bottom: 50px !important; }
@@ -372,6 +469,10 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
   #process .process-step { padding: 14px 0; }
 }
 
+
+@media (max-width:760px) and (prefers-reduced-motion:reduce) {
+  #services .service-grid.service-stack-enabled { padding-bottom: 0 !important; }
+}
 
 
 /* Mobile-only spacing adjustments: services CTA and problem statement to How I Work. */
@@ -957,4 +1058,10 @@ html.brand-intro-running .brand-dust-cloud{animation:brandDustBurst 1.1s .38s ea
   .process-film.is-playing .process-film-scene,
   .process-film.is-playing .process-film-progress > i { animation: none !important; }
   #process .process-list.has-focused-step .process-step.is-focused { scroll-behavior: auto; }
+}
+
+
+/* Keep the phone process layout consistent with the previous version. */
+@media (max-width: 760px) {
+  #process .process-film { display: none !important; }
 }
