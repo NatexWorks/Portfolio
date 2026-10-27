@@ -675,8 +675,14 @@
         span.className = 'mobile-reveal-word';
         if (hideFromAssistiveTech) span.setAttribute('aria-hidden', 'true');
         span.textContent = part;
-        span.style.display = inlineBlock ? 'inline-block' : 'inline';
+        // Inline-block keeps each word's transform animatable without changing its text.
+        // The explicit initial state makes the diagonal/line-rise keyframes visible.
+        span.style.display = 'inline-block';
+        span.style.verticalAlign = 'baseline';
         span.style.opacity = '0';
+        span.style.filter = 'blur(4px)';
+        const side = wrapped.length % 2 === 0 ? '-7px' : '7px';
+        span.style.transform = inlineBlock ? `translate3d(${side},7px,0)` : 'translateY(7px)';
         wrapped.push(span);
         fragment.appendChild(span);
       });
