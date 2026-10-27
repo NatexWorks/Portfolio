@@ -597,3 +597,19 @@
 
 
 })();
+/* Mobile-only menu scroll lock, process touch feedback and services text reveal. */
+(()=>{
+ const mq=window.matchMedia('(max-width:650px)'), reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const button=document.querySelector('.menu-toggle'),nav=document.querySelector('#primary-nav');let prior='';
+ if(button&&nav){
+  const sync=()=>{const open=nav.classList.contains('is-open');document.body.classList.toggle('mobile-menu-open',open&&mq.matches);if(open&&mq.matches&&document.body.style.overflow!=='hidden'){prior=document.body.style.overflow;document.body.style.overflow='hidden'}else if((!open||!mq.matches)&&document.body.style.overflow==='hidden'){document.body.style.overflow=prior}button.setAttribute('aria-expanded',String(open))};
+  new MutationObserver(sync).observe(nav,{attributes:true,attributeFilter:['class']});sync();mq.addEventListener?.('change',sync);
+ }
+ if(!mq.matches||reduce)return;
+ document.querySelectorAll('.process-film-scene').forEach(card=>{card.addEventListener('touchstart',()=>card.classList.add('mobile-touch-active'),{passive:true});['touchend','touchcancel'].forEach(t=>card.addEventListener(t,()=>card.classList.remove('mobile-touch-active'),{passive:true}))});
+ const words=el=>{if(!el||el.dataset.mobileWordReveal)return;const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),nodes=[];while(w.nextNode())nodes.push(w.currentNode);let i=0;nodes.forEach(node=>{if(!node.nodeValue.trim())return;const frag=document.createDocumentFragment();node.nodeValue.split(/(\\s+)/).forEach(part=>{if(!part)return;if(/^\\s+$/.test(part))frag.append(document.createTextNode(part));else{const s=document.createElement('span');s.setAttribute('aria-hidden','true');s.textContent=part;s.style.cssText='display:inline-block;opacity:0;filter:blur(4px);transform:translateY(7px);animation:mobileWordReveal .42s ease-out forwards;animation-delay:'+Math.min(i++*45,1400)+'ms';frag.append(s)}});node.replaceWith(frag)});el.dataset.mobileWordReveal='true'};
+ words(document.querySelector('.services-page-hero h1'));words(document.querySelector('[data-services-hero-typewriter]'));
+ const h=Array.from(document.querySelectorAll('.service-detail-list h2')).find(el=>el.textContent.includes('Visibility is a process'));
+ const p=h?.parentElement?.querySelector('p');
+ if(p&&'IntersectionObserver'in window){const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(!e.isIntersecting||p.dataset.mobileLineReveal)return;p.dataset.mobileLineReveal='true';p.style.opacity='1';p.animate([{opacity:0,transform:'translateY(10px)',filter:'blur(4px)'},{opacity:1,transform:'translateY(0)',filter:'blur(0)'}],{duration:650,easing:'ease-out',fill:'both'});io.disconnect()}),{threshold:.18});p.style.opacity='1';io.observe(p)}
+})();
