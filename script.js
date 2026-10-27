@@ -713,7 +713,8 @@
     }
   }
 
-  // Four homepage service cards: scroll progress drives diagonal entrance and the next-section panel rise.
+  // Homepage service cards: keep their natural appearance and let CSS sticky positioning stack them.
+  // Only the completed section and the next section move during the final handoff.
   const serviceSection = document.querySelector('#services.services-section');
   const serviceGrid = serviceSection?.querySelector('.service-grid');
   const serviceCards = serviceGrid ? Array.from(serviceGrid.querySelectorAll(':scope > .service-card')) : [];
@@ -732,7 +733,8 @@
   };
   let metrics = null;
   let frame = 0;
-  let enabled = true;
+  let enabled = false;
+
   const clearInlineMotion = () => {
     serviceSection.style.removeProperty('transform');
     serviceSection.style.removeProperty('transform-origin');
@@ -746,23 +748,18 @@
     nextSection.classList.remove('service-foreground-enabled');
     enabled = false;
   };
+
   const measure = () => {
     const vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight);
-    const travel = Math.max(vh * .38, 180);
-    const stagger = vh * .055;
-    const entries = serviceCards.map((card, index) => {
-      const start = documentTop(card) - vh * .82 + index * stagger;
-      return { card, index, start, end:start + travel };
-    });
-    const sectionTop = documentTop(serviceSection);
-    const sectionBottom = sectionTop + serviceSection.offsetHeight;
-    const lastEnd = Math.max(...entries.map((entry) => entry.end));
-    const exitDuration = Math.max(vh * .27, 160);
+    const sectionBottom = documentTop(serviceSection) + serviceSection.offsetHeight;
+    const exitDuration = Math.max(vh * 0.3, 170);
     metrics = {
-      entries, vh, exitDuration,
-      exitStart:Math.max(sectionBottom - vh * .82, lastEnd + exitDuration + vh * .28)
+      vh,
+      exitDuration,
+      exitStart: Math.max(sectionBottom - vh * 0.78, documentTop(serviceSection) + vh * 0.6)
     };
   };
+
   const update = () => {
     frame = 0;
     if (!mobileQuery.matches || reduceQuery.matches) {
@@ -776,42 +773,34 @@
       measure();
     }
     if (!metrics) measure();
-    const y = window.scrollY || window.pageYOffset || 0;
-    const side = Math.min(34, Math.max(18, window.innerWidth * .065));
-    metrics.entries.forEach(({card,index,start,end}) => {
-      const progress = clamp((y - start) / (end - start));
-      const approach = 1 - progress;
-      const direction = index % 2 === 0 ? -1 : 1;
-      const x = direction * side * approach;
-      const translateY = (30 + index * 3) * approach;
-      const z = -15 * approach;
-      const rotate = direction * 2.2 * approach;
-      const scale = .975 + .025 * progress;
-      card.style.opacity = String(.08 + .92 * progress);
-      if (progress < 1) {
-        card.style.transform = `perspective(1100px) translate3d(${x.toFixed(2)}px,${translateY.toFixed(2)}px,${z.toFixed(2)}px) rotateY(${rotate.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-        card.style.boxShadow = `0 ${(8 + progress * 9).toFixed(1)}px ${(22 + progress * 14).toFixed(1)}px rgba(0,0,0,${(.10 + progress * .08).toFixed(3)})`;
-      } else {
-        card.style.removeProperty('transform');
-        card.style.opacity = '1';
-        card.style.removeProperty('box-shadow');
-      }
+
+    // Cards stay fully visible and have no JavaScript-driven transform: no fade, no lateral drift.
+    serviceCards.forEach((card) => {
+      card.style.removeProperty('opacity');
+      card.style.removeProperty('transform');
+      card.style.removeProperty('box-shadow');
     });
-    const transitionStart = metrics.exitStart - metrics.exitDuration;
+
+    const y = window.scrollY || window.pageYOffset || 0;
+    const transitionStart = metrics.exitStart;
     const progress = clamp((y - transitionStart) / metrics.exitDuration);
+
     if (y >= transitionStart) {
       serviceSection.style.transformOrigin = 'center bottom';
-      serviceSection.style.transform = `perspective(1100px) translate3d(0,${(-12 * progress).toFixed(2)}px,0) rotateX(${(3.2 * progress).toFixed(2)}deg) scale(${(1 - .032 * progress).toFixed(4)})`;
-      nextSection.style.transform = `translate3d(0,${(72 * (1 - progress)).toFixed(2)}px,0)`;
+      serviceSection.style.transform =
+        `perspective(1100px) translate3d(0,${(-14 * progress).toFixed(2)}px,0) rotateX(${(4 * progress).toFixed(2)}deg) scale(${(1 - 0.035 * progress).toFixed(4)})`;
+      nextSection.style.transform = `translate3d(0,${(76 * (1 - progress)).toFixed(2)}px,0)`;
     } else {
       serviceSection.style.removeProperty('transform');
       serviceSection.style.removeProperty('transform-origin');
       nextSection.style.removeProperty('transform');
     }
   };
+
   const schedule = () => {
     if (!frame) frame = window.requestAnimationFrame(update);
   };
+
   const syncMotionPreference = () => {
     if (!mobileQuery.matches || reduceQuery.matches) {
       clearInlineMotion();
@@ -821,10 +810,13 @@
     metrics = null;
     schedule();
   };
-  serviceSection.classList.add('service-exit-motion-enabled');
-  nextSection.classList.add('service-foreground-enabled');
-  measure();
-  schedule();
+
+  if (mobileQuery.matches && !reduceQuery.matches) {
+    serviceSection.classList.add('service-exit-motion-enabled');
+    nextSection.classList.add('service-foreground-enabled');
+    measure();
+    schedule();
+  }
   window.addEventListener('scroll', schedule, { passive:true });
   window.addEventListener('resize', () => { metrics = null; schedule(); }, { passive:true });
   if (mobileQuery.addEventListener) mobileQuery.addEventListener('change', syncMotionPreference);
