@@ -55,6 +55,7 @@
   .process-film-foot span:last-child { display: none !important; }
 
   .services-page-hero h1 .mobile-reveal-word,
+  .services-page-hero > p .mobile-reveal-word,
   .service-principle [data-mobile-word-reveal] .mobile-reveal-word {
     display: inline-block;
     opacity: 0;
@@ -62,6 +63,11 @@
     transform: translate3d(0, 10px, 0);
     animation: mobile-word-clear .62s cubic-bezier(.2,.7,.2,1) forwards;
     animation-delay: var(--word-delay, 0ms);
+  }
+
+  .services-page-hero > p .mobile-reveal-word,
+  .service-principle p .mobile-reveal-word {
+    animation-duration: 1.8s;
   }
 
   .service-principle .visibility-underline {
@@ -97,6 +103,7 @@
 @media (prefers-reduced-motion: reduce) {
   .about-word-heading .headline-muted::after { animation: none !important; transform: none; }
   .services-page-hero h1 .mobile-reveal-word,
+  .services-page-hero > p .mobile-reveal-word,
   .service-principle [data-mobile-word-reveal] .mobile-reveal-word {
     opacity: 1 !important;
     filter: none !important;
